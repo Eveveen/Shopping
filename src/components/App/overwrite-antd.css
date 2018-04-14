@@ -1,0 +1,200 @@
+/*.ant-menu-horizontal > .ant-menu-item, .ant-menu-horizontal > .ant-menu-submenu{
+  position: relative;
+  top: 1px;
+  float: left;
+  border-bottom: 4px solid transparent;
+}
+.ant-menu-horizontal > .ant-menu-item:hover, .ant-menu-horizontal > .ant-menu-submenu:hover, .ant-menu-horizontal > .ant-menu-item-active, .ant-menu-horizontal > .ant-menu-submenu-active, .ant-menu-horizontal > .ant-menu-item-open, .ant-menu-horizontal > .ant-menu-submenu-open, .ant-menu-horizontal > .ant-menu-item-selected, .ant-menu-horizontal > .ant-menu-submenu-selected{
+  border-bottom: 4px solid #70C262;
+  color: #70C262;
+}
+.ant-menu-horizontal > .ant-menu-item, .ant-menu-horizontal > .ant-menu-submenu{
+  font-size: 12px;
+}
+.ant-menu-horizontal{
+  border: 0;
+  border-bottom: 1px solid #e8e8e8;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  line-height: 20px;
+}
+
+.ant-tabs-nav .ant-tabs-tab:hover{
+  color: #53AE43;
+}
+.ant-tabs-tab-active.ant-tabs-tab{
+  color: #53AE43;
+}
+.ant-tabs-ink-bar{
+  background-color: #70c262;
+}
+
+.ant-btn.ant-btn-primary {
+  background-color: #70C262;
+  border-color: #70C262;
+  color: #fff;
+}
+
+.ant-btn:hover, .ant-btn:focus{
+  color: #53AE43;
+  border-color: #53AE43;
+}
+.ant-btn-primary {
+  color: #fff;
+  background-color: #70C262;
+  border-color: #70C262;
+}
+.ant-btn-primary:hover, .ant-btn-primary:focus {
+  color: #fff;
+  background-color: #53AE43;
+  border-color: #53AE43;
+}
+.ant-checkbox-checked .ant-checkbox-inner, .ant-checkbox-indeterminate .ant-checkbox-inner {
+  background-color: #70C262;
+  border-color: #70C262;
+  border-top-color: #70C262;
+  border-right-color: #70C262;
+  border-bottom-color: #70C262;
+  border-left-color: #70C262;
+}
+.ant-checkbox-wrapper:hover .ant-checkbox-inner, .ant-checkbox:hover .ant-checkbox-inner, .ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: #70C262;
+}
+.ant-transfer-list-content-item:not(.ant-transfer-list-content-item-disabled):hover {
+  cursor: pointer;
+  background-color: #C9E4C5;
+}
+@-webkit-keyframes transferHighlightIn {
+  0% {
+    background: #C9E4C5;
+  }
+  100% {
+    background: transparent;
+  }
+}
+@keyframes transferHighlightIn {
+  0% {
+    background: #C9E4C5;
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.ant-btn.ant-btn-primary:hover, .ant-btn.ant-btn-primary:focus {
+  background-color: #53ae43;
+  border-color: #53ae43;
+  color: #fff;
+}
+
+.ant-btn-primary.ant-btn-clicked:after {
+  border-color: #70C262;
+}
+
+.ant-btn {
+  min-width: 75px;
+  color: #70c262;
+  border-color: #70c262;
+  font-size: 12px;
+}
+
+.ant-btn:active, .ant-btn:focus {
+  color: #70c262;
+  border-color: #70c262;
+}
+
+.ant-btn:hover, .ant-btn:focus {
+  color: #70c262;
+  border-color: #70c262;
+  background-color: #DAEAD3;
+}
+
+.ant-btn-clicked:after {
+  border-color: #70c262;
+}
+
+.ant-btn.ant-btn-danger {
+  background-color: #f5222d;
+  border-color: #f5222d;
+  color: #fff;
+}
+
+.ant-btn.ant-btn-danger:hover, .ant-btn.ant-btn-danger:focus {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.ant-btn-danger.ant-btn-clicked:after {
+  border-color: #f5222d;
+}
+
+.ant-input:hover {
+  border-color: #70c262;
+}
+
+.ant-input:focus {
+  border-color: #70c262;
+  box-shadow: 0 0 0 2px rgba(82, 172, 67, 0.2);
+}
+
+.ant-select-selection:hover {
+  border-color: #70c262;
+}
+
+.ant-select-selection:focus {
+  border-color: #70c262;
+  box-shadow: 0 0 0 2px rgba(82, 172, 67, 0.2);
+}
+
+.ant-select-selection:active {
+  border-color: #70c262;
+}
+
+.ant-select-open .ant-select-selection {
+  border-color: #70c262;
+  box-shadow: 0 0 0 2px rgba(82, 172, 67, 0.2);
+}
+
+.ant-select-dropdown-menu-item-active {
+  background-color: #DAEAD3;
+}
+
+.ant-select-dropdown-menu-item-active:hover {
+  background-color: #DAEAD3;
+}
+
+.ant-form-item {
+  margin-bottom: 8px;
+}
+
+.ant-form-item .ant-btn {
+  margin-right: 8px;
+}
+
+.ant-select-focused .ant-select-selection, .ant-select-selection:focus, .ant-select-selection:active {
+  border-color: #70c262;
+  outline: 0;
+  -webkit-box-shadow: 0 0 0 2px #C9E4C5;
+  box-shadow: 0 0 0 2px #C9E4C5;
+}
+.ant-select-selection:hover {
+  border-color: #70c262;
+}
+.ant-upload.ant-upload-select-picture-card:hover {
+  border-color: #70c262;
+}
+.ant-checkbox-wrapper + .ant-checkbox-wrapper {
+  margin-left: 0px;
+  margin-right: 8px;
+}
+
+.ant-upload-select-picture-card {
+  position: relative;
+}
+
+.ant-upload-select-picture-card .anticon-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px;
+}*/

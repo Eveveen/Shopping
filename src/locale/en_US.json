@@ -1,0 +1,23 @@
+{
+    "numberFormat": "{num, plural, other {#}}",
+
+    "username": "User Name",
+    "usernameNotnull": "User Name can't be null",
+    "usernameLength": "User Name can't be more than 20 characters!",
+    "password": "Password",
+    "passwordNotnull": "Password can't be null",
+    "passwordLength": "Password can't be more than 20 characters!",
+    "repassword": "Confirm Password",
+    "repasswordNotnull": "Confirm Password can't be null",
+    "repasswordLength": "Confirm Password can't be more than 20 characters!",
+    "login": "Login",
+    "telphone": "telphone",
+    "telphoneNotnull": "Telphone can't be null",
+    "telphoneLength": "Telphone can't be more than 20 characters!",
+    "validateCode": "Velidate Code",
+    "validateCodeNotnull": "Velidate Code can't be null",
+    "loginName": "Login Name",
+    "loginNameNotnull": "Login Name can't be null",
+    "loginNameLength": "Login Name can't be more than 20 characters!" 
+
+}
