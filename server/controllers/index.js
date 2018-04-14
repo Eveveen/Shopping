@@ -18,9 +18,9 @@ router.post("/getCode", function (req, res) {
     //num.substring(0,s.indexOf(".")+3);
     var code2 = `` + code.toString().slice(0,4) + ``;
     var sendData = {
-        PhoneNumbers: '18206295937',
-        SignName: '孙梦娟',
-        TemplateCode: 'SMS_130840278',
+        PhoneNumbers: 'xxxx',
+        SignName: 'xxx',
+        TemplateCode: 'xxx',
         TemplateParam: '{"code":' + '"' + code2 + '"' + '}'
     }
     console.log(code2);
@@ -44,7 +44,6 @@ var utl = require('../../assets/lib/utl');
 var outTradeId = Date.now().toString();
 
 var ali = new Alipay({
-    appId: '2017060207410259',
     notifyUrl: 'http://127.0.0.1:3000/',
     rsaPrivate: path.resolve('assets/pem/alipay_private_key_nonjava.pem'),
     rsaPublic: path.resolve('assets/pem/alipay_public_key_nonjava.pem'),
