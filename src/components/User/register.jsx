@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Select, Upload, Modal, message, Icon, Form, Steps,Checkbox  } from 'antd';
+import { Button, Input, Select, Upload, Modal, message, Icon, Form, Steps, Checkbox } from 'antd';
 import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/main.sass';
@@ -19,8 +19,6 @@ const formItemLayout = {
     },
 };
 
-
-
 class Register extends Component {
     state = {
         submitLoading: false,
@@ -33,7 +31,7 @@ class Register extends Component {
 
     next = () => {
         const current = this.state.current + 1;
-        console.log("current",current)
+        console.log("current", current)
         this.setState({ current });
     }
 
@@ -45,36 +43,36 @@ class Register extends Component {
     getCode = () => {
         // 发送短信验证码
         axios.post(SERVICE_URL + "/getCode")
-        .then(response => {
-            console.log("aaaa",response.data);
-            // const resData = response.data;
-            // if (!resData.error) {
-            //     this.props.handleShowList();
-            //     this.props.handleCancel();
-            // } else {
-            //     message.error(messageText(resData.error.code, intl.get("createApplicationFailed")));
-            // }
-            // this.setState({ iconImg: "", iconId: "", submitLoading: false });
-        }).catch(error => {
-            console.log(error);
-            // message.error(intl.get("createApplicationFailed"));
-            // this.setState({ iconImg: "", iconId: "", submitLoading: false });
-        });
+            .then(response => {
+                console.log("aaaa", response.data);
+                // const resData = response.data;
+                // if (!resData.error) {
+                //     this.props.handleShowList();
+                //     this.props.handleCancel();
+                // } else {
+                //     message.error(messageText(resData.error.code, intl.get("createApplicationFailed")));
+                // }
+                // this.setState({ iconImg: "", iconId: "", submitLoading: false });
+            }).catch(error => {
+                console.log(error);
+                // message.error(intl.get("createApplicationFailed"));
+                // this.setState({ iconImg: "", iconId: "", submitLoading: false });
+            });
     }
 
     handleNextStep = (e) => {
         e.preventDefault();
         // 支付宝调用失败
         axios.get(SERVICE_URL + "/pay")
-        .then(response => {
-            console.log("aaaa",response.data);
-        }).catch(error => {
-            console.log(error);
-        });
+            .then(response => {
+                console.log("aaaa", response.data);
+            }).catch(error => {
+                console.log(error);
+            });
         this.props.form.validateFieldsAndScroll((err, data) => {
             if (!err) {
                 this.setState({ submitLoading: false });
-                console.log("hhhel  ",err)
+                console.log("hhhel  ", err)
                 this.next()
             }
         });
@@ -83,59 +81,59 @@ class Register extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-        if (!err) {
-            console.log('Received values of form: ', values);
-            this.next();
-        }
+            if (!err) {
+                console.log('Received values of form: ', values);
+                this.next();
+            }
         });
     }
 
     render() {
         const { current } = this.state;
-        console.log("current,",current)
+        console.log("current,", current)
         const steps = [{
             title: 'First',
             content: this.renderFirstStep(),
-          }, {
+        }, {
             title: 'Second',
             // content: this.renderSecondStep(),
             content: current == 1 ? this.renderSecondStep() : null,
-          }, {
+        }, {
             title: 'Last',
             content: 'Last-content',
-          }];
+        }];
         return (
-          <div>
-            <div className="step-content">
-                <Steps current={current}>
-                    {steps.map(item => <Step key={item.title} title={item.title} />)}
-                </Steps>
-            </div>
-            <div className="steps-content">{steps[this.state.current].content}</div>
-            <div className="steps-action">
-              {
-                this.state.current < steps.length - 1
-                &&
-                <Button type="primary" onClick={() => this.next()}>Next</Button>
-              }
-              {
-                this.state.current === steps.length - 1
-                &&
-                <Button type="primary" onClick={() => message.success('Processing complete!')}>Done</Button>
-              }
-              {
-                this.state.current > 0
-                &&
-                <Button style={{ marginLeft: 8 }} onClick={() => this.prev()}>
-                  Previous
+            <div>
+                <div className="step-content">
+                    <Steps current={current}>
+                        {steps.map(item => <Step key={item.title} title={item.title} />)}
+                    </Steps>
+                </div>
+                <div className="steps-content">{steps[this.state.current].content}</div>
+                <div className="steps-action">
+                    {
+                        this.state.current < steps.length - 1
+                        &&
+                        <Button type="primary" onClick={() => this.next()}>Next</Button>
+                    }
+                    {
+                        this.state.current === steps.length - 1
+                        &&
+                        <Button type="primary" onClick={() => message.success('Processing complete!')}>Done</Button>
+                    }
+                    {
+                        this.state.current > 0
+                        &&
+                        <Button style={{ marginLeft: 8 }} onClick={() => this.prev()}>
+                            Previous
                 </Button>
-              }
+                    }
+                </div>
             </div>
-          </div>
         );
     }
 
-    renderLogin(){
+    renderLogin() {
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
@@ -160,13 +158,13 @@ class Register extends Component {
                     </FormItem>
                     <FormItem>
                         <div className="register-forget">
-                        {getFieldDecorator('remember', {
-                            valuePropName: 'checked',
-                            initialValue: true,
-                        })(
-                            <Checkbox>Remember me</Checkbox>
-                        )}
-                        <a className="login-form-forgot" href="">Forgot password</a>
+                            {getFieldDecorator('remember', {
+                                valuePropName: 'checked',
+                                initialValue: true,
+                            })(
+                                <Checkbox>Remember me</Checkbox>
+                            )}
+                            <a className="login-form-forgot" href="">Forgot password</a>
                         </div>
                         <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSubmit}>
                             Log in
@@ -176,13 +174,13 @@ class Register extends Component {
                 </Form>
             </div>
         );
-        
+
     }
 
     renderFirstStep() {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading } = this.state;
-        return(
+        return (
             <div className="first-step">
                 <Form onSubmit={this.handleSubmit}>
                     <FormItem
@@ -198,7 +196,7 @@ class Register extends Component {
                             }],
                         })(
                             <Input placeholder={intl.get("telphone")} disabled={submitLoading} />
-                            )}
+                        )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
@@ -211,10 +209,10 @@ class Register extends Component {
                             }],
                         })(
                             <div>
-                            <Input placeholder={intl.get("validateCode")} disabled={submitLoading} />
-                            <Button type="primary" onClick={this.getCode} loading={submitLoading}>点击获取验证码</Button>
+                                <Input placeholder={intl.get("validateCode")} disabled={submitLoading} />
+                                <Button type="primary" onClick={this.getCode} loading={submitLoading}>点击获取验证码</Button>
                             </div>
-                            )}
+                        )}
                     </FormItem>
                     <FormItem>
                         <div className="footer-btn">
@@ -229,7 +227,7 @@ class Register extends Component {
     renderSecondStep() {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading } = this.state;
-        return(
+        return (
             <div>
                 <Form onSubmit={this.handleSubmit2}>
                     <FormItem
@@ -245,7 +243,7 @@ class Register extends Component {
                             }],
                         })(
                             <Input placeholder={intl.get("loginName")} disabled={submitLoading} />
-                            )}
+                        )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
@@ -260,7 +258,7 @@ class Register extends Component {
                             }],
                         })(
                             <Input placeholder={intl.get("password")} disabled={submitLoading} />
-                            )}
+                        )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
@@ -275,7 +273,7 @@ class Register extends Component {
                             }],
                         })(
                             <Input placeholder={intl.get("repassword")} disabled={submitLoading} />
-                            )}
+                        )}
                     </FormItem>
                     <FormItem>
                         <Button type="primary" onClick={this.next} loading={submitLoading}>{intl.get("login")}</Button>
@@ -284,7 +282,7 @@ class Register extends Component {
             </div>
         );
     }
-    
+
 }
 
 export default Form.create()(Register);
