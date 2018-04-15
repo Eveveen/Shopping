@@ -1,14 +1,133 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Header from './header';
+import HeaderTop from './headerTop';
 import Account from './account';
+import { Layout, Menu, Icon, Carousel, AutoComplete, Input, Button } from 'antd';
+const { Header, Footer, Sider, Content } = Layout;
+const SubMenu = Menu.SubMenu;
+const MenuItemGroup = Menu.ItemGroup;
+import './Style/homePage.sass';
+import CartPage from './cartPage';
+
 
 class HomePage extends Component {
+    state = {
+        pageStatus: "homePage"
+    }
+
+    handlePageStatus = (e) => {
+        this.setState({ pageStatus: e.key })
+    }
+
     render() {
+        const { pageStatus } = this.state;
+        console.log(pageStatus);
         return (
             <div>
-                <Header />
-                <Account />
+                <HeaderTop
+                    pageStatus={pageStatus}
+                    handleChangePageStatus={this.handlePageStatus}
+                />
+                {/* <Account /> */}
+                {pageStatus == "homePage" ? this.renderHomePage() :
+                    pageStatus == "cart" ? <CartPage /> :
+                        pageStatus == "accountSetting" ? <Account /> : null}
+            </div>
+        )
+    }
+
+    renderHomePage() {
+        return (
+            <div className="home-page">
+                <Layout>
+                    <Header>{this.renderHeader()}</Header>
+                    <Layout>
+                        <Sider> {this.renderLeftMenu()}</Sider>
+                        <Content>{this.renderContent()}</Content>
+                    </Layout>
+                    <Footer>Footer</Footer>
+                </Layout>
+            </div>
+        )
+    }
+
+    renderHeader() {
+        const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
+        return (
+            <div className="global-search-wrapper">
+                <AutoComplete
+                    style={{ width: 200 }}
+                    dataSource={dataSource}
+                    placeholder="try to type `b`"
+                    className="global-search"
+                    filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                >
+                    <Input
+                        suffix={(
+                            <Button className="search-btn" type="primary">
+                                <Icon type="search" />
+                            </Button>
+                        )}
+                    />
+                </AutoComplete>
+            </div>
+        )
+    }
+
+    renderLeftMenu() {
+        return (
+            <div className="home-left-menu">
+                <Menu>
+                    <SubMenu key="sub4" title={<span><Icon type="setting" /><span>Navigation four&nbsp;&nbsp;</span></span>}>
+                        <Menu.Item key="9">Option 9</Menu.Item>
+                        <Menu.Item key="10">Option 10</Menu.Item>
+                        <Menu.Item key="11">Option 11</Menu.Item>
+                        <Menu.Item key="12">Option 12</Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="sub3" title={<span><Icon type="setting" /><span>Navigation two</span></span>}>
+                        <Menu.Item key="9">Option 9</Menu.Item>
+                        <Menu.Item key="10">Option 10</Menu.Item>
+                        <Menu.Item key="11">Option 11</Menu.Item>
+                        <Menu.Item key="12">Option 12</Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="sub2" title={<span><Icon type="setting" /><span>Navigation one</span></span>}>
+                        <Menu.Item key="9">Option 9</Menu.Item>
+                        <Menu.Item key="10">Option 10</Menu.Item>
+                        <Menu.Item key="11">Option 11</Menu.Item>
+                        <Menu.Item key="12">Option 12</Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="sub1" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
+                        <Menu.Item key="9">Option 9</Menu.Item>
+                        <Menu.Item key="10">Option 10</Menu.Item>
+                        <Menu.Item key="11">Option 11</Menu.Item>
+                        <Menu.Item key="12">Option 12</Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="sub0" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
+                        <Menu.Item key="9">Option 9</Menu.Item>
+                        <Menu.Item key="10">Option 10</Menu.Item>
+                        <Menu.Item key="11">Option 11</Menu.Item>
+                        <Menu.Item key="12">Option 12</Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="sub11" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
+                        <Menu.Item key="9">Option 9</Menu.Item>
+                        <Menu.Item key="10">Option 10</Menu.Item>
+                        <Menu.Item key="11">Option 11</Menu.Item>
+                        <Menu.Item key="12">Option 12</Menu.Item>
+                    </SubMenu>
+                </Menu>
+            </div>
+        )
+    }
+
+    renderContent() {
+        return (
+            <div className="home-page-content">
+                <Carousel autoplay>
+                    <div><h3>1</h3></div>
+                    <div><h3>2</h3></div>
+                    <div><h3>3</h3></div>
+                    <div><h3>4</h3></div>
+                </Carousel>
             </div>
         )
     }

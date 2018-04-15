@@ -3,10 +3,9 @@ import axios from 'axios';
 import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
-import './Style/account.sass';
+import './Style/editAddress.sass';
 const FormItem = Form.Item;
 import intl from 'react-intl-universal';
-import AddAddress from './addAddress';
 
 const formItemLayout = {
     labelCol: {
@@ -47,7 +46,6 @@ class EditAddress extends Component {
     state = {
         manageStatus: 1,
         submitLoading: false,
-        showAddAddress: false
     }
 
     handleSavePersonInfo = (e) => {
@@ -62,7 +60,7 @@ class EditAddress extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
-        const { submitLoading, showAddAddress } = this.state;
+        const { submitLoading } = this.state;
         const prefixSelector = getFieldDecorator('prefix', {
             initialValue: '86',
         })(
@@ -72,7 +70,7 @@ class EditAddress extends Component {
             </Select>
         );
         return (
-            <div className="personal-info">
+            <div className="edit-address">
                 <Form onSubmit={this.handleSavePersonInfo} className="personal-info-form">
                     <FormItem
                         {...formItemLayout}
@@ -150,23 +148,21 @@ class EditAddress extends Component {
                             <Cascader options={residences} />
                         )}
                     </FormItem>
-                    <FormItem>
-                        {getFieldDecorator('remember', {
-                            valuePropName: 'checked',
-                            initialValue: true,
-                        })(
-                            <Checkbox>设为默认地址</Checkbox>
-                        )}
-                        <div>
+                    <div className="footer-checkbox">
+                        <FormItem>
+                            {getFieldDecorator('remember', {
+                                valuePropName: 'checked',
+                                initialValue: true,
+                            })(
+                                <Checkbox>设为默认地址</Checkbox>
+                            )}
+
                             <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
                                 保存
                             </Button>
-                        </div>
-                    </FormItem>
+                        </FormItem>
+                    </div>
                 </Form>
-                <AddAddress
-                    visible={showAddAddress}
-                    handleCancel={() => { this.setState({ showAddAddress: false }) }} />
             </div>
         )
     }
