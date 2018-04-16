@@ -8,6 +8,7 @@ const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/homePage.sass';
 import CartPage from './cartPage';
+import Collect from './collect';
 
 
 class HomePage extends Component {
@@ -31,7 +32,8 @@ class HomePage extends Component {
                 {/* <Account /> */}
                 {pageStatus == "homePage" ? this.renderHomePage() :
                     pageStatus == "cart" ? <CartPage /> :
-                        pageStatus == "accountSetting" ? <Account /> : null}
+                        pageStatus == "accountSetting" ? <Account /> :
+                            pageStatus == "collectTreasure" || "collectShop" ? <Collect pageStatus={pageStatus} /> : null}
             </div>
         )
     }
