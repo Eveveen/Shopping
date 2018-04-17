@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/collect.sass';
+import './Style/main.sass';
 import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar } from 'antd';
 const { Meta } = Card;
 const { Header, Footer, Sider, Content } = Layout;

@@ -39,7 +39,7 @@ class HeaderTop extends Component {
                         <Menu.Item key="collectTreasure">收藏的宝贝</Menu.Item>
                         <Menu.Item key="collectShop">收藏的店铺</Menu.Item>
                     </SubMenu>
-                    <Menu.Item key="catagory">
+                    <Menu.Item key="category">
                         <Icon type="appstore" />商品分类
                     </Menu.Item>
                     <SubMenu title={<span><Icon type="setting" />买家中心</span>}>

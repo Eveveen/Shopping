@@ -7,8 +7,11 @@ const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/homePage.sass';
+import './Style/main.sass';
 import CartPage from './cartPage';
 import Collect from './collect';
+import Category from './category';
+import DetailInfo from './detailInfo';
 
 
 class HomePage extends Component {
@@ -33,7 +36,8 @@ class HomePage extends Component {
                 {pageStatus == "homePage" ? this.renderHomePage() :
                     pageStatus == "cart" ? <CartPage /> :
                         pageStatus == "accountSetting" ? <Account /> :
-                            pageStatus == "collectTreasure" || "collectShop" ? <Collect pageStatus={pageStatus} /> : null}
+                            pageStatus == "collectTreasure" || pageStatus == "collectShop" ? <Collect pageStatus={pageStatus} /> :
+                                pageStatus == "category" ? <Category /> : null}
             </div>
         )
     }
@@ -44,8 +48,9 @@ class HomePage extends Component {
                 <Layout>
                     <Header>{this.renderHeader()}</Header>
                     <Layout>
-                        <Sider> {this.renderLeftMenu()}</Sider>
-                        <Content>{this.renderContent()}</Content>
+                        {/* <Sider> {this.renderLeftMenu()}</Sider> */}
+                        {/* <Content>{this.renderContent()}</Content> */}
+                        <Content><DetailInfo /></Content>
                     </Layout>
                     <Footer>Footer</Footer>
                 </Layout>
