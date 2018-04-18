@@ -23,6 +23,10 @@ class HomePage extends Component {
         this.setState({ pageStatus: e.key })
     }
 
+    handleShowDetail = () => {
+        this.setState({ pageStatus: "detailInfo" })
+    }
+
     render() {
         const { pageStatus } = this.state;
         console.log(pageStatus);
@@ -33,7 +37,7 @@ class HomePage extends Component {
                     handleChangePageStatus={this.handlePageStatus}
                 />
                 {/* <Account /> */}
-                {pageStatus == "homePage" ? this.renderHomePage() :
+                {pageStatus == "homePage" || pageStatus == "detailInfo" ? this.renderHomePage() :
                     pageStatus == "cart" ? <CartPage /> :
                         pageStatus == "accountSetting" ? <Account /> :
                             pageStatus == "collectTreasure" || pageStatus == "collectShop" ? <Collect pageStatus={pageStatus} /> :
@@ -43,14 +47,17 @@ class HomePage extends Component {
     }
 
     renderHomePage() {
+        console.log("===");
+        const { pageStatus } = this.state;
         return (
             <div className="home-page">
                 <Layout>
                     <Header>{this.renderHeader()}</Header>
                     <Layout>
-                        {/* <Sider> {this.renderLeftMenu()}</Sider> */}
-                        {/* <Content>{this.renderContent()}</Content> */}
-                        <Content><DetailInfo /></Content>
+                        {pageStatus == "homePage" ? <Sider> {this.renderLeftMenu()}</Sider> : null}
+                        {pageStatus == "homePage" ? <Content>{this.renderContent()}</Content> : null}
+                        {pageStatus == "detailInfo" ? <Content><DetailInfo /></Content> : null}
+                        {/* <Content><DetailInfo /></Content> */}
                     </Layout>
                     <Footer>Footer</Footer>
                 </Layout>
@@ -130,7 +137,7 @@ class HomePage extends Component {
         return (
             <div className="home-page-content">
                 <Carousel autoplay>
-                    <div><h3>1</h3></div>
+                    <div onClick={this.handleShowDetail}><h3>1</h3></div>
                     <div><h3>2</h3></div>
                     <div><h3>3</h3></div>
                     <div><h3>4</h3></div>
