@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import HeaderTop from './headerTop';
 import Account from './account';
 import { Layout, Menu, Icon, Carousel, AutoComplete, Input, Button } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
@@ -12,6 +11,7 @@ import CartPage from './cartPage';
 import Collect from './collect';
 import Category from './category';
 import DetailInfo from './detailInfo';
+import OrderItem from './orderItem';
 
 
 class HomePage extends Component {
@@ -32,16 +32,13 @@ class HomePage extends Component {
         console.log(pageStatus);
         return (
             <div>
-                <HeaderTop
-                    pageStatus={pageStatus}
-                    handleChangePageStatus={this.handlePageStatus}
-                />
                 {/* <Account /> */}
                 {pageStatus == "homePage" || pageStatus == "detailInfo" ? this.renderHomePage() :
                     pageStatus == "cart" ? <CartPage /> :
                         pageStatus == "accountSetting" ? <Account /> :
                             pageStatus == "collectTreasure" || pageStatus == "collectShop" ? <Collect pageStatus={pageStatus} /> :
-                                pageStatus == "category" ? <Category /> : null}
+                                pageStatus == "category" ? <Category /> :
+                                    pageStatus == "order" ? <OrderItem /> : null}
             </div>
         )
     }
