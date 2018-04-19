@@ -7,6 +7,8 @@ import './Style/main.sass';
 import './Style/detailInfo.sass';
 const { Meta } = Card;
 const TabPane = Tabs.TabPane;
+import { Link, browserHistory } from 'react-router';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class DetailInfo extends Component {
     state = {
@@ -34,6 +36,10 @@ class DetailInfo extends Component {
 
     callback = (key) => {
         console.log(key);
+    }
+
+    handleBuyNow = () => {
+        browserHistory.push(BASE_URL + "/buy");
     }
 
     render() {
@@ -78,7 +84,7 @@ class DetailInfo extends Component {
                         </div>
                         <div className="text-detail">
                             <div className="left-btn">
-                                <Button onClick={this.decreaseCount}>立即购买</Button>
+                                <Button onClick={this.handleBuyNow}>立即购买</Button>
                             </div>
                             <div className="right-btn">
                                 <Button onClick={this.decreaseCount}>加入购物车</Button>
@@ -92,14 +98,14 @@ class DetailInfo extends Component {
                             <div className="detailed-header">商品基本信息</div>
                         </TabPane>
                         <TabPane tab="累计评论" key="2">
-                            <div className="comment">
+                            <div className="remark">
                                 <div className="user-info">
                                     <Avatar shape="square" size="large" icon="user" />
                                     <div className="user-name">匿名</div>
                                 </div>
-                                <div className="comment-info">
-                                    <div className="comment-text">好评</div>
-                                    <div className="comment-time">2018年04月17日 09:52</div>
+                                <div className="remark-info">
+                                    <div className="remark-text">好评</div>
+                                    <div className="remark-time">2018年04月17日 09:52</div>
                                 </div>
                             </div>
                         </TabPane>
