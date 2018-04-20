@@ -1,5 +1,5 @@
 .buy-item
-    margin: 0 5%
+    margin: 0 13%
     .card
         .card-title
             display: flex
@@ -17,11 +17,45 @@
                 flex: 2
             .item-price
                 flex: 1
+                margin-left: 20px
             .item-count
                 flex: 1
+                display: flex
+                .ant-btn
+                    height: 30px
+                    max-width: 30px
+                    padding-left: 10px
+                .ant-input
+                    height: 30px
             .item-total-price
                 flex: 1
+                padding-left: 50px
             .item-status
                 flex: 1
-            .item-remark
-                flex: 1
+                margin-left: 20px
+    .summary-text
+        display: flex
+        flex-direction: column
+        float: right
+        .real-pay
+            width: 418.5px
+            height: 125px
+            border: 1px solid #f40 
+            text-align: right
+            .pay-info
+                padding: 10px 10px 10px 20px
+                .pay-info-content
+                    margin-top: 10px
+                .real-pay-title
+                    font-weight: 700
+                    color: #333
+                .real-pay-price
+                    color: #f40
+                    font: 700 26px tahoma
+                .real-pay-text
+                    font-size: 12px
+        .submit-btn
+            float:  right
+            .ant-btn
+                float: right
+           
