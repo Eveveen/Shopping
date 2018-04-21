@@ -6,8 +6,8 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "webpack-dev-server --config ./webpack/webpack-dev.config.js --watch --colors",
-        "build": "rm -rf dist && webpack --config ./webpack/webpack-prod.config.js --colors",
-        "start": "rm -rf dist && webpack --config ./webpack/webpack-prod.config.js --colors && node ./server/server"
+        "build": "del dist && webpack --config ./webpack/webpack-prod.config.js --colors",
+        "start": "del dist && webpack --config ./webpack/webpack-prod.config.js --colors && node ./server/server"
     },
     "keywords": [
         "react"

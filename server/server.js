@@ -18,9 +18,9 @@ var outTradeId = Date.now().toString();
 var crypto = require("crypto");
 var Buffer = require("buffer").Buffer;
 md5 = function (data, codeBase) { //MD5加密
-    var buf = typeof data == "string" ? codeBase == 'gbk' ? iconv.encode(data, 'gbk') : new Buffer(data) : data;
-    var str = buf.toString("binary");
-    return crypto.createHash("md5").update(str).digest("hex");
+  var buf = typeof data == "string" ? codeBase == 'gbk' ? iconv.encode(data, 'gbk') : new Buffer(data) : data;
+  var str = buf.toString("binary");
+  return crypto.createHash("md5").update(str).digest("hex");
 }
 
 
@@ -137,10 +137,7 @@ app.use('/static', express.static(path.resolve(__dirname + '/static')));
 
 // or do some logic yourself
 app.use('/', require("./controllers/index.js"));
-app.use('/application', require("./controllers/application.js"));
-app.use('/persona', require("./controllers/persona.js"));
-app.use('/tenant', require("./controllers/tenant.js"));
-app.use('/users', require("./controllers/users.js"));
+app.use('/user', require("./controllers/user.js"));
 
 app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname + '/../dist/index.html'));

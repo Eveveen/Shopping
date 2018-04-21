@@ -52,11 +52,28 @@ exports.httpRequest = function (data, dataType, type, host, port, path, method, 
         opt.port = port;
     }
     var req = fnReq(opt, function (resHttp) {
-        var body = "";
-        resHttp.on('data', function (data) {
-            body += data;
+        var chunks = [];
+        var size = 0;
+        resHttp.on('data', function (chunk) {
+            chunks.push(chunk);
+            size += chunk.length;
         }).on('end', function () {
-            if (resHttp.statusCode == 200) {
+            var body = null;
+            switch (chunks.length) {
+                case 0: body = new Buffer(0);
+                    break;
+                case 1: body = chunks[0];
+                    break;
+                default:
+                    body = new Buffer(size);
+                    for (var i = 0, pos = 0, l = chunks.length; i < l; i++) {
+                        var chunk = chunks[i];
+                        chunk.copy(body, pos);
+                        pos += chunk.length;
+                    }
+                    break;
+            }
+            if (resHttp.statusCode >= 200 && resHttp.statusCode < 400) {
                 try {
                     const json = JSON.parse(body);
                     cbEnd(json);
@@ -81,7 +98,9 @@ exports.httpRequest = function (data, dataType, type, host, port, path, method, 
     }).on('error', function (err) {
         logger.error('request error with: ' + err);
     });
-    req.write(data);
+    if (method != "get") {
+        req.write(data);
+    }
     req.end();
 }
 
@@ -103,11 +122,28 @@ exports.uploadFiles = function (files, data, type, host, port, path, method, cbE
     }
     var req = fnReq(opt, function (resHttp) {
         resHttp.setEncoding('utf8');
-        var body = "";
-        resHttp.on('data', function (data) {
-            body += data;
+        var chunks = [];
+        var size = 0;
+        resHttp.on('data', function (chunk) {
+            chunks.push(chunk);
+            size += chunk.length;
         }).on('end', function () {
-            if (resHttp.statusCode == 200) {
+            var body = null;
+            switch (chunks.length) {
+                case 0: body = new Buffer(0);
+                    break;
+                case 1: body = chunks[0];
+                    break;
+                default:
+                    body = new Buffer(size);
+                    for (var i = 0, pos = 0, l = chunks.length; i < l; i++) {
+                        var chunk = chunks[i];
+                        chunk.copy(body, pos);
+                        pos += chunk.length;
+                    }
+                    break;
+            }
+            if (resHttp.statusCode >= 200 && resHttp.statusCode < 400) {
                 cbEnd(body);
             } else {
                 logger.error('problem with request: ' + body);

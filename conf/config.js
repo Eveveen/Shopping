@@ -1,8 +1,8 @@
 // uc api
 exports.BACKEND_API = {
     TYPE: 'http',
-    HOST: '10.201.10.152',
-    PORT: '8081'
+    HOST: 'localhost',
+    PORT: '7777'
 };
 // base url, the same as nginx
 exports.BASE_URL = '';
