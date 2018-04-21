@@ -1,6 +1,5 @@
 {
     "numberFormat": "{num, plural, other {#}}",
-
     "username": "User Name",
     "usernameNotnull": "User Name can't be null",
     "usernameLength": "User Name can't be more than 20 characters!",
@@ -18,6 +17,7 @@
     "validateCodeNotnull": "Velidate Code can't be null",
     "loginName": "Login Name",
     "loginNameNotnull": "Login Name can't be null",
-    "loginNameLength": "Login Name can't be more than 20 characters!" 
-
+    "loginNameLength": "Login Name can't be more than 20 characters!",
+    "save": "Save",
+    "cancel": "Cancel"
 }

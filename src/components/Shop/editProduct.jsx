@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider } from 'antd';
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
-import './Style/editAddress.sass';
+import { Button, Input, Select, Upload, Modal, message, Icon, Form, Cascader } from 'antd';
 const FormItem = Form.Item;
+import axios from 'axios';
 import intl from 'react-intl-universal';
-import AccountMenu from '../Menu/accountMenu';
+// import './Style/main.sass';
 
 const formItemLayout = {
     labelCol: {
@@ -43,9 +40,8 @@ const residences = [{
     }],
 }];
 
-class EditAddress extends Component {
+class EditProduct extends Component {
     state = {
-        manageStatus: 1,
         submitLoading: false,
     }
 
@@ -61,86 +57,31 @@ class EditAddress extends Component {
 
     render() {
         return (
-            <div className="manage">
-                <div className="manage-menu">
-                    <AccountMenu
-                        keyMenu="address"
-                    />
-                </div>
-                <div className="manage-menu-content">
-                    {this.renderEditAddress()}
-                </div>
+            <div>
+                {this.renderEditProduct()}
             </div >
         )
     }
 
-    renderEditAddress() {
+    renderEditProduct() {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading } = this.state;
-        const prefixSelector = getFieldDecorator('prefix', {
-            initialValue: '86',
-        })(
-            <Select style={{ width: 70 }}>
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-            </Select>
-        );
         return (
-            <div className="edit-address">
+            <div className="personal-info">
                 <Form onSubmit={this.handleSavePersonInfo} className="personal-info-form">
                     <FormItem
                         {...formItemLayout}
-                        label="手机号码"
+                        label={"商品名称"}
                     >
-                        {getFieldDecorator('phone', {
-                            rules: [{ required: true, message: 'Please input your phone number!' }],
-                        })(
-                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label={"所在地区"}
-                        required="true"
-                    >
-                        {getFieldDecorator('nickname', {
-                            rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
-                            }, {
-                                eq: 11, message: intl.get("telphoneLength")
-                            }],
-                        })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label={"详细地址"}
-                        required="true"
-                    >
-                        {getFieldDecorator('nickname', {
-                            rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
-                            }, {
-                                eq: 11, message: intl.get("telphoneLength")
-                            }],
-                        })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label={"邮政编码"}
-                    >
-                        {getFieldDecorator('nickname', {
+                        {getFieldDecorator('telphone', {
                             rules: [],
                         })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                            <Input placeholder={intl.get("telphone")} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label={"收货人姓名"}
+                        label={"商品描述"}
                         required="true"
                     >
                         {getFieldDecorator('nickname', {
@@ -155,7 +96,7 @@ class EditAddress extends Component {
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label="居住地"
+                        label="价格"
                     >
                         {getFieldDecorator('residence', {
                             initialValue: ['zhejiang', 'hangzhou', 'xihu'],
@@ -164,24 +105,46 @@ class EditAddress extends Component {
                             <Cascader options={residences} />
                         )}
                     </FormItem>
-                    <div className="footer-checkbox">
-                        <FormItem>
-                            {getFieldDecorator('remember', {
-                                valuePropName: 'checked',
-                                initialValue: true,
-                            })(
-                                <Checkbox>设为默认地址</Checkbox>
-                            )}
-
-                            <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
-                                保存
-                            </Button>
-                        </FormItem>
-                    </div>
+                    <FormItem
+                        {...formItemLayout}
+                        label={"商品状态"}
+                        required="true"
+                    >
+                        {getFieldDecorator('nickname', {
+                            rules: [{
+                                required: true, message: intl.get("telphoneNotnull")
+                            }, {
+                                eq: 11, message: intl.get("telphoneLength")
+                            }],
+                        })(
+                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label={"商品图片"}
+                        required="true"
+                    >
+                        {getFieldDecorator('nickname', {
+                            rules: [{
+                                required: true, message: intl.get("telphoneNotnull")
+                            }, {
+                                eq: 11, message: intl.get("telphoneLength")
+                            }],
+                        })(
+                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
+                            保存
+                                </Button>
+                    </FormItem>
                 </Form>
             </div>
         )
     }
+
 }
 
-export default Form.create()(EditAddress);
+export default Form.create()(EditProduct);

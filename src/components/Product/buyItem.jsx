@@ -5,6 +5,7 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/buyItem.sass';
 // import './Style/main.sass';
+import AddressItem from './addressItem';
 
 class BuyItem extends Component {
     state = {
@@ -31,7 +32,10 @@ class BuyItem extends Component {
             <div className="buy-item">
                 <Layout>
                     <Header>Header</Header>
-                    <Content>{this.renderBuyItem()}</Content>
+                    <Content>
+                        <AddressItem />
+                        {this.renderBuyItem()}
+                    </Content>
                     <Footer>Footer</Footer>
                 </Layout>
 

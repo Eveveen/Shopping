@@ -5,8 +5,9 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/cartPage.sass';
 const CheckboxGroup = Checkbox.Group;
-
-
+import CartFooter from './cartFooter';
+import { Link, browserHistory } from 'react-router';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 
 class CartPage extends Component {
@@ -52,9 +53,17 @@ class CartPage extends Component {
         });
     }
 
+    handleBuy = () => {
+        browserHistory.push(BASE_URL + "/buy");
+    }
+
     render() {
         const defaultCheckedList = [this.renderItem()];
         const plainOptions = ['apple', 'PERA'];
+        let cartFooterDiv =
+            <div>
+                勾选购物车内所有商品 全选删除清除失效宝贝移入收藏夹分享已选商品29件合计（不含运费）： ￥2460.40
+            </div>
         return (
             <div className="cart-page">
                 <Layout>
@@ -70,7 +79,16 @@ class CartPage extends Component {
                         <CheckboxGroup options={plainOptions} value={this.state.checkedList} onChange={this.onChange} />
                         {this.renderItem()}
                     </Content>
-                    <Footer>Footer</Footer>
+                    <Footer>
+                    </Footer>
+                    <div className="cart-footer">
+                        <CartFooter
+                            footerShow={true}
+                            footerContent={this.renderFooterContent()}
+                            handleBuy={this.handleBuy}
+                        />
+                    </div>
+
                 </Layout>
             </div >
         )
@@ -119,6 +137,19 @@ class CartPage extends Component {
                 </Card>
             </div >
         );
+    }
+
+    renderFooterContent() {
+        return (
+            <div className="cart-footer-content">
+                <div className="footer-operation">全选</div>
+                <div className="footer-operation">删除</div>
+                <div className="footer-operation">清除失效宝贝</div>
+                <div className="footer-operation"> 移入收藏夹</div>
+                <div className="footer-operation"> 已选商品29件</div>
+                <div className="footer-operation">合计（不含运费）： ￥2460.40</div>
+            </div>
+        )
     }
 }
 
