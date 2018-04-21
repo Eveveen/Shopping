@@ -8,6 +8,10 @@ const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import AddAddress from './addAddress';
 import EditAddress from './editAddress';
+import AddressList from './addressList';
+import { Link, browserHistory } from 'react-router';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import AccountMenu from '../Menu/accountMenu';
 
 const formItemLayout = {
     labelCol: {
@@ -44,38 +48,12 @@ const residences = [{
     }],
 }];
 
-const data = [{
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No.',
-}, {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No',
-}, {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No',
-}];
-
-
 class Account extends Component {
     state = {
-        manageStatus: 1,
+        manageStatus: "member",
         submitLoading: false,
         showAddAddress: false,
         addressAction: "list"
-    }
-
-    handleClick = (e) => {
-        console.log('click ', e);
-        this.setState({
-            manageStatus: e.key,
-            addressAction: "list"
-        })
     }
 
     handleSavePersonInfo = (e) => {
@@ -88,39 +66,19 @@ class Account extends Component {
         });
     }
 
-    handleShowAddAddress = () => {
-        this.setState({
-            showAddAddress: true
-        })
-    }
-
-    handleChangeAddressStatus = () => {
-        this.setState({
-            addressAction: "edit"
-        })
-    }
 
     render() {
+        console.log("hello");
         const { manageStatus } = this.state;
         return (
             <div className="manage">
                 <div className="manage-menu">
-                    <Menu
-                        onClick={this.handleClick}
-                        style={{ width: 256 }}
-                        defaultSelectedKeys={['1']}
-                        defaultOpenKeys={['sub1']}
-                        mode="inline"
-                        theme="light"
-                    >
-                        <SubMenu key="sub1" title={<span><Icon type="mail" /><span>帐号管理</span></span>}>
-                            <Menu.Item key="1">个人资料</Menu.Item>
-                            <Menu.Item key="2">收货地址</Menu.Item>
-                        </SubMenu>
-                    </Menu>
+                    <AccountMenu
+                        keyMenu="member"
+                    />
                 </div>
                 <div className="manage-menu-content">
-                    {manageStatus == 1 ? this.renderPersonalInfo() : this.renderAddress()}
+                    {this.renderPersonalInfo()}
                 </div>
             </div>
         )
@@ -178,48 +136,6 @@ class Account extends Component {
         )
     }
 
-    renderAddress() {
-        const { addressAction } = this.state;
-        const columns = [{
-            title: '收货人',
-            dataIndex: 'name',
-            key: 'name',
-            render: text => <a href="javascript:;">{text}</a>,
-        }, {
-            title: '所在地区',
-            dataIndex: 'age',
-            key: 'age',
-        }, {
-            title: '详细地址',
-            dataIndex: 'detailAddress',
-            key: 'detailAddress',
-        }, {
-            title: '电话/手机',
-            dataIndex: 'telphone',
-            key: 'telphone',
-        }, {
-            title: '邮编',
-            dataIndex: 'address',
-            key: 'address',
-        }, {
-            title: 'Action',
-            key: 'action',
-            render: (text, record) => (
-                <span>
-                    <Divider type="vertical" />
-                    <a href="javascript:;" onClick={this.handleChangeAddressStatus}>edit</a>
-                    <Divider type="vertical" />
-                </span>
-            ),
-        }];
-
-        return (
-            <div className="address-list">
-                {addressAction == "list" ?
-                    <div className="address-table"><Table columns={columns} dataSource={data} /></div> : <EditAddress />}
-            </div>
-        )
-    }
 }
 
 export default Form.create()(Account);

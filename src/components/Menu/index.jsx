@@ -13,7 +13,11 @@ class MenuIndex extends Component {
     }
 
     handleClick = (e) => {
-        browserHistory.push(BASE_URL + '/' + e.key);
+        if (e.key == "exitAccount") {
+            browserHistory.push(BASE_URL);
+        } else {
+            browserHistory.push(BASE_URL + '/' + e.key);
+        }
         // this.props.handleChangePageStatus(e);
         // this.setState({
         //     current: e.key,
