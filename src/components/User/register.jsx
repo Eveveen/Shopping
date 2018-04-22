@@ -7,6 +7,9 @@ import './Style/register.sass';
 import { SERVICE_URL } from '../../../conf/config';
 const FormItem = Form.Item;
 const Step = Steps.Step;
+import { httpRequestGet, httpRequestPost } from '../../common/utils';
+import { guid, contains } from '../../common/tools';
+import { getCookie, messageText, getBase64 } from '../../data/tools';
 
 const formItemLayout = {
     labelCol: {
@@ -23,15 +26,22 @@ class Register extends Component {
     state = {
         submitLoading: false,
         current: 0,
+        telphone: '',
+        alert: {},
     }
 
     componentWillMount() {
-        console.log(this.state.current)
+        // console.log(this.state.current)
+    }
+
+    alertMsg = (msg) => {
+        var alert = { isShow: true, type: "error", message: msg }
+        this.setState({ alert: alert })
     }
 
     next = () => {
         const current = this.state.current + 1;
-        console.log("current", current)
+        // console.log("current", current)
         this.setState({ current });
     }
 
@@ -41,56 +51,89 @@ class Register extends Component {
     }
 
     getCode = () => {
-        // 发送短信验证码
-        axios.post(SERVICE_URL + "/getCode")
-            .then(response => {
-                console.log("aaaa", response.data);
-                // const resData = response.data;
-                // if (!resData.error) {
-                //     this.props.handleShowList();
-                //     this.props.handleCancel();
-                // } else {
-                //     message.error(messageText(resData.error.code, intl.get("createApplicationFailed")));
-                // }
-                // this.setState({ iconImg: "", iconId: "", submitLoading: false });
-            }).catch(error => {
-                console.log(error);
-                // message.error(intl.get("createApplicationFailed"));
-                // this.setState({ iconImg: "", iconId: "", submitLoading: false });
-            });
+        const { telphone } = this.state;
+
+        //发送短信验证码
+        httpRequestPost(SERVICE_URL + "/user/getCode", { telphone: telphone }, (resData) => {
+            this.setState({ showLoading: false });
+        }, (errorData) => {
+            this.setState({ showLoading: false })
+            message.error(intl.get("createApplicationFailed"));
+        })
     }
 
     handleNextStep = (e) => {
         e.preventDefault();
         // 支付宝调用失败
-        axios.get(SERVICE_URL + "/pay")
-            .then(response => {
-                console.log("aaaa", response.data);
-            }).catch(error => {
-                console.log(error);
-            });
+        // axios.get(SERVICE_URL + "/pay")
+        //     .then(response => {
+        //         console.log("aaaa", response.data);
+        //     }).catch(error => {
+        //         console.log(error);
+        //     });
+        let addUserFlag = false;
+        let telphone = 0;
         this.props.form.validateFieldsAndScroll((err, data) => {
             if (!err) {
                 this.setState({ submitLoading: false });
-                console.log("hhhel  ", err)
-                this.next()
+                telphone = data.telphone;
+                httpRequestPost(SERVICE_URL + "/user/verifyCode", { data }, (resData) => {
+                    this.setState({ showLoading: false });
+                    console.log("ddddresData", resData)
+                    if (resData == true) {
+
+                        this.next();
+                    }
+                }, (errorData) => {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("createApplicationFailed"));
+                })
+            }
+            console.log("addUserFlag", typeof addUserFlag)
+        });
+        if (addUserFlag == true) {
+
+        }
+    }
+
+    handleSubmit = (e) => {
+
+        e.preventDefault();
+        this.props.form.validateFields((err, data) => {
+            if (!err) {
+                console.log('Received values of form: ', data);
+
             }
         });
     }
 
-    handleSubmit = (e) => {
+    handleSubmitSecond = (e) => {
+        const { telphone } = this.state;
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields((err, data) => {
             if (!err) {
-                console.log('Received values of form: ', values);
-                this.next();
+                console.log('Received values of form: ', data);
+                data.telphone = telphone;
+                httpRequestPost(SERVICE_URL + "/user/addUser", { data }, (resData) => {
+                    // this.setState({ showLoading: false });
+                    console.log("addU", resData)
+                    if (resData == true) {
+                        console.log("true");
+                        this.next();
+                    } else {
+                        message.error(intl.get("createApplicationFailed"));
+                    }
+                }, (errorData) => {
+                    // this.setState({ showLoading: false })
+                    message.error(intl.get("createApplicationFailed"));
+                })
+                // this.next();
             }
         });
     }
 
     render() {
         const { current } = this.state;
-        console.log("current,", current)
         const steps = [{
             title: 'First',
             content: this.renderFirstStep(),
@@ -179,7 +222,7 @@ class Register extends Component {
 
     renderFirstStep() {
         const { getFieldDecorator } = this.props.form;
-        const { submitLoading } = this.state;
+        const { submitLoading, telphone } = this.state;
         return (
             <div className="first-step">
                 <Form onSubmit={this.handleSubmit}>
@@ -195,7 +238,11 @@ class Register extends Component {
                                 eq: 11, message: intl.get("telphoneLength")
                             }],
                         })(
-                            <Input placeholder={intl.get("telphone")} disabled={submitLoading} />
+                            <Input placeholder={intl.get("telphone")}
+                                setFieldsValue={this.state.telphone}
+                                onChange={(e) => { this.setState({ telphone: e.target.value }) }}
+                                disabled={submitLoading}
+                            />
                         )}
                     </FormItem>
                     <FormItem
@@ -276,7 +323,7 @@ class Register extends Component {
                         )}
                     </FormItem>
                     <FormItem>
-                        <Button type="primary" onClick={this.next} loading={submitLoading}>{intl.get("login")}</Button>
+                        <Button type="primary" onClick={this.handleSubmitSecond} loading={submitLoading}>{intl.get("login")}</Button>
                     </FormItem>
                 </Form>
             </div>

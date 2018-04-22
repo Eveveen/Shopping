@@ -15,8 +15,8 @@ const routes = (
     <Router history={browserHistory}>
         <Route path={"/"} component={App} >
             <IndexRoute component={Login} />
-            <Route path={"/register"} component={Register} />
             <Route path={baseUrl} component={MenuIndex}>
+                <Route path={"/register"} component={Register} />
                 <IndexRoute component={HomePage} />
                 <Route path={"/home"} component={HomePage} />
                 <Route path={"/buy"} component={BuyItem} />

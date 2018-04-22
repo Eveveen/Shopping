@@ -62,64 +62,33 @@ app.use((req, res, next) => {
   next();
 });
 
-// var casClient = new ConnectCas({
-//   //debug: true,
-//   ignore: [
-//     /\/ignore/
-//   ],
-//   match: [],
-//   servicePrefix: config.SERVICE_URL,
-//   serverPath: config.CAS_URL,
-//   paths: {
-//     validate: '/validate',
-//     serviceValidate: '/serviceValidate',
-//     proxy: '',
-//     login: '/login',
-//     logout: '/logout',
-//     proxyCallback: false
-//   },
-//   restletIntegration: false,
-//   redirect: false,
-//   gateway: false,
-//   renew: false,
-//   slo: true,
-//   cache: {
-//     enable: false,
-//     ttl: 5 * 60 * 1000,
-//     filter: []
-//   },
-//   fromAjax: {
-//     header: 'x-client-ajax',
-//     status: 418
-//   }
-// });
 
-// app.use(casClient.core());
 
 // app.use(csrf({ cookie: true }));
 
 //check and save session
 // app.use(function (req, res, next) {
-//   req.session.cas = { user: "super" };
-//   // let csrf = req.csrfToken();
-//   // res.cookie('XSRF-TOKEN', csrf);
-//   if (req.session && req.session.cas) {
-//     let userName = req.session.cas.user;
-//     let path = utils.BASE_URL_V2 + "/principal";
-//     httpAgent.httpRequest({ login: userName, appurl: config.SERVICE_URL }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (principal) {
-//       if (!principal.error) {
-//         req.session.principal = principal;
-//         next();
-//       } else {
-//         logger.error("get principal error!");
-//       }
-//     }, function (statusCode, msg) {
+// console.log("hello")
+// req.session.cas = { user: "super" };
+// let csrf = req.csrfToken();
+// res.cookie('XSRF-TOKEN', csrf);
+// if (req.session && req.session.cas) {
+//   let userName = req.session.cas.user;
+//   let path = utils.BASE_URL_V2 + "/principal";
+//   httpAgent.httpRequest({ login: userName, appurl: config.SERVICE_URL }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (principal) {
+//     if (!principal.error) {
+//       req.session.principal = principal;
+//       next();
+//     } else {
 //       logger.error("get principal error!");
-//     })
-//   } else {
-//     logger.error("This check session log shouldn't appear!");
-//     next();
-//   }
+//     }
+//   }, function (statusCode, msg) {
+//     logger.error("get principal error!");
+//   })
+// } else {
+//   logger.error("This check session log shouldn't appear!");
+//   next();
+// }
 // })
 
 // NOTICE: If you want to enable single sign logout, you must use casClient middleware before bodyParser.
