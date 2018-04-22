@@ -7,8 +7,8 @@ const log4js = require('log4js');
 const logger = log4js.getLogger();
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAI4U9l91SizWvG'
-const secretAccessKey = 'x9Bp7LYdvUCOPHOTqU3otr0itlJJtn'
+const accessKeyId = 'xx'
+const secretAccessKey = 'xx'
 //初始化sms_client
 let smsClient = new SMSClient({ accessKeyId, secretAccessKey })
 
@@ -40,7 +40,7 @@ router.post("/getCode", function (req, res) {
     console.log(sendCode)
     var sendData = {
         PhoneNumbers: telphone,
-        SignName: '孙梦娟',
+        SignName: 'xxx',
         TemplateCode: 'SMS_130840278',
         TemplateParam: '{"code":' + '"' + sendCode + '"' + '}'
     }
