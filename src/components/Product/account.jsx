@@ -12,6 +12,7 @@ import AddressList from './addressList';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import AccountMenu from '../Menu/accountMenu';
+import { httpRequestGet, httpRequestPost } from '../../common/utils';
 
 const formItemLayout = {
     labelCol: {
@@ -54,6 +55,15 @@ class Account extends Component {
         submitLoading: false,
         showAddAddress: false,
         addressAction: "list"
+    }
+
+    componentWillMount() {
+        httpRequestGet(SERVICE_URL + "/user/getUserInfo", (resData) => {
+            this.setState({ showLoading: false });
+        }, (errorData) => {
+            this.setState({ showLoading: false })
+            this.alertMsg(messageText(errorData.code, intl.get("initSourceFailedTip")));
+        })
     }
 
     handleSavePersonInfo = (e) => {

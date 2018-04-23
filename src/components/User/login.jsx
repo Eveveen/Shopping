@@ -33,7 +33,11 @@ class Login extends Component {
                 this.setState({ submitLoading: true });
                 httpRequestPost(SERVICE_URL + "/user/login", { data }, (resData) => {
                     this.setState({ showLoading: false });
-                    browserHistory.push(BASE_URL + "/home");
+                    if (resData == true) {
+                        browserHistory.push(BASE_URL + "/home");
+                    } else {
+                        this.alertMsg(messageText(errorData.code, intl.get("initSourceFailedTip")));
+                    }
                 }, (errorData) => {
                     this.setState({ showLoading: false })
                     this.alertMsg(messageText(errorData.code, intl.get("initSourceFailedTip")));

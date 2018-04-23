@@ -10,6 +10,7 @@ const Step = Steps.Step;
 import { httpRequestGet, httpRequestPost } from '../../common/utils';
 import { guid, contains } from '../../common/tools';
 import { getCookie, messageText, getBase64 } from '../../data/tools';
+import FirstStep from './firstStep';
 
 const formItemLayout = {
     labelCol: {
@@ -41,7 +42,6 @@ class Register extends Component {
 
     next = () => {
         const current = this.state.current + 1;
-        // console.log("current", current)
         this.setState({ current });
     }
 
@@ -50,50 +50,11 @@ class Register extends Component {
         this.setState({ current });
     }
 
-    getCode = () => {
-        const { telphone } = this.state;
-
-        //发送短信验证码
-        httpRequestPost(SERVICE_URL + "/user/getCode", { telphone: telphone }, (resData) => {
-            this.setState({ showLoading: false });
-        }, (errorData) => {
-            this.setState({ showLoading: false })
-            message.error(intl.get("createApplicationFailed"));
+    handleGetTelphone = (telphone) => {
+        console.log("telphone,,", telphone);
+        this.setState({
+            telphone: telphone
         })
-    }
-
-    handleNextStep = (e) => {
-        e.preventDefault();
-        // 支付宝调用失败
-        // axios.get(SERVICE_URL + "/pay")
-        //     .then(response => {
-        //         console.log("aaaa", response.data);
-        //     }).catch(error => {
-        //         console.log(error);
-        //     });
-        let addUserFlag = false;
-        let telphone = 0;
-        this.props.form.validateFieldsAndScroll((err, data) => {
-            if (!err) {
-                this.setState({ submitLoading: false });
-                telphone = data.telphone;
-                httpRequestPost(SERVICE_URL + "/user/verifyCode", { data }, (resData) => {
-                    this.setState({ showLoading: false });
-                    console.log("ddddresData", resData)
-                    if (resData == true) {
-
-                        this.next();
-                    }
-                }, (errorData) => {
-                    this.setState({ showLoading: false })
-                    message.error(intl.get("createApplicationFailed"));
-                })
-            }
-            console.log("addUserFlag", typeof addUserFlag)
-        });
-        if (addUserFlag == true) {
-
-        }
     }
 
     handleSubmit = (e) => {
@@ -109,6 +70,7 @@ class Register extends Component {
 
     handleSubmitSecond = (e) => {
         const { telphone } = this.state;
+        console.log(telphone)
         e.preventDefault();
         this.props.form.validateFields((err, data) => {
             if (!err) {
@@ -136,7 +98,7 @@ class Register extends Component {
         const { current } = this.state;
         const steps = [{
             title: 'First',
-            content: this.renderFirstStep(),
+            content: <FirstStep next={this.next} handleGetTelphone={this.handleGetTelphone} />,
         }, {
             title: 'Second',
             // content: this.renderSecondStep(),
@@ -152,15 +114,15 @@ class Register extends Component {
                         {steps.map(item => <Step key={item.title} title={item.title} />)}
                     </Steps>
                 </div>
-                <div className="steps-content">{steps[this.state.current].content}</div>
+                <div className="steps-content">{steps[current].content}</div>
                 <div className="steps-action">
                     {
-                        this.state.current < steps.length - 1
+                        current < steps.length - 1
                         &&
                         <Button type="primary" onClick={() => this.next()}>Next</Button>
                     }
                     {
-                        this.state.current === steps.length - 1
+                        current === steps.length - 1
                         &&
                         <Button type="primary" onClick={() => message.success('Processing complete!')}>Done</Button>
                     }
@@ -220,69 +182,18 @@ class Register extends Component {
 
     }
 
-    renderFirstStep() {
-        const { getFieldDecorator } = this.props.form;
-        const { submitLoading, telphone } = this.state;
-        return (
-            <div className="first-step">
-                <Form onSubmit={this.handleSubmit}>
-                    <FormItem
-                        {...formItemLayout}
-                        label={intl.get("telphone")}
-                        required="true"
-                    >
-                        {getFieldDecorator('telphone', {
-                            rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
-                            }, {
-                                eq: 11, message: intl.get("telphoneLength")
-                            }],
-                        })(
-                            <Input placeholder={intl.get("telphone")}
-                                setFieldsValue={this.state.telphone}
-                                onChange={(e) => { this.setState({ telphone: e.target.value }) }}
-                                disabled={submitLoading}
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label={intl.get("validateCode")}
-                        required="true"
-                    >
-                        {getFieldDecorator('validateCode', {
-                            rules: [{
-                                required: true, message: intl.get("validateCodeNotnull")
-                            }],
-                        })(
-                            <div>
-                                <Input placeholder={intl.get("validateCode")} disabled={submitLoading} />
-                                <Button type="primary" onClick={this.getCode} loading={submitLoading}>点击获取验证码</Button>
-                            </div>
-                        )}
-                    </FormItem>
-                    <FormItem>
-                        <div className="footer-btn">
-                            <Button type="primary" onClick={this.handleNextStep} loading={submitLoading}>{intl.get("login")}</Button>
-                        </div>
-                    </FormItem>
-                </Form>
-            </div>
-        )
-    }
-
     renderSecondStep() {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading } = this.state;
         return (
             <div>
-                <Form onSubmit={this.handleSubmit2}>
+                <Form onSubmit={this.handleSubmitSecond}>
                     <FormItem
                         {...formItemLayout}
                         label={intl.get("loginName")}
                         required="true"
                     >
-                        {getFieldDecorator('loginName', {
+                        {getFieldDecorator('userName', {
                             rules: [{
                                 required: true, message: intl.get("loginNameNotnull")
                             }, {
