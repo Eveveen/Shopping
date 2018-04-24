@@ -54,12 +54,13 @@ class Account extends Component {
         manageStatus: "member",
         submitLoading: false,
         showAddAddress: false,
-        addressAction: "list"
+        addressAction: "list",
+        userInfo: {}
     }
 
     componentWillMount() {
         httpRequestGet(SERVICE_URL + "/user/getUserInfo", (resData) => {
-            this.setState({ showLoading: false });
+            this.setState({ showLoading: false, userInfo: resData });
         }, (errorData) => {
             this.setState({ showLoading: false })
             this.alertMsg(messageText(errorData.code, intl.get("initSourceFailedTip")));
@@ -68,10 +69,19 @@ class Account extends Component {
 
     handleSavePersonInfo = (e) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        const { userInfo } = this.state;
+        this.props.form.validateFields((err, data) => {
+            data.userId = userInfo.userId;
+            data.role = 1;
+            console.log("0000");
             if (!err) {
-                console.log('Received values of form: ', values);
-                this.next();
+                httpRequestPost(SERVICE_URL + "/user/updateUser", { data }, (resData) => {
+                    // this.setState({ showLoading: false });
+                    console.log(resData)
+                }, (errorData) => {
+                    // this.setState({ showLoading: false })
+                    message.error(intl.get("createApplicationFailed"));
+                })
             }
         });
     }
@@ -96,7 +106,7 @@ class Account extends Component {
 
     renderPersonalInfo() {
         const { getFieldDecorator } = this.props.form;
-        const { submitLoading } = this.state;
+        const { submitLoading, userInfo } = this.state;
         return (
             <div className="personal-info">
                 <Form onSubmit={this.handleSavePersonInfo} className="personal-info-form">
@@ -104,8 +114,20 @@ class Account extends Component {
                         {...formItemLayout}
                         label={"用户头像"}
                     >
+                        {getFieldDecorator('avatar', {
+                            rules: [],
+                            initialValue: userInfo.avatar
+                        })(
+                            <Input placeholder={intl.get("telphone")} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label={"手机号码"}
+                    >
                         {getFieldDecorator('telphone', {
                             rules: [],
+                            initialValue: userInfo.telphone
                         })(
                             <Input placeholder={intl.get("telphone")} disabled={submitLoading} />
                         )}
@@ -115,14 +137,47 @@ class Account extends Component {
                         label={"昵称"}
                         required="true"
                     >
-                        {getFieldDecorator('nickname', {
+                        {getFieldDecorator('userName', {
                             rules: [{
                                 required: true, message: intl.get("telphoneNotnull")
                             }, {
                                 eq: 11, message: intl.get("telphoneLength")
                             }],
+                            initialValue: userInfo.userName
                         })(
                             <Input placeholder={"nickname"} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label={"密码"}
+                        required="true"
+                    >
+                        {getFieldDecorator('password', {
+                            rules: [{
+                                required: true, message: intl.get("telphoneNotnull")
+                            }, {
+                                eq: 11, message: intl.get("telphoneLength")
+                            }],
+                            initialValue: userInfo.password
+                        })(
+                            <Input placeholder={"password"} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label={"邮箱"}
+                        required="true"
+                    >
+                        {getFieldDecorator('email', {
+                            rules: [{
+                                required: true, message: intl.get("telphoneNotnull")
+                            }, {
+                                eq: 11, message: intl.get("telphoneLength")
+                            }],
+                            initialValue: userInfo.email
+                        })(
+                            <Input placeholder={"email"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
