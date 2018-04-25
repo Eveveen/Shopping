@@ -5,6 +5,7 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 // import './Style/main.sass';
 import HomePage from './homePage';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class ProductIndex extends Component {
     render() {

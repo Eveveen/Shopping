@@ -5,12 +5,15 @@ const utils = require('../common/utils');
 const httpAgent = require('../common/httpAgent');
 const log4js = require('log4js');
 const logger = log4js.getLogger();
-const SMSClient = require('@alicloud/sms-sdk')
+const fs = require('fs');
+const multer = require('multer')
+const paramsMulter = multer({ dest: 'upload/' });
+// const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
 const accessKeyId = 'xx'
 const secretAccessKey = 'xx'
 //初始化sms_client
-let smsClient = new SMSClient({ accessKeyId, secretAccessKey })
+// let smsClient = new SMSClient({ accessKeyId, secretAccessKey })
 
 /**
  * 登录
@@ -128,6 +131,30 @@ router.post("/updateUser", function (req, res) {
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })
+});
+
+
+router.post("/uploadImg", paramsMulter.any(), function (req, res) {
+    if (req.files.length > 0) {
+        let filePath = req.files[0].path;
+        let fileMimetype = req.files[0].mimetype;
+        let data = fs.readFileSync(filePath);
+        data = new Buffer(data).toString('base64');
+        let base64 = 'data:' + fileMimetype + ';base64,' + data;
+        const path = utils.PROJECT + "/uploadImg";
+        const sendData = { imgCode: base64 }
+        httpAgent.httpRequest(sendData, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (resData) {
+            if (!resData.error) {
+                res.send({ imgId: resData });
+            } else {
+                res.send(resData);
+            }
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        res.send({ error: { code: -1, msg: "no files" } });
+    }
 });
 
 // router.post("/createChannel", function (req, res) {

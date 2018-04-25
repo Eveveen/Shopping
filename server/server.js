@@ -63,6 +63,34 @@ app.use((req, res, next) => {
 });
 
 
+app.use(csrf({ cookie: true }));
+
+//check and save session
+app.use(function (req, res, next) {
+  // console.log("hello")
+  // req.session.cas = { user: "super" };
+  let csrf = req.csrfToken();
+  res.cookie('XSRF-TOKEN', csrf);
+  // if (req.session && req.session.cas) {
+  //   let userName = req.session.cas.user;
+  //   let path = utils.BASE_URL_V2 + "/principal";
+  //   httpAgent.httpRequest({ login: userName, appurl: config.SERVICE_URL }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (principal) {
+  //     if (!principal.error) {
+  //       req.session.principal = principal;
+  //       next();
+  //     } else {
+  //       logger.error("get principal error!");
+  //     }
+  //   }, function (statusCode, msg) {
+  //     logger.error("get principal error!");
+  //   })
+  // } else {
+  //   logger.error("This check session log shouldn't appear!");
+  next();
+  // }
+})
+
+
 
 // app.use(csrf({ cookie: true }));
 
@@ -107,6 +135,7 @@ app.use('/static', express.static(path.resolve(__dirname + '/static')));
 // or do some logic yourself
 app.use('/', require("./controllers/index.js"));
 app.use('/user', require("./controllers/user.js"));
+app.use('/product', require("./controllers/product.js"));
 
 app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname + '/../dist/index.html'));

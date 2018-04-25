@@ -16,5 +16,6 @@ export ProductIndex from './Product';
 export ProductList from "./Shop/productList";
 export Register from './User/register';
 export Remark from './Product/remark';
+export UploadItem from "./Product/uploadItem";
 
 
