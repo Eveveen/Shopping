@@ -60,7 +60,7 @@ class UploadItem extends Component {
                     showUploadList={false}
                     withCredentials={true}
                     headers={{ 'X-XSRF-TOKEN': getCookie("XSRF-TOKEN") }}
-                    action={SERVICE_URL + "/product/uploadImg"}
+                    action={SERVICE_URL + "/user/uploadImg"}
                     beforeUpload={this.beforeUpload}
                     onChange={this.handleChange}
                     disabled={submitLoading}
