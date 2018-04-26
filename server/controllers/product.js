@@ -32,7 +32,15 @@ router.post("/uploadImg", paramsMulter.any(), function (req, res) {
     }
 });
 
-
+router.post("/addProduct", function (req, res) {
+    const { data } = req.body;
+    const path = utils.PROJECT + "/addProduct";
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
 
 
 function checkIsRole(req) {

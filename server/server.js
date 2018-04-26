@@ -47,8 +47,8 @@ log4js.configure({
 const app = express();
 
 //cross-domain 
-// const cors = require('cors')
-// app.use(cors())
+const cors = require('cors')
+app.use(cors())
 
 app.use(cookieParser());
 app.use(session({
@@ -57,67 +57,21 @@ app.use(session({
   store: new MemoryStore(), // or other session store
 }));
 
-app.use((req, res, next) => {
-  req.sn = translator.uuid();
-  next();
-});
-
-
-app.use(csrf({ cookie: true }));
-
-//check and save session
-app.use(function (req, res, next) {
-  // console.log("hello")
-  // req.session.cas = { user: "super" };
-  let csrf = req.csrfToken();
-  res.cookie('XSRF-TOKEN', csrf);
-  // if (req.session && req.session.cas) {
-  //   let userName = req.session.cas.user;
-  //   let path = utils.BASE_URL_V2 + "/principal";
-  //   httpAgent.httpRequest({ login: userName, appurl: config.SERVICE_URL }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (principal) {
-  //     if (!principal.error) {
-  //       req.session.principal = principal;
-  //       next();
-  //     } else {
-  //       logger.error("get principal error!");
-  //     }
-  //   }, function (statusCode, msg) {
-  //     logger.error("get principal error!");
-  //   })
-  // } else {
-  //   logger.error("This check session log shouldn't appear!");
-  next();
-  // }
-})
-
+// app.use((req, res, next) => {
+//   req.sn = translator.uuid();
+//   next();
+// });
 
 
 // app.use(csrf({ cookie: true }));
 
 //check and save session
 // app.use(function (req, res, next) {
-// console.log("hello")
-// req.session.cas = { user: "super" };
-// let csrf = req.csrfToken();
-// res.cookie('XSRF-TOKEN', csrf);
-// if (req.session && req.session.cas) {
-//   let userName = req.session.cas.user;
-//   let path = utils.BASE_URL_V2 + "/principal";
-//   httpAgent.httpRequest({ login: userName, appurl: config.SERVICE_URL }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (principal) {
-//     if (!principal.error) {
-//       req.session.principal = principal;
-//       next();
-//     } else {
-//       logger.error("get principal error!");
-//     }
-//   }, function (statusCode, msg) {
-//     logger.error("get principal error!");
-//   })
-// } else {
-//   logger.error("This check session log shouldn't appear!");
+//   let csrf = req.csrfToken();
+//   res.cookie('XSRF-TOKEN', csrf);
 //   next();
-// }
 // })
+
 
 // NOTICE: If you want to enable single sign logout, you must use casClient middleware before bodyParser.
 app.use(bodyParser.urlencoded({

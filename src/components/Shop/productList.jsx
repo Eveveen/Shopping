@@ -56,7 +56,7 @@ class ProductList extends Component {
             </div>
         return (
             <div className="cart-card" >
-                <Card title={titleDiv} extra={<Icon type="delete" />}>
+                <Card title={titleDiv} extra={<div><Icon type="delete" /> <Icon type="plus-circle-o" onClick={this.handleEditItem} /></div>}>
                     <div className="card-item-content">
                         <div className="left-img">
                             <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />

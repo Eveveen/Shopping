@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider } from 'antd';
+import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, Upload } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/account.sass';
@@ -12,7 +12,8 @@ import AddressList from './addressList';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import AccountMenu from '../Menu/accountMenu';
-import { httpRequestGet, httpRequestPost } from '../../common/utils';
+// import UploadItem from './uploadItem';
+import { getBase64, contains, messageText, getCookie } from '../../data/tools';
 
 const formItemLayout = {
     labelCol: {
@@ -55,16 +56,27 @@ class Account extends Component {
         submitLoading: false,
         showAddAddress: false,
         addressAction: "list",
-        userInfo: {}
+        userInfo: {},
+        imgId: "",
+        imgCode: "",
+        loading: false,
     }
 
     componentWillMount() {
-        httpRequestGet(SERVICE_URL + "/user/getUserInfo", (resData) => {
-            this.setState({ showLoading: false, userInfo: resData });
-        }, (errorData) => {
-            this.setState({ showLoading: false })
-            this.alertMsg(messageText(errorData.code, intl.get("initSourceFailedTip")));
-        })
+        axios.get(SERVICE_URL + "/user/getUserInfo")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, userInfo: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
     }
 
     handleSavePersonInfo = (e) => {
@@ -75,17 +87,53 @@ class Account extends Component {
             data.role = 1;
             console.log("0000");
             if (!err) {
-                httpRequestPost(SERVICE_URL + "/user/updateUser", { data }, (resData) => {
-                    // this.setState({ showLoading: false });
-                    console.log(resData)
-                }, (errorData) => {
-                    // this.setState({ showLoading: false })
-                    message.error(intl.get("createApplicationFailed"));
-                })
+                axios.post(SERVICE_URL + "/user/updateUser", { data })
+                    .then(response => {
+                        const resData = response.data;
+                        if (response.status == 200 && !resData.error) {
+                            message.success(intl.get("editSuccess"));
+                        } else {
+                            message.error(messageText(resData.error.code, intl.get("editFailed")));
+                        }
+                        this.setState({ editApplicationLoading: false });
+                    }).catch(error => {
+                        console.log(error);
+                        message.error(intl.get("editFailed"));
+                        this.setState({ editApplicationLoading: false });
+                    });
             }
         });
     }
 
+    beforeUpload = () => {
+        this.setState({ imgCode: "", loading: false });
+    }
+
+    handleIconDelete = (e) => {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+        this.setState({
+            imgId: null,
+            imgCode: null
+        });
+    }
+
+    handleChange = (info) => {
+        if (info.file.status === 'uploading') {
+            this.setState({ loading: true });
+            return;
+        }
+        if (info.file.status === 'done') {
+            // Get this url from response in real world.
+            getBase64(info.file.originFileObj, imgCode => this.setState({
+                imgCode,
+                loading: false,
+            }));
+            if (!info.file.response.error) {
+                this.setState({ imgId: info.file.response.imgId });
+            }
+        }
+    }
 
     render() {
         console.log("hello");
@@ -106,7 +154,13 @@ class Account extends Component {
 
     renderPersonalInfo() {
         const { getFieldDecorator } = this.props.form;
-        const { submitLoading, userInfo } = this.state;
+        const { submitLoading, imgCode, loading, userInfo } = this.state;
+        const uploadButton = (
+            <div>
+                <Icon type={loading ? 'loading' : 'plus'} />
+                <div className="ant-upload-text">{intl.get("upload")}</div>
+            </div>
+        );
         return (
             <div className="personal-info">
                 <Form onSubmit={this.handleSavePersonInfo} className="personal-info-form">
@@ -118,7 +172,19 @@ class Account extends Component {
                             rules: [],
                             initialValue: userInfo.avatar
                         })(
-                            <Input placeholder={intl.get("telphone")} disabled={submitLoading} />
+                            <Upload
+                                listType="picture-card"
+                                showUploadList={false}
+                                withCredentials={true}
+                                headers={{ 'X-XSRF-TOKEN': getCookie("XSRF-TOKEN") }}
+                                action={SERVICE_URL + "/user/uploadImg"}
+                                beforeUpload={this.beforeUpload}
+                                onChange={this.handleChange}
+                                disabled={submitLoading}
+                            >
+                                {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
+                                {imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
+                            </Upload>
                         )}
                     </FormItem>
                     <FormItem
