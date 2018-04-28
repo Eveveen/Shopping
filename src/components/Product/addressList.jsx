@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider } from 'antd';
+import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, message } from 'antd';
 const FormItem = Form.Item;
 import axios from 'axios';
 import intl from 'react-intl-universal';
@@ -29,11 +29,31 @@ const data = [{
 
 class AddressList extends Component {
     state = {
-        showAddAddress: false
+        showAddAddress: false,
+        addressData: []
     }
 
-    handleChangeAddressStatus = () => {
-        browserHistory.push(BASE_URL + "/account/editAddress");
+    componentWillMount() {
+        axios.get(SERVICE_URL + "/product/getAllAddress")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    console.log("addressData", resData);
+                    this.setState({ showLoading: false, addressData: resData });
+                } else {
+                    // this.setState({ showLoading: false })
+                    // message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                // message.error(intl.get("editFailed"));
+                // this.setState({ showLoading: false });
+            });
+    }
+
+    handleChangeAddressStatus = (id) => {
+        console.log("id,,=", id);
+        browserHistory.push(BASE_URL + "/account/editAddress/" + id);
         // this.setState({
         //     addressAction: "edit"
         // })
@@ -69,32 +89,36 @@ class AddressList extends Component {
     renderAddress() {
         const columns = [{
             title: '收货人',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'consignee',
+            key: 'consignee',
             render: text => <a href="javascript:;">{text}</a>,
         }, {
-            title: '所在地区',
-            dataIndex: 'age',
-            key: 'age',
-        }, {
-            title: '详细地址',
-            dataIndex: 'detailAddress',
-            key: 'detailAddress',
-        }, {
-            title: '电话/手机',
+            title: '手机号码',
             dataIndex: 'telphone',
             key: 'telphone',
         }, {
+            title: '所在地区',
+            dataIndex: 'area',
+            key: 'area',
+        }, {
+            title: '详细地址',
+            dataIndex: 'addressName',
+            key: 'addressName',
+        }, {
             title: '邮编',
-            dataIndex: 'address',
-            key: 'address',
+            dataIndex: 'zipCode',
+            key: 'zipCode',
+        }, {
+            title: '默认地址',
+            dataIndex: 'addressStatus',
+            key: 'addressStatus',
         }, {
             title: 'Action',
-            key: 'action',
-            render: (text, record) => (
+            key: 'addressId',
+            render: (data, record) => (
                 <span>
                     <Divider type="vertical" />
-                    <a href="javascript:;" onClick={this.handleChangeAddressStatus}>edit</a>
+                    <a href="javascript:;" onClick={this.handleChangeAddressStatus.bind(this, data.addressId)}>edit</a>
                     <Divider type="vertical" />
                 </span>
             ),
@@ -103,7 +127,7 @@ class AddressList extends Component {
         return (
             <div className="address-list">
                 <div className="address-table">
-                    <Table columns={columns} dataSource={data} />
+                    <Table columns={columns} dataSource={this.state.addressData} />
                 </div>
                 <Icon type="plus-circle" onClick={this.handleShowAddAddress} />
                 <AddAddress

@@ -34,6 +34,20 @@ class Login extends Component {
                 httpRequestPost(SERVICE_URL + "/user/login", { data }, (resData) => {
                     this.setState({ showLoading: false });
                     if (resData == true) {
+                        axios.get(SERVICE_URL + "/user/getUserInfo")
+                            .then(response => {
+                                const resData = response.data;
+                                if (response.status == 200 && !resData.error) {
+                                    this.setState({ showLoading: false, userInfo: resData });
+                                } else {
+                                    this.setState({ showLoading: false })
+                                    message.error(intl.get("editFailed"));
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                message.error(intl.get("editFailed"));
+                                this.setState({ showLoading: false });
+                            });
                         browserHistory.push(BASE_URL + "/home");
                     } else {
                         this.alertMsg(messageText(errorData.code, intl.get("initSourceFailedTip")));

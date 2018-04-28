@@ -36,7 +36,7 @@ const routes = (
                     <IndexRoute component={Account} />
                     <Route path="member" component={Account} />
                     <Route path="address" component={AddressList} />
-                    <Route path="editAddress" component={EditAddress} />
+                    <Route path="editAddress/:id" component={EditAddress} />
                 </Route>
 
                 <Route path={"/openShop"} component={App}>

@@ -42,6 +42,41 @@ router.post("/addProduct", function (req, res) {
     })
 });
 
+/**
+ * 获取所有的地址
+ */
+router.get("/getAllAddress", function (req, res) {
+    const path = utils.PROJECT + "/getAllAddress";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据地址id获取地址
+ */
+router.get("/getAddress/:id", function (req, res) {
+    const path = utils.PROJECT + "/getAddress";
+    httpAgent.httpRequest({ addressId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.post("/editAddress", function (req, res) {
+    const path = utils.PROJECT + "/editAddress";
+    const { data } = req.body;
+    console.log("data1", data);
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        console.log("data2,", data);
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
 
 function checkIsRole(req) {
     const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
