@@ -66,12 +66,68 @@ router.get("/getAddress/:id", function (req, res) {
     })
 });
 
+router.post("/addAddress", function (req, res) {
+    const path = utils.PROJECT + "/addAddress";
+    const { data } = req.body;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.post("/changeAddressStatus", function (req, res) {
+    const path = utils.PROJECT + "/changeAddressStatus";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
 router.post("/editAddress", function (req, res) {
     const path = utils.PROJECT + "/editAddress";
     const { data } = req.body;
     console.log("data1", data);
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         console.log("data2,", data);
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.get("/deleteAddress/:id", function (req, res) {
+    const path = utils.PROJECT + "/deleteAddress";
+    httpAgent.httpRequest({ addressId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.get("/getAllCart", function (req, res) {
+    const path = utils.PROJECT + "/getAllCart";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.get("/getShop/:id", function (req, res) {
+    const path = utils.PROJECT + "/getShop";
+    httpAgent.httpRequest({ shopId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.get("/getAllShop", function (req, res) {
+    const path = utils.PROJECT + "/getAllShop";
+    httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

@@ -8,6 +8,7 @@ const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import AccountMenu from '../Menu/accountMenu';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import { Link, browserHistory } from 'react-router';
 
 const formItemLayout = {
     labelCol: {
@@ -69,18 +70,47 @@ class EditAddress extends Component {
             });
     }
 
+    handleChageAddressStatus = () => {
+        axios.post(SERVICE_URL + "/product/changeAddressStatus")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    console.log("--", resData);
+                    this.setState({ showLoading: false });
+                } else {
+                    // this.setState({ showLoading: false })
+                    // message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                // message.error(intl.get("editFailed"));
+                // this.setState({ showLoading: false });
+            });
+    }
+
     handleSavePersonInfo = (e) => {
         e.preventDefault();
+        const { address } = this.state;
+        console.log("---", address);
         this.props.form.validateFields((err, data) => {
             if (!err) {
                 data.addressId = this.props.params.id;
                 console.log(data);
+                if (data.addressStatus == true && address.addressStatus == 1) {
+                    data.addressStatus = 1;
+                } else if (data.addressStatus == true && address.addressStatus != 1) {
+                    data.addressStatus = 1;
+                    this.handleChageAddressStatus();
+                } else {
+                    data.addressStatus = 0;
+                }
                 axios.post(SERVICE_URL + "/product/editAddress", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
                             console.log("--", resData);
                             this.setState({ showLoading: false, address: resData });
+                            message.success("保存成功");
                         } else {
                             // this.setState({ showLoading: false })
                             // message.error(intl.get("editFailed"));
@@ -92,6 +122,10 @@ class EditAddress extends Component {
                     });
             }
         });
+    }
+
+    handleCancel = () => {
+        browserHistory.push(BASE_URL + "/account/address");
     }
 
     render() {
@@ -197,26 +231,43 @@ class EditAddress extends Component {
                     <FormItem
                         {...formItemLayout}
                         label={"邮政编码"}
+                        required="true"
                     >
                         {getFieldDecorator('zipCode', {
-                            rules: [],
+                            rules: [{
+                                required: true, message: intl.get("telphoneNotnull")
+                            }],
                             initialValue: address.zipCode
                         })(
                             <Input placeholder={"nickname"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <div className="footer-checkbox">
-                        <FormItem>
-                            {getFieldDecorator('remember', {
+                        <FormItem
+                            {...formItemLayout}
+                        >
+                            {getFieldDecorator('addressStatus', {
                                 valuePropName: 'checked',
-                                initialValue: true,
+                                initialValue: address.addressStatus == 1 ? true : false,
                             })(
-                                <Checkbox>设为默认地址</Checkbox>
+                                <Checkbox>{address.addressStatus == 1 ? "默认地址" : "设为默认"}</Checkbox>
                             )}
 
-                            <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
+                            {/* <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
                                 保存
-                            </Button>
+                            </Button> */}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                        >
+                            <div>
+                                <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
+                                    保存
+                                </Button>
+                                <Button onClick={this.handleCancel}>
+                                    取消
+                                </Button>
+                            </div>
                         </FormItem>
                     </div>
                 </Form>

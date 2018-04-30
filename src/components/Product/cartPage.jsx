@@ -16,8 +16,63 @@ class CartPage extends Component {
         checkedList: [],
         indeterminate: true,
         checkAll: false,
+        cartInfos: [],
+        shopInfos: [],
+        cartItemDiv: ''
     };
     plainOptions = ['apple', 'PERA'];
+
+    componentWillMount() {
+        this.handleGetAllCart();
+        // this.handleGetAllShop();
+        console.log(this.state.cartInfos);
+    }
+
+    handleGetAllCart = () => {
+        axios.get(SERVICE_URL + "/product/getAllCart")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(cartInfo => {
+                        this.handleGetShop(cartInfo.shopId);
+                    });
+                    this.setState({ showLoading: false, cartInfos: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleGetShop = (id) => {
+        console.log("0000", id);
+
+        axios.get(SERVICE_URL + "/product/getShop/" + id)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    let shopInfo = resData;
+                    let cartItemDiv = [];
+                    cartItemDiv.push(this.renderItem(shopInfo.shopName));
+                    this.setState({ showLoading: false, cartItemDiv: cartItemDiv });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleGetProduct = (shopId) => {
+
+    }
 
     changeCount = (e) => {
         console.log(e.target.value);
@@ -36,6 +91,10 @@ class CartPage extends Component {
 
     handleDeleteItem = () => {
         console.log("delete");
+    }
+
+    handleOnChange = (e) => {
+        console.log(`checked = ${e.target.checked}`);
     }
 
     onChange = (checkedList) => {
@@ -58,6 +117,7 @@ class CartPage extends Component {
     }
 
     render() {
+        const { cartItemDiv } = this.state;
         const defaultCheckedList = [this.renderItem()];
         const plainOptions = ['apple', 'PERA'];
         let cartFooterDiv =
@@ -77,7 +137,8 @@ class CartPage extends Component {
                             Check all
                         </Checkbox>
                         <CheckboxGroup options={plainOptions} value={this.state.checkedList} onChange={this.onChange} />
-                        {this.renderItem()}
+                        {/* {this.renderItem()} */}
+                        {cartItemDiv}
                     </Content>
                     <Footer>
                     </Footer>
@@ -95,15 +156,18 @@ class CartPage extends Component {
     }
 
 
-    renderItem = () => {
+    renderItem = (shopName) => {
         const { count } = this.state;
         let titleDiv =
             <div className="card-title">
-                <div className="card-title-text">
-                    <CheckboxGroup options={this.plainOptions} value={this.state.checkedList} onChange={this.onChange} />
-                </div>
-                <div className="card-title-text">店铺：</div>
-                <div className="card-title-text">阿福家萌物</div>
+                <Checkbox onChange={this.handleOnChange}>
+                    <div className="card-title-text">
+                        <div className="card-title-text">店铺：</div>
+                        <div className="card-title-text">{shopName}</div>
+                    </div>
+                </Checkbox>
+                {/* <CheckboxGroup options={this.plainOptions} value={this.state.checkedList} onChange={this.onChange} /> */}
+
             </div>
         return (
             <div className="cart-card" >

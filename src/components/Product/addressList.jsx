@@ -10,23 +10,6 @@ import EditAddress from './editAddress';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
-const data = [{
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No.',
-}, {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No',
-}, {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No',
-}];
-
 class AddressList extends Component {
     state = {
         showAddAddress: false,
@@ -34,6 +17,10 @@ class AddressList extends Component {
     }
 
     componentWillMount() {
+        this.handleGetAllAddress();
+    }
+
+    handleGetAllAddress = () => {
         axios.get(SERVICE_URL + "/product/getAllAddress")
             .then(response => {
                 const resData = response.data;
@@ -51,12 +38,30 @@ class AddressList extends Component {
             });
     }
 
-    handleChangeAddressStatus = (id) => {
+    handleEditAddress = (id) => {
         console.log("id,,=", id);
         browserHistory.push(BASE_URL + "/account/editAddress/" + id);
         // this.setState({
         //     addressAction: "edit"
         // })
+    }
+
+    handleDeleteAddress = (id) => {
+        axios.get(SERVICE_URL + "/product/deleteAddress/" + id)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, address: resData });
+                    this.handleGetAllAddress();
+                } else {
+                    // this.setState({ showLoading: false })
+                    // message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                // message.error(intl.get("editFailed"));
+                // this.setState({ showLoading: false });
+            });
     }
 
     handleShowAddAddress = () => {
@@ -118,7 +123,10 @@ class AddressList extends Component {
             render: (data, record) => (
                 <span>
                     <Divider type="vertical" />
-                    <a href="javascript:;" onClick={this.handleChangeAddressStatus.bind(this, data.addressId)}>edit</a>
+                    <a href="javascript:;" onClick={this.handleEditAddress.bind(this, data.addressId)}>edit</a>
+                    <Divider type="vertical" />
+                    <Divider type="vertical" />
+                    <a href="javascript:;" onClick={this.handleDeleteAddress.bind(this, data.addressId)}>delete</a>
                     <Divider type="vertical" />
                 </span>
             ),
@@ -133,6 +141,7 @@ class AddressList extends Component {
                 <AddAddress
                     visible={this.state.showAddAddress}
                     handleCancel={this.handleCancelAddress}
+                    handleGetAllAddress={this.handleGetAllAddress}
                 />
             </div>
         )
