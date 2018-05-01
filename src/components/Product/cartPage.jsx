@@ -8,6 +8,7 @@ const CheckboxGroup = Checkbox.Group;
 import CartFooter from './cartFooter';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import { _ } from 'underscore';
 
 
 class CartPage extends Component {
@@ -18,83 +19,175 @@ class CartPage extends Component {
         checkAll: false,
         cartInfos: [],
         shopInfos: [],
-        cartItemDiv: ''
+        cartItemDiv: '',
+        titleDiv: '',
+        productList: [],
+        productInfo: {},
+        shopIds: [],
+        shopIdList: [],
+        checkedAll: false
     };
     plainOptions = ['apple', 'PERA'];
 
     componentWillMount() {
         this.handleGetAllCart();
         // this.handleGetAllShop();
-        console.log(this.state.cartInfos);
     }
 
     handleGetAllCart = () => {
+        const { shopIds, shopIdList } = this.state;
         axios.get(SERVICE_URL + "/product/getAllCart")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
                     resData.forEach(cartInfo => {
-                        this.handleGetShop(cartInfo.shopId);
+                        if (!_.contains(shopIds, cartInfo.shopId)) {
+                            shopIds.push(cartInfo.shopId)
+                            shopIdList.push({ "shopId": cartInfo.shopId });
+                        }
                     });
-                    this.setState({ showLoading: false, cartInfos: resData });
+                    this.setState({ showLoading: false, cartInfos: resData, shopIds: shopIds });
+                    this.handleGetShop();
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取购物车失败");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("获取购物车失败");
                 this.setState({ showLoading: false });
             });
     }
 
-    handleGetShop = (id) => {
-        console.log("0000", id);
+    handleGetShop = () => {
+        const { shopIdList, cartInfos, shopIds } = this.state;
+        cartInfos.forEach(cartInfo => {
+            axios.get(SERVICE_URL + "/product/getShop/" + cartInfo.shopId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        let shopInfo = resData;
+                        shopIdList.forEach(shop => {
+                            if (shop.shopId == cartInfo.shopId) {
+                                shop.shopInfo = shopInfo;
+                                shop.checked = false;
+                            }
+                        });
+                        this.setState({ showLoading: false });
+                        this.handleGetProduct(cartInfo, shopInfo);
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error("获取店铺失败");
+                    }
+                }).catch(error => {
+                    console.log(error);
+                    message.error("获取店铺失败");
+                    this.setState({ showLoading: false });
+                });
+        });
 
-        axios.get(SERVICE_URL + "/product/getShop/" + id)
+    }
+
+    handleGetProduct = (cartInfo, shopInfo) => {
+        const { count, shopIdList, shopIds, productList } = this.state;
+        axios.get(SERVICE_URL + "/product/getProduct/" + cartInfo.shopId + "/" + cartInfo.proId)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    let shopInfo = resData;
-                    let cartItemDiv = [];
-                    cartItemDiv.push(this.renderItem(shopInfo.shopName));
-                    this.setState({ showLoading: false, cartItemDiv: cartItemDiv });
+                    resData.cartInfo = cartInfo;
+                    resData.shopInfo = shopInfo;
+                    productList.push(resData);
+                    this.setState({ productInfo: resData })
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取商品失败1");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("获取商品失败2");
                 this.setState({ showLoading: false });
             });
     }
 
-    handleGetProduct = (shopId) => {
-
+    changeCount = (cartId, product, e) => {
+        product.cartInfo.proNum = e.target.value;
+        this.setState({})
     }
 
-    changeCount = (e) => {
-        console.log(e.target.value);
-        this.setState({
-            count: e.target.value
-        })
+    decreaseCount = (cartId, product) => {
+        product.cartInfo.proNum = product.cartInfo.proNum - 1;
+        this.setState({})
     }
 
-    decreaseCount = () => {
-        this.setState({ count: this.state.count - 1 })
-    }
-
-    increaseCount = () => {
-        this.setState({ count: this.state.count + 1 })
+    increaseCount = (cartId, product) => {
+        product.cartInfo.proNum = product.cartInfo.proNum + 1;
+        this.setState({})
     }
 
     handleDeleteItem = () => {
         console.log("delete");
     }
 
-    handleOnChange = (e) => {
-        console.log(`checked = ${e.target.checked}`);
+    handleCheckboxProduct = (proId, checked, e) => {
+        const { shopIdList } = this.state;
+        let shopId = '';
+        shopIdList.forEach(shop => {
+            let flag = true;
+            shop.productList.forEach(product => {
+                if (proId == product.proId) {
+                    product.checked = e.target.checked;
+                }
+                if (product.checked == false) {
+                    shop.checked = false;
+                } else {
+                    shopId = shop.shopId;
+                }
+            });
+        });
+        checked = e.target.checked;
+        this.setState({})
+    }
+
+    handleCheckboxShop = (shopId, checked, e) => {
+        const { shopIdList } = this.state;
+        checked = e.target.checked;
+        shopIdList.forEach(shop => {
+            if (shopId == shop.shopId) {
+                shop.checked = e.target.checked;
+            }
+            shop.productList.forEach(product => {
+                if (shop.shopId == product.shopInfo.shopId) {
+                    product.checked = shop.checked;
+                }
+            });
+
+        });
+        this.setState({})
+    }
+
+    handleCheckAll = (e) => {
+        const { shopIdList } = this.state;
+        let flag = true;
+        let checkedAll = false;
+        shopIdList.forEach(shop => {
+            shop.checked = e.target.checked;
+            if (shop.checked == false) {
+                flag = false;
+            }
+            shop.productList.forEach(product => {
+                product.checked = shop.checked;
+                if (product.checked == false) {
+                    flag = false;
+                }
+            });
+        });
+        if (flag == true) {
+            checkedAll = true;
+        } else {
+            checkedAll = false;
+        }
+        console.log("checkedAll", checkedAll)
+        this.setState({ checkedAll: checkedAll })
     }
 
     onChange = (checkedList) => {
@@ -104,21 +197,15 @@ class CartPage extends Component {
             checkAll: checkedList.length === this.plainOptions.length,
         });
     }
-    onCheckAllChange = (e) => {
-        this.setState({
-            checkedList: e.target.checked ? this.plainOptions : [],
-            indeterminate: false,
-            checkAll: e.target.checked,
-        });
-    }
+
 
     handleBuy = () => {
         browserHistory.push(BASE_URL + "/buy");
     }
 
     render() {
-        const { cartItemDiv } = this.state;
-        const defaultCheckedList = [this.renderItem()];
+        const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll } = this.state;
+        console.log("shopIdList", checkedAll);
         const plainOptions = ['apple', 'PERA'];
         let cartFooterDiv =
             <div>
@@ -130,15 +217,17 @@ class CartPage extends Component {
                     <Header>Header</Header>
                     <Content>
                         <Checkbox
-                            indeterminate={this.state.indeterminate}
-                            onChange={this.onCheckAllChange}
-                            checked={this.state.checkAll}
+                            onChange={this.handleCheckAll}
+                            checked={this.state.checkedAll}
                         >
-                            Check all
+                            全选
                         </Checkbox>
-                        <CheckboxGroup options={plainOptions} value={this.state.checkedList} onChange={this.onChange} />
-                        {/* {this.renderItem()} */}
-                        {cartItemDiv}
+                        {productInfo.proId == null ? null : this.renderProduct()}
+                        {/* {cartInfos.length == 0 ? null :
+                            cartInfos.forEach(cartInfo => {
+                                // if(cartInfo.shopId)
+                            })
+                        } */}
                     </Content>
                     <Footer>
                     </Footer>
@@ -155,52 +244,88 @@ class CartPage extends Component {
         )
     }
 
+    renderProduct() {
+        console.log("pri");
+        const { count, cartInfos, productInfo, shopIdList, productList } = this.state;
+        shopIdList.forEach(shop => {
+            productList.forEach(product => {
+                shop.productList = shop.productList ? shop.productList : [];
+                if (shop.shopId == product.shopInfo.shopId && !_.contains(shop.productList, product)) {
+                    product.checked = false;
+                    shop.productList.push(product);
+                }
+            });
+        });
 
-    renderItem = (shopName) => {
-        const { count } = this.state;
-        let titleDiv =
-            <div className="card-title">
-                <Checkbox onChange={this.handleOnChange}>
-                    <div className="card-title-text">
-                        <div className="card-title-text">店铺：</div>
-                        <div className="card-title-text">{shopName}</div>
-                    </div>
-                </Checkbox>
-                {/* <CheckboxGroup options={this.plainOptions} value={this.state.checkedList} onChange={this.onChange} /> */}
+        let cartDiv = [];
+        let productFlag = false;
+        let tempProductList = [];
+        shopIdList.forEach(shop => {
+            console.log("shop.checked", shop.checked);
+            let cartItemDiv = [];
+            let titleDiv =
+                <div className="card-title">
+                    <Checkbox checked={shop.checked} onChange={this.handleCheckboxShop.bind(this, shop.shopId, shop.checked)}>
+                        <div className="card-title-text">
+                            <div className="card-title-text">店铺：</div>
+                            <div className="card-title-text">{shop.shopInfo ? shop.shopInfo.shopName : null}</div>
+                        </div>
+                    </Checkbox>
+                </div>
+            cartDiv.push(titleDiv);
+            tempProductList = shop.productList;
+            shop.productList.forEach(product => {
+                productFlag = false;
+                cartItemDiv = this.renderProductContent(product);
+                cartDiv.push(cartItemDiv)
+            })
+        });
+        // });
 
-            </div>
         return (
-            <div className="cart-card" >
-                <Card title={titleDiv} extra={<Icon type="delete" />}>
-                    <div className="card-item-content">
-                        <div className="left-img">
-                            <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
-                        </div>
-                        <div className="item-info">
-                            韩国Laneige兰芝雪凝雪纱双重防晒隔离霜 SPF22 30ML紫色绿色正品
-                        </div>
-                        <div className="item-status">
-                            颜色分类：白色<br />
-                            尺码：均码
-                        </div>
-                        <div className="item-price">
-                            ￥151.90
-                        </div>
-                        <div className="item-count">
-                            <Button onClick={this.decreaseCount}>-</Button>
-                            <Input value={count} onChange={this.changeCount} />
-                            <Button onClick={this.increaseCount}>+</Button>
-                        </div>
-                        <div className="item-total-price">
-                            ￥151.90
-                        </div>
-                        <div className="item-operation">
-                            <span onClick={this.handleDeleteItem}>删除</span>
-                        </div>
+            <div>
+                {cartDiv}
+            </div>
+        )
+    }
+
+
+    renderProductContent = (product) => {
+        let cartItemDiv = [];
+        cartItemDiv.push(
+            <div className="cart-card">
+                <Checkbox checked={product.checked} onChange={this.handleCheckboxProduct.bind(this, product.proId, product.checked)}>
+                </Checkbox>
+                <div className="card-item-content">
+                    <div className="left-img">
+                        <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
                     </div>
-                </Card>
-            </div >
-        );
+                    <div className="item-info">
+                        {product.proName} {product.description}
+                    </div>
+                    <div className="item-status">
+                        颜色分类：白色<br />
+                        尺码：均码
+                        </div>
+                    <div className="item-price">
+                        {product.price}
+                    </div>
+                    <div className="item-count">
+                        <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)}>-</Button>
+                        <Input value={product.cartInfo.proNum} onChange={this.changeCount.bind(this, product.cartInfo.cartId, product)} />
+                        <Button onClick={this.increaseCount.bind(this, product.cartInfo.cartId, product)}>+</Button>
+                    </div>
+                    <div className="item-total-price">
+                        ￥{product.price * product.cartInfo.proNum}
+                    </div>
+                    <div className="item-operation">
+                        <span onClick={this.handleDeleteItem}>删除</span>
+                    </div>
+                </div>
+            </div>)
+        return (
+            <div>{cartItemDiv}</div>
+        )
     }
 
     renderFooterContent() {

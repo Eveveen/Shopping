@@ -125,6 +125,28 @@ router.get("/getShop/:id", function (req, res) {
     })
 });
 
+router.get("/getProduct/:shopId/:proId", function (req, res) {
+    const path = utils.PROJECT + "/getProduct";
+    let data = {}
+    data.shopId = req.params.shopId;
+    data.proId = req.params.proId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        console.log(data)
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.get("/getProduct/:id", function (req, res) {
+    const path = utils.PROJECT + "/getAllProduct";
+    httpAgent.httpRequest({ shopId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
 router.get("/getAllShop", function (req, res) {
     const path = utils.PROJECT + "/getAllShop";
     httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
