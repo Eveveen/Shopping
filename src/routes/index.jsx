@@ -21,7 +21,7 @@ const routes = (
                 <Route path={"/register"} component={Register} />
                 <IndexRoute component={HomePage} />
                 <Route path={"/home"} component={HomePage} />
-                <Route path={"/buy"} component={BuyItem} />
+                <Route path={"/buy/:id"} component={BuyItem} />
                 <Route path={"/item"} component={DetailInfo} />
                 {/* <Route path={"/account"} component={Account} /> */}
                 {/* <Route path={"/address"} component={AddressList} /> */}

@@ -153,6 +153,28 @@ router.get("/deleteOneCart/:cartId", function (req, res) {
     })
 });
 
+router.post("/deleteMoreCart", function (req, res) {
+    const path = utils.PROJECT + "/deleteCarts";
+    const { selectedCartIds } = req.body;
+    console.log("selectedCartIds", selectedCartIds)
+    httpAgent.httpRequest({ cartIds: selectedCartIds }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.post("/editCartNum", function (req, res) {
+    const path = utils.PROJECT + "/editCart";
+    let data = req.body;
+    console.log(data);
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
 router.get("/getAllShop", function (req, res) {
     const path = utils.PROJECT + "/getAllShop";
     httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {

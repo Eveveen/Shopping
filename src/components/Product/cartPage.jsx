@@ -9,29 +9,26 @@ import CartFooter from './cartFooter';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { _ } from 'underscore';
+// import { withRouter } from 'react-router';
 
 
 class CartPage extends Component {
     state = {
         count: 1,
-        checkedList: [],
-        indeterminate: true,
-        checkAll: false,
         cartInfos: [],
-        shopInfos: [],
         cartItemDiv: '',
         titleDiv: '',
         productList: [],
         productInfo: {},
         shopIds: [],
         shopIdList: [],
-        checkedAll: false
+        checkedAll: false,
+        selectedCartIds: [],
+        totalCount: 0
     };
-    plainOptions = ['apple', 'PERA'];
 
     componentWillMount() {
         this.handleGetAllCart();
-        // this.handleGetAllShop();
     }
 
     handleGetAllCart = () => {
@@ -105,10 +102,8 @@ class CartPage extends Component {
                                 product.checked = false;
                                 shop.productList.push(product);
                             }
-
                         });
                     });
-
                     this.setState({ productInfo: resData })
                 } else {
                     this.setState({ showLoading: false })
@@ -121,18 +116,41 @@ class CartPage extends Component {
     }
 
     changeCount = (cartId, product, e) => {
-        product.cartInfo.proNum = e.target.value;
+        let cart = { "cartId": cartId, "proNum": e.target.value }
+        this.handleChageProNum(cart, product);
         this.setState({})
     }
 
     decreaseCount = (cartId, product) => {
-        product.cartInfo.proNum = product.cartInfo.proNum - 1;
+        let cart = { "cartId": cartId, "proNum": product.cartInfo.proNum - 1 }
+        this.handleChageProNum(cart, product);
         this.setState({})
     }
 
     increaseCount = (cartId, product) => {
-        product.cartInfo.proNum = product.cartInfo.proNum + 1;
+        let cart = { "cartId": cartId, "proNum": product.cartInfo.proNum + 1 }
+        this.handleChageProNum(cart, product);
         this.setState({})
+    }
+
+    handleChageProNum = (cart, product) => {
+        let totalCount = this.state.totalCount;
+        axios.post(SERVICE_URL + "/product/editCartNum", cart)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    totalCount += (cart.proNum - product.cartInfo.proNum) * product.price;
+                    product.cartInfo.proNum = cart.proNum;
+                    this.setState({ showLoading: false, totalCount: totalCount })
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("减少购物车商品失败1");
+                }
+
+            }).catch(error => {
+                message.error("减少购物车商品失败");
+                this.setState({ showLoading: false });
+            });
     }
 
     handleDeleteItem = (cartId) => {
@@ -166,8 +184,45 @@ class CartPage extends Component {
         this.setState({})
     }
 
+    handleDeleteMoreItem = () => {
+        const { shopIdList, cartInfos, productList, selectedCartIds } = this.state;
+        axios.post(SERVICE_URL + "/product/deleteMoreCart", { selectedCartIds: selectedCartIds })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    shopIdList.forEach((shop, index) => {
+                        shop.productList.forEach(product => {
+                            selectedCartIds.forEach(cartId => {
+                                if (product.cartInfo.cartId === cartId && shop.productList.length == 1) {
+                                    shop.shopInfo = {};
+                                    shopIdList.splice(index, 1)
+                                }
+                            });
+
+                        });
+
+                    });
+
+                    this.setState({ showLoading: false, productList: [] })
+                    this.handleGetAllCart();
+                } else {
+                    this.setState({ showLoading: false })
+                    console.log(error);
+                    message.error("删除购物车商品失败1");
+                }
+
+            }).catch(error => {
+                console.log(error);
+                message.error("删除购物车商品失败");
+                this.setState({ showLoading: false });
+            });
+
+        this.setState({})
+    }
+
     handleCheckboxProduct = (proId, checked, e) => {
-        const { shopIdList } = this.state;
+        const { shopIdList, selectedCartIds, productList } = this.state;
+        let totalCount = this.state.totalCount;
         let shopId = '';
         let shopFlag = true;
         shopIdList.forEach(shop => {
@@ -190,17 +245,34 @@ class CartPage extends Component {
                 shopFlag = false;
             }
         });
+
+        productList.forEach((product, index) => {
+            if (product.proId == proId) {
+                if (product.checked && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
+                    selectedCartIds.push(product.cartInfo.cartId);
+                    totalCount += product.cartInfo.proNum * product.price;
+                } else if (_.contains(selectedCartIds, product.cartInfo.cartId) && product.checked == false) {
+                    totalCount -= product.cartInfo.proNum * product.price;
+                    selectedCartIds.forEach((id, idIndex) => {
+                        if (id == product.cartInfo.cartId) {
+                            selectedCartIds.splice(idIndex, 1);
+                        }
+                    });
+                }
+            }
+        });
         if (shopFlag) {
             this.state.checkedAll = true;
         } else {
             this.state.checkedAll = false;
         }
-        this.setState({})
+        this.setState({ totalCount: totalCount })
     }
 
     handleCheckboxShop = (shopId, checked, e) => {
-        const { shopIdList } = this.state;
+        const { shopIdList, productList, selectedCartIds } = this.state;
         let shopFlag = true;
+        let totalCount = this.state.totalCount;
         shopIdList.forEach(shop => {
             if (shopId == shop.shopId) {
                 shop.checked = e.target.checked;
@@ -215,16 +287,31 @@ class CartPage extends Component {
                 }
             });
         });
+        productList.forEach((product, index) => {
+            if (product.shopInfo.shopId == shopId) {
+                if (product.checked && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
+                    selectedCartIds.push(product.cartInfo.cartId);
+                    totalCount += product.cartInfo.proNum * product.price;
+                } else if (_.contains(selectedCartIds, product.cartInfo.cartId) && product.checked == false) {
+                    totalCount -= product.cartInfo.proNum * product.price;
+                    selectedCartIds.forEach((id, idIndex) => {
+                        if (id == product.cartInfo.cartId) {
+                            selectedCartIds.splice(idIndex, 1);
+                        }
+                    });
+                }
+            }
+        });
         if (shopFlag) {
             this.state.checkedAll = true;
         } else {
             this.state.checkedAll = false;
         }
-        this.setState({})
+        this.setState({ totalCount: totalCount })
     }
 
     handleCheckAll = (e) => {
-        const { shopIdList } = this.state;
+        const { shopIdList, selectedCartIds, productList } = this.state;
         let flag = true;
         let checkedAll = false;
         shopIdList.forEach(shop => {
@@ -239,34 +326,53 @@ class CartPage extends Component {
                 }
             });
         });
+
+        let totalCount = 0;
         if (flag == true) {
             checkedAll = true;
+            productList.forEach((product, index) => {
+                if (product.checked && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
+                    selectedCartIds.push(product.cartInfo.cartId);
+                    totalCount += product.cartInfo.proNum * product.price;
+                } else if (_.contains(selectedCartIds, product.cartInfo.cartId) && product.checked == false) {
+                    selectedCartIds.forEach((id, idIndex) => {
+                        if (id == product.cartInfo.cartId) {
+                            selectedCartIds.splice(idIndex, 1);
+                        }
+                    });
+                }
+            });
         } else {
             checkedAll = false;
+            this.state.selectedCartIds = [];
         }
-        this.setState({ checkedAll: checkedAll })
-    }
 
-    onChange = (checkedList) => {
-        this.setState({
-            checkedList,
-            indeterminate: !!checkedList.length && (checkedList.length < this.plainOptions.length),
-            checkAll: checkedList.length === this.plainOptions.length,
-        });
+        this.setState({ checkedAll: checkedAll, totalCount: totalCount })
     }
-
 
     handleBuy = () => {
-        browserHistory.push(BASE_URL + "/buy");
+        const { selectedCartIds, productList, shopIdList } = this.state;
+        let cartList = [];
+        let shopList = [];
+        selectedCartIds.forEach(cartId => {
+            productList.forEach(product => {
+                if (cartId == product.cartInfo.cartId) {
+                    cartList.push({ "cartId": cartId, "product": product })
+                }
+            })
+            shopIdList.forEach((shop, index) => {
+                shop.productList.forEach(pro => {
+                    if (pro.cartInfo.cartId == cartId && !_.contains(shopList, shop)) {
+                        shopList.push(shop);
+                    }
+                });
+            });
+        });
+        browserHistory.push({ pathname: BASE_URL + "/buy/" + selectedCartIds, state: { cartList: cartList, shopList: shopList } });
     }
 
     render() {
-        const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll } = this.state;
-        const plainOptions = ['apple', 'PERA'];
-        let cartFooterDiv =
-            <div>
-                勾选购物车内所有商品 全选删除清除失效宝贝移入收藏夹分享已选商品29件合计（不含运费）： ￥2460.40
-            </div>
+        const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll, selectedCartIds } = this.state;
         return (
             <div className="cart-page">
                 <Layout>
@@ -279,11 +385,6 @@ class CartPage extends Component {
                             全选
                         </Checkbox>
                         {productInfo.proId == null ? null : this.renderProduct()}
-                        {/* {cartInfos.length == 0 ? null :
-                            cartInfos.forEach(cartInfo => {
-                                // if(cartInfo.shopId)
-                            })
-                        } */}
                     </Content>
                     <Footer>
                     </Footer>
@@ -319,11 +420,7 @@ class CartPage extends Component {
             tempProductList = shop.productList;
             let flag = false;
             shop.productList.forEach(product => {
-                // productList.forEach(pro => {
-                // if (pro.proId == product.proId) {
                 cartItemDiv = this.renderProductContent(product);
-                // }
-                // })
                 cartDiv.push(cartItemDiv)
             })
         });
@@ -376,6 +473,7 @@ class CartPage extends Component {
     }
 
     renderFooterContent() {
+        const { selectedCartIds, totalCount } = this.state;
         return (
             <div className="cart-footer-content">
                 <div className="footer-operation">
@@ -386,14 +484,15 @@ class CartPage extends Component {
                         全选
                     </Checkbox>
                 </div>
-                <div className="footer-operation"><a onClick={this.delete}>删除</a></div>
+                <div className="footer-operation"><a onClick={this.handleDeleteMoreItem}>删除</a></div>
                 <div className="footer-operation">清除失效宝贝</div>
                 <div className="footer-operation"> 移入收藏夹</div>
-                <div className="footer-operation"> 已选商品29件</div>
-                <div className="footer-operation">合计（不含运费）： ￥2460.40</div>
+                <div className="footer-operation"> 已选商品{selectedCartIds.length}件</div>
+                <div className="footer-operation">合计（不含运费）： ￥{totalCount}</div>
             </div>
         )
     }
 }
 
 export default CartPage;
+// export default withRouter(CartPage)

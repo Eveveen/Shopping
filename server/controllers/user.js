@@ -99,6 +99,7 @@ router.post("/addUser", function (req, res) {
 router.get("/getUserInfo", function (req, res) {
     const path = utils.PROJECT + "/getUserInfo";
     httpAgent.httpRequest({ userName: req.session.user.userName }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        req.session.user = data;
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

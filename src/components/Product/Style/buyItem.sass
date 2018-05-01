@@ -1,10 +1,56 @@
 .buy-item
     margin: 0 13%
-    .card
-        .card-title
+    .card-title
+        display: flex
+        background: #fff
+        border: 1px solid #e8e8e8
+        padding: 24px
+        border-radius: 2px 2px 0 0
+        zoom: 1
+        margin-bottom: -1px
+        min-height: 48px
+        .card-title-text
+            margin-right: 20px
             display: flex
-            .card-title-text
-                margin-right: 20px
+    .cart-card
+        padding: 24px
+        zoom: 1
+        border: 1px solid #e8e8e8
+        background: #fff
+        display: flex
+        .ant-checkbox-wrapper
+            margin-right: 20px
+        .card-item-content
+            display: flex
+            height: 100px
+            .left-img
+                flex: 1
+                img
+                    width: 80
+                    height: 80px
+            .item-info
+                flex: 2
+            .item-price
+                flex: 1
+                margin-left: 20px
+            .item-count
+                flex: 1
+                display: flex
+                .ant-btn
+                    height: 30px
+                    max-width: 30px
+                    padding-left: 10px
+                .ant-input
+                    height: 30px
+                    min-width: 40px
+                    text-align: center                    
+            .item-total-price
+                flex: 1
+                padding-left: 50px
+            .item-status
+                flex: 1
+                margin-left: 20px
+    .card
         .card-item-content
             display: flex
             height: 100px
