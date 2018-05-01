@@ -43,7 +43,7 @@ class CartPage extends Component {
                     resData.forEach(cartInfo => {
                         if (!_.contains(shopIds, cartInfo.shopId)) {
                             shopIds.push(cartInfo.shopId)
-                            shopIdList.push({ "shopId": cartInfo.shopId });
+                            shopIdList.push({ "shopId": cartInfo.shopId, "productList": [] });
                         }
                     });
                     this.setState({ showLoading: false, cartInfos: resData, shopIds: shopIds });
@@ -53,7 +53,6 @@ class CartPage extends Component {
                     message.error("获取购物车失败");
                 }
             }).catch(error => {
-                console.log(error);
                 message.error("获取购物车失败");
                 this.setState({ showLoading: false });
             });
@@ -80,7 +79,6 @@ class CartPage extends Component {
                         message.error("获取店铺失败");
                     }
                 }).catch(error => {
-                    console.log(error);
                     message.error("获取店铺失败");
                     this.setState({ showLoading: false });
                 });
@@ -90,6 +88,9 @@ class CartPage extends Component {
 
     handleGetProduct = (cartInfo, shopInfo) => {
         const { count, shopIdList, shopIds, productList } = this.state;
+        shopIdList.forEach(shop => {
+            shop.productList = [];
+        });
         axios.get(SERVICE_URL + "/product/getProduct/" + cartInfo.shopId + "/" + cartInfo.proId)
             .then(response => {
                 const resData = response.data;
@@ -97,13 +98,23 @@ class CartPage extends Component {
                     resData.cartInfo = cartInfo;
                     resData.shopInfo = shopInfo;
                     productList.push(resData);
+
+                    shopIdList.forEach(shop => {
+                        productList.forEach((product, index) => {
+                            if (shop.shopId == product.shopInfo.shopId && !_.contains(shop.productList, product)) {
+                                product.checked = false;
+                                shop.productList.push(product);
+                            }
+
+                        });
+                    });
+
                     this.setState({ productInfo: resData })
                 } else {
                     this.setState({ showLoading: false })
                     message.error("获取商品失败1");
                 }
             }).catch(error => {
-                console.log(error);
                 message.error("获取商品失败2");
                 this.setState({ showLoading: false });
             });
@@ -124,44 +135,91 @@ class CartPage extends Component {
         this.setState({})
     }
 
-    handleDeleteItem = () => {
-        console.log("delete");
+    handleDeleteItem = (cartId) => {
+        const { shopIdList, cartInfos, productList } = this.state;
+        axios.get(SERVICE_URL + "/product/deleteOneCart/" + cartId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    shopIdList.forEach((shop, index) => {
+                        shop.productList.forEach(product => {
+                            if (product.cartInfo.cartId === cartId && shop.productList.length == 1) {
+                                shop.shopInfo = {};
+                                shopIdList.splice(index, 1)
+                            }
+                        });
+
+                    });
+
+                    this.setState({ showLoading: false, productList: [] })
+                    this.handleGetAllCart();
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("删除购物车商品失败1");
+                }
+
+            }).catch(error => {
+                message.error("删除购物车商品失败");
+                this.setState({ showLoading: false });
+            });
+
+        this.setState({})
     }
 
     handleCheckboxProduct = (proId, checked, e) => {
         const { shopIdList } = this.state;
         let shopId = '';
+        let shopFlag = true;
         shopIdList.forEach(shop => {
-            let flag = true;
+            let productFlag = true;
             shop.productList.forEach(product => {
                 if (proId == product.proId) {
                     product.checked = e.target.checked;
                 }
                 if (product.checked == false) {
                     shop.checked = false;
-                } else {
-                    shopId = shop.shopId;
+                    this.state.checkedAll = false;
+                    productFlag = false;
+                    shopFlag = false;
+                }
+                if (productFlag) {
+                    shop.checked = true;
                 }
             });
+            if (shop.checked == false) {
+                shopFlag = false;
+            }
         });
-        checked = e.target.checked;
+        if (shopFlag) {
+            this.state.checkedAll = true;
+        } else {
+            this.state.checkedAll = false;
+        }
         this.setState({})
     }
 
     handleCheckboxShop = (shopId, checked, e) => {
         const { shopIdList } = this.state;
-        checked = e.target.checked;
+        let shopFlag = true;
         shopIdList.forEach(shop => {
             if (shopId == shop.shopId) {
                 shop.checked = e.target.checked;
             }
+            if (shop.checked == false) {
+                shopFlag = false;
+
+            }
             shop.productList.forEach(product => {
-                if (shop.shopId == product.shopInfo.shopId) {
+                if (shopId == product.shopInfo.shopId) {
                     product.checked = shop.checked;
                 }
             });
-
         });
+        if (shopFlag) {
+            this.state.checkedAll = true;
+        } else {
+            this.state.checkedAll = false;
+        }
         this.setState({})
     }
 
@@ -186,7 +244,6 @@ class CartPage extends Component {
         } else {
             checkedAll = false;
         }
-        console.log("checkedAll", checkedAll)
         this.setState({ checkedAll: checkedAll })
     }
 
@@ -205,7 +262,6 @@ class CartPage extends Component {
 
     render() {
         const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll } = this.state;
-        console.log("shopIdList", checkedAll);
         const plainOptions = ['apple', 'PERA'];
         let cartFooterDiv =
             <div>
@@ -245,23 +301,10 @@ class CartPage extends Component {
     }
 
     renderProduct() {
-        console.log("pri");
         const { count, cartInfos, productInfo, shopIdList, productList } = this.state;
-        shopIdList.forEach(shop => {
-            productList.forEach(product => {
-                shop.productList = shop.productList ? shop.productList : [];
-                if (shop.shopId == product.shopInfo.shopId && !_.contains(shop.productList, product)) {
-                    product.checked = false;
-                    shop.productList.push(product);
-                }
-            });
-        });
-
         let cartDiv = [];
-        let productFlag = false;
         let tempProductList = [];
         shopIdList.forEach(shop => {
-            console.log("shop.checked", shop.checked);
             let cartItemDiv = [];
             let titleDiv =
                 <div className="card-title">
@@ -274,9 +317,13 @@ class CartPage extends Component {
                 </div>
             cartDiv.push(titleDiv);
             tempProductList = shop.productList;
+            let flag = false;
             shop.productList.forEach(product => {
-                productFlag = false;
+                // productList.forEach(pro => {
+                // if (pro.proId == product.proId) {
                 cartItemDiv = this.renderProductContent(product);
+                // }
+                // })
                 cartDiv.push(cartItemDiv)
             })
         });
@@ -319,7 +366,7 @@ class CartPage extends Component {
                         ￥{product.price * product.cartInfo.proNum}
                     </div>
                     <div className="item-operation">
-                        <span onClick={this.handleDeleteItem}>删除</span>
+                        <span onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</span>
                     </div>
                 </div>
             </div>)
@@ -331,8 +378,15 @@ class CartPage extends Component {
     renderFooterContent() {
         return (
             <div className="cart-footer-content">
-                <div className="footer-operation">全选</div>
-                <div className="footer-operation">删除</div>
+                <div className="footer-operation">
+                    <Checkbox
+                        onChange={this.handleCheckAll}
+                        checked={this.state.checkedAll}
+                    >
+                        全选
+                    </Checkbox>
+                </div>
+                <div className="footer-operation"><a onClick={this.delete}>删除</a></div>
                 <div className="footer-operation">清除失效宝贝</div>
                 <div className="footer-operation"> 移入收藏夹</div>
                 <div className="footer-operation"> 已选商品29件</div>

@@ -89,9 +89,7 @@ router.post("/changeAddressStatus", function (req, res) {
 router.post("/editAddress", function (req, res) {
     const path = utils.PROJECT + "/editAddress";
     const { data } = req.body;
-    console.log("data1", data);
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        console.log("data2,", data);
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
@@ -131,7 +129,6 @@ router.get("/getProduct/:shopId/:proId", function (req, res) {
     data.shopId = req.params.shopId;
     data.proId = req.params.proId;
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        console.log(data)
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
@@ -141,6 +138,15 @@ router.get("/getProduct/:shopId/:proId", function (req, res) {
 router.get("/getProduct/:id", function (req, res) {
     const path = utils.PROJECT + "/getAllProduct";
     httpAgent.httpRequest({ shopId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+router.get("/deleteOneCart/:cartId", function (req, res) {
+    const path = utils.PROJECT + "/deleteCart";
+    httpAgent.httpRequest({ cartId: req.params.cartId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
