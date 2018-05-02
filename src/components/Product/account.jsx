@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, Upload } from 'antd';
+import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, Upload, message } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/account.sass';
@@ -67,7 +67,7 @@ class Account extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, userInfo: resData });
+                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
                 } else {
                     this.setState({ showLoading: false })
                     message.error(intl.get("editFailed"));
@@ -81,11 +81,13 @@ class Account extends Component {
 
     handleSavePersonInfo = (e) => {
         e.preventDefault();
-        const { userInfo } = this.state;
+        const { userInfo, imgId } = this.state;
         this.props.form.validateFields((err, data) => {
             data.userId = userInfo.userId;
+            data.imgId = imgId;
+            data.avatar = '';
             data.role = 1;
-            console.log("0000");
+            console.log("0000", data);
             if (!err) {
                 axios.post(SERVICE_URL + "/user/updateUser", { data })
                     .then(response => {

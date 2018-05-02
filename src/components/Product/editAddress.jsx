@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider } from 'antd';
+import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, message } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/editAddress.sass';
 const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import AccountMenu from '../Menu/accountMenu';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import { Link, browserHistory } from 'react-router';
 
 const formItemLayout = {
     labelCol: {
@@ -47,16 +49,83 @@ class EditAddress extends Component {
     state = {
         manageStatus: 1,
         submitLoading: false,
+        address: {}
+    }
+
+    componentWillMount() {
+        axios.get(SERVICE_URL + "/product/getAddress/" + this.props.params.id)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    console.log("addressData", resData);
+                    this.setState({ showLoading: false, address: resData });
+                } else {
+                    // this.setState({ showLoading: false })
+                    // message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                // message.error(intl.get("editFailed"));
+                // this.setState({ showLoading: false });
+            });
+    }
+
+    handleChageAddressStatus = () => {
+        axios.post(SERVICE_URL + "/product/changeAddressStatus")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    console.log("--", resData);
+                    this.setState({ showLoading: false });
+                } else {
+                    // this.setState({ showLoading: false })
+                    // message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                // message.error(intl.get("editFailed"));
+                // this.setState({ showLoading: false });
+            });
     }
 
     handleSavePersonInfo = (e) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        const { address } = this.state;
+        console.log("---", address);
+        this.props.form.validateFields((err, data) => {
             if (!err) {
-                console.log('Received values of form: ', values);
-                this.next();
+                data.addressId = this.props.params.id;
+                console.log(data);
+                if (data.addressStatus == true && address.addressStatus == 1) {
+                    data.addressStatus = 1;
+                } else if (data.addressStatus == true && address.addressStatus != 1) {
+                    data.addressStatus = 1;
+                    this.handleChageAddressStatus();
+                } else {
+                    data.addressStatus = 0;
+                }
+                axios.post(SERVICE_URL + "/product/editAddress", { data })
+                    .then(response => {
+                        const resData = response.data;
+                        if (response.status == 200 && !resData.error) {
+                            console.log("--", resData);
+                            this.setState({ showLoading: false, address: resData });
+                            message.success("保存成功");
+                        } else {
+                            // this.setState({ showLoading: false })
+                            // message.error(intl.get("editFailed"));
+                        }
+                    }).catch(error => {
+                        console.log(error);
+                        // message.error(intl.get("editFailed"));
+                        // this.setState({ showLoading: false });
+                    });
             }
         });
+    }
+
+    handleCancel = () => {
+        browserHistory.push(BASE_URL + "/account/address");
     }
 
     render() {
@@ -76,7 +145,7 @@ class EditAddress extends Component {
 
     renderEditAddress() {
         const { getFieldDecorator } = this.props.form;
-        const { submitLoading } = this.state;
+        const { submitLoading, address } = this.state;
         const prefixSelector = getFieldDecorator('prefix', {
             initialValue: '86',
         })(
@@ -90,10 +159,27 @@ class EditAddress extends Component {
                 <Form onSubmit={this.handleSavePersonInfo} className="personal-info-form">
                     <FormItem
                         {...formItemLayout}
+                        label={"收货人姓名"}
+                        required="true"
+                    >
+                        {getFieldDecorator('consignee', {
+                            rules: [{
+                                required: true, message: intl.get("telphoneNotnull")
+                            }, {
+                                eq: 11, message: intl.get("telphoneLength")
+                            }],
+                            initialValue: address.consignee
+                        })(
+                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
                         label="手机号码"
                     >
-                        {getFieldDecorator('phone', {
+                        {getFieldDecorator('telphone', {
                             rules: [{ required: true, message: 'Please input your phone number!' }],
+                            initialValue: address.telphone
                         })(
                             <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
                         )}
@@ -103,27 +189,41 @@ class EditAddress extends Component {
                         label={"所在地区"}
                         required="true"
                     >
-                        {getFieldDecorator('nickname', {
+                        {getFieldDecorator('area', {
                             rules: [{
                                 required: true, message: intl.get("telphoneNotnull")
                             }, {
                                 eq: 11, message: intl.get("telphoneLength")
                             }],
+                            initialValue: address.area
                         })(
                             <Input placeholder={"nickname"} disabled={submitLoading} />
                         )}
                     </FormItem>
+                    {/* <FormItem
+                        {...formItemLayout}
+                        label="所在地区"
+                    >
+                        {getFieldDecorator('area', {
+                            initialValue: ['zhejiang', 'hangzhou', 'xihu'],
+                            rules: [{ type: 'array', required: true, message: 'Please select your habitual residence!' }],
+                            // initialValue: address.area
+                        })(
+                            <Cascader options={residences} />
+                        )}
+                    </FormItem> */}
                     <FormItem
                         {...formItemLayout}
                         label={"详细地址"}
                         required="true"
                     >
-                        {getFieldDecorator('nickname', {
+                        {getFieldDecorator('addressName', {
                             rules: [{
                                 required: true, message: intl.get("telphoneNotnull")
                             }, {
                                 eq: 11, message: intl.get("telphoneLength")
                             }],
+                            initialValue: address.addressName
                         })(
                             <Input placeholder={"nickname"} disabled={submitLoading} />
                         )}
@@ -131,51 +231,43 @@ class EditAddress extends Component {
                     <FormItem
                         {...formItemLayout}
                         label={"邮政编码"}
-                    >
-                        {getFieldDecorator('nickname', {
-                            rules: [],
-                        })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label={"收货人姓名"}
                         required="true"
                     >
-                        {getFieldDecorator('nickname', {
+                        {getFieldDecorator('zipCode', {
                             rules: [{
                                 required: true, message: intl.get("telphoneNotnull")
-                            }, {
-                                eq: 11, message: intl.get("telphoneLength")
                             }],
+                            initialValue: address.zipCode
                         })(
                             <Input placeholder={"nickname"} disabled={submitLoading} />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="居住地"
-                    >
-                        {getFieldDecorator('residence', {
-                            initialValue: ['zhejiang', 'hangzhou', 'xihu'],
-                            rules: [{ type: 'array', required: true, message: 'Please select your habitual residence!' }],
-                        })(
-                            <Cascader options={residences} />
                         )}
                     </FormItem>
                     <div className="footer-checkbox">
-                        <FormItem>
-                            {getFieldDecorator('remember', {
+                        <FormItem
+                            {...formItemLayout}
+                        >
+                            {getFieldDecorator('addressStatus', {
                                 valuePropName: 'checked',
-                                initialValue: true,
+                                initialValue: address.addressStatus == 1 ? true : false,
                             })(
-                                <Checkbox>设为默认地址</Checkbox>
+                                <Checkbox>{address.addressStatus == 1 ? "默认地址" : "设为默认"}</Checkbox>
                             )}
 
-                            <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
+                            {/* <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
                                 保存
-                            </Button>
+                            </Button> */}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                        >
+                            <div>
+                                <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
+                                    保存
+                                </Button>
+                                <Button onClick={this.handleCancel}>
+                                    取消
+                                </Button>
+                            </div>
                         </FormItem>
                     </div>
                 </Form>

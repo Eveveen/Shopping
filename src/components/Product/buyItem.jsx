@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Layout } from 'antd';
+import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Layout, Checkbox } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
 import axios from 'axios';
 import intl from 'react-intl-universal';
@@ -9,11 +9,19 @@ import AddressItem from './addressItem';
 
 class BuyItem extends Component {
     state = {
-        count: 1
+        count: 1,
+        cartIds: [],
+        buyList: [],
+        shopList: []
+    }
+
+    componentWillMount() {
+        let cartIds = this.props.params.id.split(",");
+        const { cartList, shopList } = this.props.location.state;
+        this.setState({ cartIds: cartIds, buyList: cartList, shopList: shopList })
     }
 
     changeCount = (e) => {
-        console.log(e.target.value);
         this.setState({
             count: e.target.value
         })
@@ -27,14 +35,21 @@ class BuyItem extends Component {
         this.setState({ count: this.state.count + 1 })
     }
 
+    handleGetCartInfo = () => {
+
+    }
+
     render() {
+        console.log("stateTest,", this.props.location.state);
+        const { shopList } = this.state;
         return (
             <div className="buy-item">
                 <Layout>
                     <Header>Header</Header>
                     <Content>
                         <AddressItem />
-                        {this.renderBuyItem()}
+                        {/* {this.renderBuyItem()} */}
+                        {shopList.length == 0 ? null : this.renderProduct()}
                     </Content>
                     <Footer>Footer</Footer>
                 </Layout>
@@ -44,7 +59,7 @@ class BuyItem extends Component {
     }
 
     renderBuyItem() {
-        const { count } = this.state;
+        const { count, cartIds, buyList, shopList } = this.state;
         let titleDiv =
             <div className="card-title">
                 <div className="card-title-text">2018-04-15</div>
@@ -102,6 +117,80 @@ class BuyItem extends Component {
             </div>
         )
     }
-}
 
+    renderProduct() {
+        const { count, buyList, shopList } = this.state;
+        console.log("buyList", buyList)
+        let cartDiv = [];
+        let tempProductList = [];
+        shopList.forEach(shop => {
+            let titleDiv =
+                <div className="card-title">
+                    <div className="card-title-text">
+                        <div className="card-title-text">店铺：</div>
+                        <div className="card-title-text">{shop.shopInfo ? shop.shopInfo.shopName : null}</div>
+                    </div>
+                </div>
+            cartDiv.push(titleDiv);
+            tempProductList = shop.productList;
+            let flag = false;
+            // shop.productList.forEach(product => {
+            //     cartItemDiv = this.renderProductContent(product);
+            //     cartDiv.push(cartItemDiv)
+            // })
+            buyList.forEach(cart => {
+                let cartItemDiv = [];
+                if (cart.product.shopInfo.shopId == shop.shopId) {
+                    cartItemDiv = this.renderProductContent(cart.product);
+                }
+                cartDiv.push(cartItemDiv)
+            })
+        });
+
+        return (
+            <div>
+                {cartDiv}
+            </div>
+        )
+    }
+
+    renderProductContent = (product) => {
+        let cartItemDiv = [];
+        cartItemDiv.push(
+            <div className="cart-card">
+                <div className="card-item-content">
+                    <div className="left-img">
+                        <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+                    </div>
+                    <div className="item-info">
+                        {product.proName} {product.description}
+                    </div>
+                    <div className="item-status">
+                        颜色分类：白色<br />
+                        尺码：均码
+                        </div>
+                    <div className="item-price">
+                        {product.price}
+                    </div>
+                    <div className="item-count">
+                        {/* <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)}>-</Button> */}
+                        {/* <Input value={product.cartInfo.proNum} onChange={this.changeCount.bind(this, product.cartInfo.cartId, product)} /> */}
+                        {/* <Button onClick={this.increaseCount.bind(this, product.cartInfo.cartId, product)}>+</Button> */}
+                    </div>
+                    <div className="item-total-price">
+                        ￥{product.price * product.cartInfo.proNum}
+                    </div>
+                    <div className="item-operation">
+                        {/* <span onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</span> */}
+                    </div>
+                </div>
+            </div>)
+        return (
+            <div>{cartItemDiv}</div>
+        )
+    }
+
+
+}
 export default BuyItem;
+// export default withRouter(BuyItem)
