@@ -159,6 +159,9 @@ router.get("/getAllCart", function (req, res) {
     })
 });
 
+/**
+ * 获取店铺信息
+ */
 router.get("/getShop/:id", function (req, res) {
     const path = utils.PROJECT + "/getShop";
     httpAgent.httpRequest({ shopId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
@@ -184,7 +187,7 @@ router.get("/getProduct/:shopId/:proId", function (req, res) {
 });
 
 /**
- * 店铺中的商品
+ * 查看本店铺所有商品
  */
 router.get("/getProduct/:id", function (req, res) {
     const path = utils.PROJECT + "/getAllProduct";
@@ -239,6 +242,20 @@ router.post("/editCartNum", function (req, res) {
 router.get("/getAllOrder", function (req, res) {
     const path = utils.PROJECT + "/getAllOrder";
     httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 添加订单
+ */
+router.post("/addOrder", function (req, res) {
+    const path = utils.PROJECT + "/addOrder";
+    const { data } = req.body;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
