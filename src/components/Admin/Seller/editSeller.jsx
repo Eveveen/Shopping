@@ -32,51 +32,23 @@ class EditSeller extends Component {
         }
     }
 
-    handleChageAddressStatus = () => {
-        axios.post(SERVICE_URL + "/product/changeAddressStatus")
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    console.log("--", resData);
-                    this.setState({ showLoading: false });
-                } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
-            });
-    }
-
-    handleAddAddress = (e) => {
+    handlEditSeller = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, data) => {
             if (!err) {
-                console.log(data);
-                if (data.addressStatus == true) {
-                    this.handleChageAddressStatus();
-                    data.addressStatus = 1;
-                } else {
-                    data.addressStatus = 0;
-                }
-                axios.post(SERVICE_URL + "/product/addAddress", { data })
+                axios.post(SERVICE_URL + "/admin/editSeller", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            console.log("--", resData);
                             this.setState({ showLoading: false });
-                            this.handleCancel();
-                            this.props.handleGetAllAddress();
                         } else {
-                            // this.setState({ showLoading: false })
-                            // message.error(intl.get("editFailed"));
+                            this.setState({ showLoading: false })
+                            message.error("编辑卖家失败");
                         }
                     }).catch(error => {
                         console.log(error);
-                        // message.error(intl.get("editFailed"));
-                        // this.setState({ showLoading: false });
+                        message.error("编辑卖家失败");
+                        this.setState({ showLoading: false });
                     });
             }
         });
@@ -115,7 +87,7 @@ class EditSeller extends Component {
         return (
             <div className="add-address">
                 <div className="personal-info">
-                    <Form onSubmit={this.handleAddAddress} className="personal-info-form">
+                    <Form onSubmit={this.handlEditSeller} className="personal-info-form">
                         <FormItem
                             {...formItemLayout}
                             label={"姓名"}
@@ -184,7 +156,7 @@ class EditSeller extends Component {
                             )}
                         </FormItem>
                         <FromItem>
-                            <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
+                            <Button type="primary" onClick={this.handlEditSeller} loading={submitLoading}>{intl.get("save")}</Button>
                             <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
                         </FromItem>
                     </Form>

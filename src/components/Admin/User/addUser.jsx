@@ -32,51 +32,25 @@ class AddUser extends Component {
         }
     }
 
-    handleChageAddressStatus = () => {
-        axios.post(SERVICE_URL + "/product/changeAddressStatus")
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    console.log("--", resData);
-                    this.setState({ showLoading: false });
-                } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
-            });
-    }
-
-    handleAddAddress = (e) => {
+    handleAddUser = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, data) => {
             if (!err) {
-                console.log(data);
-                if (data.addressStatus == true) {
-                    this.handleChageAddressStatus();
-                    data.addressStatus = 1;
-                } else {
-                    data.addressStatus = 0;
-                }
-                axios.post(SERVICE_URL + "/product/addAddress", { data })
+                axios.post(SERVICE_URL + "/admin/addUser", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            console.log("--", resData);
                             this.setState({ showLoading: false });
                             this.handleCancel();
-                            this.props.handleGetAllAddress();
+                            this.props.handleGetAllUser();
                         } else {
-                            // this.setState({ showLoading: false })
-                            // message.error(intl.get("editFailed"));
+                            this.setState({ showLoading: false })
+                            message.error("添加用户失败");
                         }
                     }).catch(error => {
                         console.log(error);
-                        // message.error(intl.get("editFailed"));
-                        // this.setState({ showLoading: false });
+                        message.error("添加用户失败");
+                        this.setState({ showLoading: false });
                     });
             }
         });
@@ -122,12 +96,12 @@ class AddUser extends Component {
                     destroyOnClose={true}
                     maskClosable={false}
                     footer={<div>
-                        <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
+                        <Button type="primary" onClick={this.handleAddUser} loading={submitLoading}>{intl.get("save")}</Button>
                         <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
                     </div>}
                 >
                     <div className="personal-info">
-                        <Form onSubmit={this.handleAddAddress} className="personal-info-form">
+                        <Form onSubmit={this.handleAddUser} className="personal-info-form">
                             <FormItem
                                 {...formItemLayout}
                                 label={"姓名"}
