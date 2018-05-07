@@ -2,6 +2,7 @@ export App from './App';
 export Account from "./Product/account";
 export AccountMenu from "./Menu/accountMenu";
 export AddressList from "./Product/addressList";
+export AdminHeader from "./Admin/header";
 export BuyItem from "./Product/buyItem";
 export Collect from "./Product/collect";
 export CartPage from "./Product/cartPage";
@@ -13,9 +14,10 @@ export Login from './User/login';
 export MenuIndex from './Menu';
 export OrderItem from './Product/orderItem';
 export ProductIndex from './Product';
-export ProductList from "./Shop/productList";
+export ShopProduct from "./Shop/shopProduct";
 export Register from './User/register';
 export Remark from './Product/remark';
+export Seller from "./Admin/Seller/seller";
 export UploadItem from "./Product/uploadItem";
-
+export User from "./Admin/User/user";
 

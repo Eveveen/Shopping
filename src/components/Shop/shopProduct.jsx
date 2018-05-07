@@ -4,14 +4,14 @@ const { Meta } = Card;
 const FormItem = Form.Item;
 import axios from 'axios';
 import intl from 'react-intl-universal';
-import './Style/productList.sass';
+import './Style/shopProduct.sass';
 const Search = Input.Search;
 const { Header, Footer, Content } = Layout;
 const CheckboxGroup = Checkbox.Group;
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
-class ProductList extends Component {
+class ShopProduct extends Component {
     state = {
         count: 1
     }
@@ -90,4 +90,4 @@ class ProductList extends Component {
     }
 }
 
-export default ProductList;
+export default ShopProduct;

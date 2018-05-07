@@ -1,0 +1,47 @@
+.confirm-modal-content
+    min-width: 350px
+    min-height: 200px
+    max-width: 400px
+    width: 30%
+    height: 25%
+    position: fixed
+    top: 0px
+    right: 0px
+    bottom: 0px
+    left: 0px
+    margin: auto
+    border: 1px solid rgb(204, 204, 204);
+    background: rgb(255, 255, 255);
+    overflow: auto;
+    border-radius: 4px;
+    outline: none;
+    padding: 30px 20px 30px 20px;
+    z-index: 998
+    box-shadow: -5px 0 10px #D8D8D8, 0 -5px 10px #D8D8D8, 5px 0 10px #D8D8D8, 0 5px 10px #D8D8D8
+    -webkit-box-shadow: -5px 0 10px #D8D8D8, 0 -5px 10px #D8D8D8, 5px 0 10px #D8D8D8, 0 5px 10px #D8D8D8
+    -moz-box-shadow: -5px 0 10px #D8D8D8, 0 -5px 10px #D8D8D8, 5px 0 10px #D8D8D8, 0 5px 10px #D8D8D8
+.confirm-modal-overlay
+    z-index: 999
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(255, 255, 255, 0.75);
+.confirm-modal-body
+    position: relative
+    height: 100%
+    .cancel-confirm-modal
+        position: absolute
+        display: inline-block
+        top: -20px
+        right: 0px
+        cursor: pointer
+    .confirm-modal-title
+        border-bottom: 2px solid #222
+        font-size: 20px
+    .confirm-modal-text
+        text-align: center
+        margin: 20px
+    .confirm-modal-footer
+        text-align: center

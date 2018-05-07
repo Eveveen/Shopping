@@ -3,7 +3,7 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import {
     App, LoginIndex, Login, Register, ProductIndex, HomePage, DetailInfo, Remark,
     OrderItem, MenuIndex, CartPage, Account, Collect, BuyItem, AddressList, AccountMenu,
-    EditAddress, ProductList, EditProduct, UploadItem
+    EditAddress, EditProduct, UploadItem, AdminHeader, User, Seller, ShopProduct
 } from '../components';
 import { BASE_URL } from '../../conf/config';
 import { adminOperationTypeEnum } from '../data/enum';
@@ -38,12 +38,11 @@ const routes = (
                     <Route path="address" component={AddressList} />
                     <Route path="editAddress/:id" component={EditAddress} />
                 </Route>
-
-                <Route path={"/openShop"} component={App}>
-                    <IndexRoute component={ProductList} />
-                    <Route path="productList" component={ProductList} />
-                    <Route path="editProduct" component={EditProduct} />
-                </Route>
+            </Route>
+            <Route path={"/admin"} component={AdminHeader}>
+                <IndexRoute component={Seller} />
+                <Route path="seller" component={Seller} />
+                <Route path="user" component={User} />
             </Route>
         </Route>
     </Router >
