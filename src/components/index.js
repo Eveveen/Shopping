@@ -18,6 +18,7 @@ export ShopProduct from "./Shop/shopProduct";
 export Register from './User/register';
 export Remark from './Product/remark';
 export Seller from "./Admin/Seller/seller";
+export ShopIndex from "./Shop/shopIndex";
 export UploadItem from "./Product/uploadItem";
 export User from "./Admin/User/user";
 

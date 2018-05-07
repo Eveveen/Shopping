@@ -13,7 +13,7 @@ const paramsMulter = multer({ dest: 'upload/' });
  * 获取所有的卖家
  */
 router.get("/getAllSeller", function (req, res) {
-    const path = utils.PROJECT + "/getAllSeller";
+    const path = utils.PROJECT + "/seller/getAllSeller";
     httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
@@ -25,7 +25,7 @@ router.get("/getAllSeller", function (req, res) {
  * 根据卖家编号获取卖家信息
  */
 router.get("/getSeller/:id", function (req, res) {
-    const path = utils.PROJECT + "/getSeller";
+    const path = utils.PROJECT + "/seller/getSeller";
     httpAgent.httpRequest({ sellerId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
@@ -37,7 +37,7 @@ router.get("/getSeller/:id", function (req, res) {
  * 添加卖家
  */
 router.post("/addSeller", function (req, res) {
-    const path = utils.PROJECT + "/addSeller";
+    const path = utils.PROJECT + "/seller/addSeller";
     const { data } = req.body;
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
@@ -51,7 +51,7 @@ router.post("/addSeller", function (req, res) {
  * 编辑卖家信息
  */
 router.post("/editSeller", function (req, res) {
-    const path = utils.PROJECT + "/editSeller";
+    const path = utils.PROJECT + "/seller/editSeller";
     const { data } = req.body;
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
@@ -64,7 +64,7 @@ router.post("/editSeller", function (req, res) {
  * 删除卖家，应该级联删除店铺
  */
 router.get("/deleteSeller/:id", function (req, res) {
-    const path = utils.PROJECT + "/deleteSeller";
+    const path = utils.PROJECT + "/seller/deleteSeller";
     httpAgent.httpRequest({ sellerId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
