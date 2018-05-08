@@ -124,6 +124,9 @@ class Login extends Component {
                             <TabPane tab={<span><Icon type="android" />我是卖家</span>} key="seller">
                                 {this.renderLogin()}
                             </TabPane>
+                            <TabPane tab={<span><Icon type="android" />管理员</span>} key="admin">
+                                {this.renderLogin()}
+                            </TabPane>
                         </Tabs>
                     </div>
                 </div>

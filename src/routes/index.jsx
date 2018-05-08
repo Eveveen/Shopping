@@ -4,7 +4,7 @@ import {
     App, LoginIndex, Login, Register, ProductIndex, HomePage, DetailInfo, Remark,
     OrderItem, MenuIndex, CartPage, Account, Collect, BuyItem, AddressList, AccountMenu,
     EditAddress, EditProduct, UploadItem, AdminHeader, User, Seller, ShopProduct, ShopIndex,
-    ShopMenu, BuyNow
+    ShopMenu, BuyNow, EditUser, EditSeller, SellerShop
 } from '../components';
 import { BASE_URL } from '../../conf/config';
 import { adminOperationTypeEnum } from '../data/enum';
@@ -49,7 +49,10 @@ const routes = (
             <Route path={"/admin"} component={AdminHeader}>
                 <IndexRoute component={Seller} />
                 <Route path="seller" component={Seller} />
+                <Route path="editSeller/:sellerId/:shopId" component={EditSeller} />
+                <Route path="editShop/:id" component={SellerShop} />
                 <Route path="user" component={User} />
+                <Route path="editUser/:id" component={EditUser} />
             </Route>
         </Route>
     </Router >

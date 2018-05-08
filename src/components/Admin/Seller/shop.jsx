@@ -5,7 +5,8 @@ const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import { getCookie, messageText, getBase64 } from '../../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
-import './Style/addAddress.sass'
+import './Style/shop.sass';
+import { Link, browserHistory } from 'react-router';
 
 const formItemLayout = {
     labelCol: {
@@ -22,14 +23,30 @@ class SellerShop extends Component {
     state = {
         iconImg: '',
         loading: false,
-        submitLoading: false
+        submitLoading: false,
+        shopInfo: {}
+    }
+
+    componentWillMount() {
+        const { shopId } = this.props;
+        axios.get(SERVICE_URL + "/admin/getSellerShop/" + shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, shopInfo: resData });
+                } else {
+                    message.error("获取店铺失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                console.log(error);
+                this.setState({ showLoading: false })
+                message.error("获取店铺失败");
+            });
     }
 
     handleCancel = () => {
-        if (!this.state.submitLoading) {
-            this.setState({ loading: false })
-            this.props.handleCancel();
-        }
+        browserHistory.push(BASE_URL + "/admin/seller");
     }
 
     handleChageAddressStatus = () => {
@@ -67,8 +84,6 @@ class SellerShop extends Component {
                         if (response.status == 200 && !resData.error) {
                             console.log("--", resData);
                             this.setState({ showLoading: false });
-                            this.handleCancel();
-                            this.props.handleGetAllAddress();
                         } else {
                             // this.setState({ showLoading: false })
                             // message.error(intl.get("editFailed"));
@@ -102,7 +117,7 @@ class SellerShop extends Component {
 
     render() {
         const { visible } = this.props;
-        const { iconImg, loading, submitLoading } = this.state;
+        const { iconImg, loading, submitLoading, shopInfo } = this.state;
         const { getFieldDecorator } = this.props.form;
         const prefixSelector = getFieldDecorator('prefix', {
             initialValue: '86',
@@ -121,12 +136,13 @@ class SellerShop extends Component {
                             label={"店铺名称"}
                             required="true"
                         >
-                            {getFieldDecorator('sellerName', {
+                            {getFieldDecorator('shopName', {
                                 rules: [{
-                                    required: true, message: "sellerName不能为空"
+                                    required: true, message: "店铺名称不能为空"
                                 }],
+                                initialValue: shopInfo.shopName
                             })(
-                                <Input placeholder={"姓名"} disabled={submitLoading} />
+                                <Input placeholder={"店铺名称"} disabled={submitLoading} />
                             )}
                         </FormItem>
                         <FormItem
@@ -135,8 +151,9 @@ class SellerShop extends Component {
                         >
                             {getFieldDecorator('description', {
                                 rules: [{ required: true, message: 'Please input your phone number!' }],
+                                initialValue: shopInfo.description
                             })(
-                                <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                <Input placeholder={"描述"} disabled={submitLoading} />
                             )}
                         </FormItem>
                         <FormItem
@@ -145,8 +162,9 @@ class SellerShop extends Component {
                         >
                             {getFieldDecorator('rate', {
                                 rules: [{ required: true, message: 'Please input your phone number!' }],
+                                initialValue: shopInfo.rate
                             })(
-                                <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                <Input placeholder={"评分"} disabled={submitLoading} />
                             )}
                         </FormItem>
                         <FormItem
@@ -155,14 +173,17 @@ class SellerShop extends Component {
                         >
                             {getFieldDecorator('shopStatus', {
                                 rules: [{ required: true, message: 'Please input your phone number!' }],
+                                initialValue: shopInfo.shopStatus
                             })(
-                                <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                <Input placeholder={"店铺状态"} disabled={submitLoading} />
                             )}
                         </FormItem>
-                        <FromItem>
-                            <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
-                            <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
-                        </FromItem>
+                        <FormItem>
+                            <div className="edit-shop-footer">
+                                <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
+                                <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                            </div>
+                        </FormItem>
                     </Form>
                 </div>
             </div>

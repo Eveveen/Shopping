@@ -5,7 +5,8 @@ const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import { getCookie, messageText, getBase64 } from '../../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
-import './Style/addAddress.sass'
+import './Style/editUser.sass'
+import { Link, browserHistory } from 'react-router';
 
 const formItemLayout = {
     labelCol: {
@@ -22,14 +23,30 @@ class EditUser extends Component {
     state = {
         iconImg: '',
         loading: false,
-        submitLoading: false
+        submitLoading: false,
+        userInfo: {}
+    }
+
+    componentWillMount() {
+        const { id } = this.props.params;
+        axios.get(SERVICE_URL + "/admin/getUser/" + id)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, userInfo: resData });
+                } else {
+                    message.error("获取用户失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                console.log(error);
+                this.setState({ showLoading: false })
+                message.error("获取用户失败");
+            });
     }
 
     handleCancel = () => {
-        if (!this.state.submitLoading) {
-            this.setState({ loading: false })
-            this.props.handleCancel();
-        }
+        browserHistory.push(BASE_URL + "/admin/user");
     }
 
     handleChageAddressStatus = () => {
@@ -40,43 +57,36 @@ class EditUser extends Component {
                     console.log("--", resData);
                     this.setState({ showLoading: false });
                 } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
                 }
             }).catch(error => {
                 console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
             });
     }
 
-    handleAddAddress = (e) => {
+    handleEditUser = (e) => {
         e.preventDefault();
+        const { userInfo } = this.state;
         this.props.form.validateFields((err, data) => {
+            data.userId = userInfo.userId;
             if (!err) {
-                console.log(data);
-                if (data.addressStatus == true) {
-                    this.handleChageAddressStatus();
-                    data.addressStatus = 1;
-                } else {
-                    data.addressStatus = 0;
-                }
-                axios.post(SERVICE_URL + "/product/addAddress", { data })
+                axios.post(SERVICE_URL + "/admin/editUser", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            console.log("--", resData);
+                            message.success("保存成功");
                             this.setState({ showLoading: false });
-                            this.handleCancel();
-                            this.props.handleGetAllAddress();
                         } else {
-                            // this.setState({ showLoading: false })
-                            // message.error(intl.get("editFailed"));
+                            this.setState({ showLoading: false })
+                            message.error(intl.get("editFailed"));
                         }
                     }).catch(error => {
                         console.log(error);
-                        // message.error(intl.get("editFailed"));
-                        // this.setState({ showLoading: false });
+                        message.error(intl.get("editFailed"));
+                        this.setState({ showLoading: false });
                     });
             }
         });
@@ -102,7 +112,7 @@ class EditUser extends Component {
 
     render() {
         const { visible } = this.props;
-        const { iconImg, loading, submitLoading } = this.state;
+        const { iconImg, loading, submitLoading, userInfo } = this.state;
         const { getFieldDecorator } = this.props.form;
         const prefixSelector = getFieldDecorator('prefix', {
             initialValue: '86',
@@ -115,16 +125,17 @@ class EditUser extends Component {
         return (
             <div className="add-address">
                 <div className="personal-info">
-                    <Form onSubmit={this.handleAddAddress} className="personal-info-form">
+                    <Form onSubmit={this.handleEditUser} className="personal-info-form">
                         <FormItem
                             {...formItemLayout}
                             label={"姓名"}
                             required="true"
                         >
-                            {getFieldDecorator('sellerName', {
+                            {getFieldDecorator('userName', {
                                 rules: [{
-                                    required: true, message: "sellerName不能为空"
+                                    required: true, message: "userName不能为空"
                                 }],
+                                initialValue: userInfo.userName
                             })(
                                 <Input placeholder={"姓名"} disabled={submitLoading} />
                             )}
@@ -135,11 +146,12 @@ class EditUser extends Component {
                         >
                             {getFieldDecorator('telphone', {
                                 rules: [{ required: true, message: 'Please input your phone number!' }],
+                                initialValue: userInfo.telphone
                             })(
                                 <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
                             )}
                         </FormItem>
-                        <FormItem
+                        {/* <FormItem
                             {...formItemLayout}
                             label={"密码"}
                         >
@@ -166,7 +178,7 @@ class EditUser extends Component {
                             })(
                                 <Input type="password" onBlur={this.handleConfirmBlur} />
                             )}
-                        </FormItem>
+                        </FormItem> */}
                         <FormItem
                             {...formItemLayout}
                             label={"邮箱"}
@@ -179,13 +191,16 @@ class EditUser extends Component {
                                 }, {
                                     max: 50, message: intl.get("emailmax")
                                 }],
+                                initialValue: userInfo.email
                             })(
                                 <Input />
                             )}
                         </FormItem>
                         <FormItem>
-                            <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
-                            <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                            <div className="edit-user-footer">
+                                <Button type="primary" onClick={this.handleEditUser} loading={submitLoading}>{intl.get("save")}</Button>
+                                <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                            </div>
                         </FormItem>
                     </Form>
                 </div>

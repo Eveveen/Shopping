@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, Input, Upload, Modal, message, Icon, Form, Select, Cascader, Checkbox } from 'antd';
+import { Button, Input, Upload, Modal, message, Icon, Form, Select, Cascader, Checkbox, Tabs } from 'antd';
 const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import { getCookie, messageText, getBase64 } from '../../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
-import './Style/addAddress.sass'
+import './Style/editSeller.sass'
+import { Link, browserHistory } from 'react-router';
+const TabPane = Tabs.TabPane;
+import SellerShop from './shop';
 
 const formItemLayout = {
     labelCol: {
@@ -22,24 +25,44 @@ class EditSeller extends Component {
     state = {
         iconImg: '',
         loading: false,
-        submitLoading: false
+        submitLoading: false,
+        sellerInfo: {}
+    }
+
+    componentWillMount() {
+        const { sellerId } = this.props.params;
+        axios.get(SERVICE_URL + "/admin/getSeller/" + sellerId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, sellerInfo: resData });
+                } else {
+                    message.error("获取用户失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                console.log(error);
+                this.setState({ showLoading: false })
+                message.error("获取用户失败");
+            });
     }
 
     handleCancel = () => {
-        if (!this.state.submitLoading) {
-            this.setState({ loading: false })
-            this.props.handleCancel();
-        }
+        browserHistory.push(BASE_URL + "/admin/seller");
     }
 
     handlEditSeller = (e) => {
         e.preventDefault();
+        const { sellerInfo } = this.state;
         this.props.form.validateFields((err, data) => {
+            data.sellerId = sellerInfo.sellerId;
+            data.password = sellerInfo.password;
             if (!err) {
                 axios.post(SERVICE_URL + "/admin/editSeller", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
+                            message.success("编辑成功");
                             this.setState({ showLoading: false });
                         } else {
                             this.setState({ showLoading: false })
@@ -73,8 +96,23 @@ class EditSeller extends Component {
     }
 
     render() {
+        const { shopId } = this.props.params;
+        return (
+            <Tabs defaultActiveKey="seller" onChange={this.callback}>
+                <TabPane tab={<span><Icon type="apple" />卖家</span>} key="seller">
+                    {this.renderEditSeller()}
+                </TabPane>
+                <TabPane tab={<span><Icon type="android" />店铺</span>} key="shop">
+                    {/* {this.renderLogin()} */}
+                    <SellerShop shopId={shopId} />
+                </TabPane>
+            </Tabs>
+        )
+    }
+
+    renderEditSeller() {
         const { visible } = this.props;
-        const { iconImg, loading, submitLoading } = this.state;
+        const { iconImg, loading, submitLoading, sellerInfo } = this.state;
         const { getFieldDecorator } = this.props.form;
         const prefixSelector = getFieldDecorator('prefix', {
             initialValue: '86',
@@ -97,6 +135,7 @@ class EditSeller extends Component {
                                 rules: [{
                                     required: true, message: "sellerName不能为空"
                                 }],
+                                initialValue: sellerInfo.sellerName
                             })(
                                 <Input placeholder={"姓名"} disabled={submitLoading} />
                             )}
@@ -107,11 +146,12 @@ class EditSeller extends Component {
                         >
                             {getFieldDecorator('telphone', {
                                 rules: [{ required: true, message: 'Please input your phone number!' }],
+                                initialValue: sellerInfo.telphone
                             })(
                                 <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
                             )}
                         </FormItem>
-                        <FormItem
+                        {/* <FormItem
                             {...formItemLayout}
                             label={"密码"}
                         >
@@ -138,7 +178,7 @@ class EditSeller extends Component {
                             })(
                                 <Input type="password" onBlur={this.handleConfirmBlur} />
                             )}
-                        </FormItem>
+                        </FormItem> */}
                         <FormItem
                             {...formItemLayout}
                             label={"邮箱"}
@@ -151,14 +191,17 @@ class EditSeller extends Component {
                                 }, {
                                     max: 50, message: intl.get("emailmax")
                                 }],
+                                initialValue: sellerInfo.email
                             })(
                                 <Input />
                             )}
                         </FormItem>
-                        <FromItem>
-                            <Button type="primary" onClick={this.handlEditSeller} loading={submitLoading}>{intl.get("save")}</Button>
-                            <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
-                        </FromItem>
+                        <FormItem>
+                            <div className="edit-seller-footer">
+                                <Button type="primary" onClick={this.handlEditSeller} loading={submitLoading}>{intl.get("save")}</Button>
+                                <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                            </div>
+                        </FormItem>
                     </Form>
                 </div>
             </div>

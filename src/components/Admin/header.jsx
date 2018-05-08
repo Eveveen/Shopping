@@ -13,9 +13,15 @@ class AdminHeader extends Component {
     state = {
         current: 'seller',
     }
+    componentWillMount() {
+        let current = this.props.location.pathname.split("/");
+        console.log(current);
+        this.setState({ current: current[2] })
+    }
 
     handleClick = (e) => {
         console.log('click ', e);
+        this.setState({ current: e.key })
         browserHistory.push(BASE_URL + "/admin/" + e.key);
         // browserHistory.push(BASE_URL + "/" + e.key);
 
@@ -31,10 +37,10 @@ class AdminHeader extends Component {
                 >
                     <Menu.Item key="seller">
                         <Icon type="appstore" />卖家
-                </Menu.Item>
+                    </Menu.Item>
                     <Menu.Item key="user">
                         <Icon type="appstore" />普通用户
-                </Menu.Item>
+                    </Menu.Item>
                 </Menu>
                 {this.props.children}
             </div>

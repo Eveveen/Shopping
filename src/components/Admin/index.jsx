@@ -24,7 +24,7 @@ class AdminIndex extends Component {
     render() {
         return (
             <div>
-                <Menu
+                {/* <Menu
                     onClick={this.handleClick}
                     selectedKeys={[this.state.current]}
                     mode="horizontal"
@@ -35,7 +35,7 @@ class AdminIndex extends Component {
                     <Menu.Item key="user">
                         <Icon type="appstore" />普通用户
                 </Menu.Item>
-                </Menu>
+                </Menu> */}
                 {this.props.children}
             </div>
         )

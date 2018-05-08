@@ -13,15 +13,13 @@ class MenuIndex extends Component {
     }
 
     handleClick = (e) => {
+        this.setState({ current: e.key });
         if (e.key == "exitAccount") {
             browserHistory.push(BASE_URL);
         } else {
             browserHistory.push(BASE_URL + '/' + e.key);
         }
         // this.props.handleChangePageStatus(e);
-        // this.setState({
-        //     current: e.key,
-        // });
     }
 
     render() {
@@ -37,9 +35,12 @@ class MenuIndex extends Component {
                             <Menu.Item key="account/user">账号管理</Menu.Item>
                             <Menu.Item key="exitAccount">退出</Menu.Item>
                         </SubMenu>
-                        <Menu.Item key="message">
-                            <Icon type="appstore" />消息
+                        <Menu.Item key="home">
+                            <Icon type="appstore" />首页
                         </Menu.Item>
+                        {/* <Menu.Item key="message">
+                            <Icon type="appstore" />消息
+                        </Menu.Item> */}
                         <Menu.Item key="cart">
                             <Icon type="appstore" />购物车
                         </Menu.Item>
@@ -47,22 +48,20 @@ class MenuIndex extends Component {
                             <Menu.Item key="collectTreasure">收藏的宝贝</Menu.Item>
                             <Menu.Item key="collectShop">收藏的店铺</Menu.Item>
                         </SubMenu>
-                        <Menu.Item key="category">
+                        {/* <Menu.Item key="category">
                             <Icon type="appstore" />商品分类
-                        </Menu.Item>
-                        <SubMenu title={<span><Icon type="setting" />卖家中心</span>}>
+                        </Menu.Item> */}
+                        {/* <SubMenu title={<span><Icon type="setting" />卖家中心</span>}>
                             <Menu.Item key="openshop">免费开店</Menu.Item>
                             <Menu.Item key="trade">已卖出的宝贝</Menu.Item>
-                        </SubMenu>
-                        <Menu.Item key="home">
-                            <Icon type="appstore" />首页
-                        </Menu.Item>
+                        </SubMenu> */}
+
                         <Menu.Item key="order">
                             <Icon type="appstore" />我的订单
                         </Menu.Item>
-                        <Menu.Item key="alipay">
+                        {/* <Menu.Item key="alipay">
                             <a href="https://ant.design" target="_blank" rel="noopener noreferrer">Navigation Four - Link</a>
-                        </Menu.Item>
+                        </Menu.Item> */}
                     </Menu>
                 </div>
                 {this.props.children}

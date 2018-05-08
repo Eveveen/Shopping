@@ -87,9 +87,9 @@ router.get("/getAllShop", function (req, res) {
 /**
  * 获取卖家的店铺
  */
-router.get("/getSellerShop", function (req, res) {
+router.get("/getSellerShop/:id", function (req, res) {
     const path = utils.PROJECT + "/getSellerShop";
-    httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+    httpAgent.httpRequest({ sellerId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
@@ -176,9 +176,9 @@ router.post("/addUser", function (req, res) {
 /**
  * 编辑买家信息
  */
-router.post("/updateUser", function (req, res) {
+router.post("/editUser", function (req, res) {
     const { data } = req.body;
-    const path = utils.PROJECT + "/updateUser";
+    const path = utils.PROJECT + "/editUser";
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
