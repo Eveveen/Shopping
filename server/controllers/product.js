@@ -147,18 +147,6 @@ router.get("/deleteAddress/:id", function (req, res) {
 });
 
 /**
- * 获取当前用户的购物车
- */
-router.get("/getAllCart", function (req, res) {
-    const path = utils.PROJECT + "/getAllCart";
-    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
-});
-
-/**
  * 获取店铺信息
  */
 router.get("/getShop/:id", function (req, res) {
@@ -210,6 +198,60 @@ router.get("/getProduct/:id", function (req, res) {
 });
 
 /**
+ * 获取当前用户的购物车
+ */
+router.get("/getAllCart", function (req, res) {
+    const path = utils.PROJECT + "/getAllCart";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 判断购物车中是否存在此记录
+ */
+router.post("/isCartExist", function (req, res) {
+    const path = utils.PROJECT + "/isCartExist";
+    const { data } = req.body;
+    let userId = req.session.user.userId;
+    data.userId = userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 编辑购物车中商品数量
+ */
+router.post("/editCartNum", function (req, res) {
+    const path = utils.PROJECT + "/editCart";
+    let data = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 向购物车中添加1条记录
+ */
+router.post("/addCart", function (req, res) {
+    const path = utils.PROJECT + "/addCart";
+    const { data } = req.body;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 删除购物车的一条记录
  */
 router.get("/deleteOneCart/:cartId", function (req, res) {
@@ -228,19 +270,6 @@ router.post("/deleteMoreCart", function (req, res) {
     const path = utils.PROJECT + "/deleteCarts";
     const { selectedCartIds } = req.body;
     httpAgent.httpRequest({ cartIds: selectedCartIds }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
-});
-
-/**
- * 编辑购物车中商品数量
- */
-router.post("/editCartNum", function (req, res) {
-    const path = utils.PROJECT + "/editCart";
-    let data = req.body;
-    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

@@ -7,12 +7,9 @@ const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/homePage.sass';
 import './Style/main.sass';
-import CartPage from './cartPage';
-import Collect from './collect';
-import Category from './category';
 import DetailInfo from './detailInfo';
-import OrderItem from './orderItem';
-
+import { Link, browserHistory } from 'react-router';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class HomePage extends Component {
     state = {
@@ -23,8 +20,8 @@ class HomePage extends Component {
         this.setState({ pageStatus: e.key })
     }
 
-    handleShowDetail = () => {
-        this.setState({ pageStatus: "detailInfo" })
+    handleShowDetail = (proId) => {
+        browserHistory.push(BASE_URL + "/item/" + proId);
     }
 
     render() {
@@ -33,12 +30,7 @@ class HomePage extends Component {
         return (
             <div>
                 {/* <Account /> */}
-                {pageStatus == "homePage" || pageStatus == "detailInfo" ? this.renderHomePage() :
-                    pageStatus == "cart" ? <CartPage /> :
-                        pageStatus == "accountSetting" ? <Account /> :
-                            pageStatus == "collectTreasure" || pageStatus == "collectShop" ? <Collect pageStatus={pageStatus} /> :
-                                pageStatus == "category" ? <Category /> :
-                                    pageStatus == "order" ? <OrderItem /> : null}
+                {pageStatus == "homePage" || pageStatus == "detailInfo" ? this.renderHomePage() : null}
             </div>
         )
     }
@@ -134,8 +126,8 @@ class HomePage extends Component {
         return (
             <div className="home-page-content">
                 <Carousel autoplay>
-                    <div onClick={this.handleShowDetail}><h3>1</h3></div>
-                    <div><h3>2</h3></div>
+                    <div onClick={this.handleShowDetail.bind(this, 1)}><h3>1</h3></div>
+                    <div onClick={this.handleShowDetail.bind(this, 4)}><h3>2</h3></div>
                     <div><h3>3</h3></div>
                     <div><h3>4</h3></div>
                 </Carousel>

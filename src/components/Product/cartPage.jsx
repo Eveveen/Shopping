@@ -94,6 +94,9 @@ class CartPage extends Component {
                 if (response.status == 200 && !resData.error) {
                     resData.cartInfo = cartInfo;
                     resData.shopInfo = shopInfo;
+                    if (resData.imgId != null) {
+                        this.handleGetImg(resData);
+                    }
                     productList.push(resData);
 
                     shopIdList.forEach(shop => {
@@ -371,6 +374,23 @@ class CartPage extends Component {
         browserHistory.push({ pathname: BASE_URL + "/buy/" + selectedCartIds, state: { cartList: cartList, shopList: shopList } });
     }
 
+    handleGetImg = (product) => {
+        axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    product.imgCode = resData.imgCode;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
     render() {
         const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll, selectedCartIds } = this.state;
         return (
@@ -420,6 +440,7 @@ class CartPage extends Component {
             tempProductList = shop.productList;
             let flag = false;
             shop.productList.forEach(product => {
+                console.log(product);
                 cartItemDiv = this.renderProductContent(product);
                 cartDiv.push(cartItemDiv)
             })
@@ -442,7 +463,7 @@ class CartPage extends Component {
                 </Checkbox>
                 <div className="card-item-content">
                     <div className="left-img">
-                        <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+                        <img alt="example" src={product.imgCode} />
                     </div>
                     <div className="item-info">
                         {product.proName} {product.description}

@@ -12,8 +12,48 @@ import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class DetailInfo extends Component {
     state = {
-        count: 1
+        count: 1,
+        productInfo: {},
+        showLoading: false
     }
+
+    componentWillMount() {
+        const { proId } = this.props.params;
+        axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
+            .then(response => {
+                const resData = response.data;
+                console.log(resData);
+                if (response.status == 200 && !resData.error) {
+                    this.handleGetImg(resData);
+                    this.setState({ showLoading: false, productInfo: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetImg = (product) => {
+        axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    product.imgCode = resData.imgCode;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
 
     handleImgFocus = () => {
         console.log("focus");
@@ -39,19 +79,90 @@ class DetailInfo extends Component {
     }
 
     handleBuyNow = () => {
-        browserHistory.push(BASE_URL + "/buy");
+        const { productInfo } = this.state;
+
+        browserHistory.push({ pathname: BASE_URL + "/buyNow/" + productInfo.proId, state: { productInfo: productInfo } });
+    }
+
+    handleIsCartExist = () => {
+        const { productInfo, count } = this.state;
+        let data = {};
+        data.proId = productInfo.proId;
+        axios.post(SERVICE_URL + "/product/isCartExist", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false });
+                    if (resData.cartId != null) {
+                        this.handleChageProNum(resData);
+                    } else {
+                        this.handleAddCart();
+                    }
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleAddCart = () => {
+        const { productInfo, count } = this.state;
+        let data = {};
+        data.shopId = productInfo.shopId;
+        data.proId = productInfo.proId;
+        data.proNum = count;
+
+        axios.post(SERVICE_URL + "/product/addCart", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false });
+                    message.success("已加入购物车");
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleChageProNum = (cart) => {
+        const { productInfo, count } = this.state;
+        cart.proNum += count;
+
+        axios.post(SERVICE_URL + "/product/editCartNum", cart)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false })
+                    message.success("已加入购物车");
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("减少购物车商品失败1");
+                }
+
+            }).catch(error => {
+                message.error("减少购物车商品失败");
+                this.setState({ showLoading: false });
+            });
     }
 
     render() {
-        const { count } = this.state;
+        const { count, productInfo } = this.state;
         return (
             <div className="detail">
                 <div className="summary-info">
                     <div className="card-info">
                         <Card
                             style={{ width: 400, height: 400 }}
-                            cover={<img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />}
-                            actions={[<Icon type="setting" />, <Icon type="edit" />, <Icon type="ellipsis" />]}
+                            cover={<img alt="example" src={productInfo.imgCode} />}
                         >
                             <div className="detail-info-img">
                                 <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
@@ -64,11 +175,11 @@ class DetailInfo extends Component {
                     </div>
                     <div className="text-info">
                         <div className="text-title">
-                            微服务架构实战
-                    </div>
+                            {productInfo.proName}
+                        </div>
                         <div className="text-detail text-price">
                             <div className="left-text">价格</div>
-                            <div className="right-text">￥18</div>
+                            <div className="right-text">￥{productInfo.price}</div>
                         </div>
                         <div className="text-detail">
                             <div className="left-text">配送</div>
@@ -87,7 +198,7 @@ class DetailInfo extends Component {
                                 <Button onClick={this.handleBuyNow}>立即购买</Button>
                             </div>
                             <div className="right-btn">
-                                <Button onClick={this.decreaseCount}>加入购物车</Button>
+                                <Button onClick={this.handleIsCartExist}>加入购物车</Button>
                             </div>
                         </div>
                     </div>

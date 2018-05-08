@@ -6,13 +6,15 @@ import intl from 'react-intl-universal';
 import './Style/buyItem.sass';
 // import './Style/main.sass';
 import AddressItem from './addressItem';
+import { Link, browserHistory } from 'react-router';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class BuyItem extends Component {
     state = {
-        count: 1,
         cartIds: [],
         buyList: [],
-        shopList: []
+        shopList: [],
+        totalCount: 0
     }
 
     componentWillMount() {
@@ -21,27 +23,46 @@ class BuyItem extends Component {
         this.setState({ cartIds: cartIds, buyList: cartList, shopList: shopList })
     }
 
-    changeCount = (e) => {
-        this.setState({
-            count: e.target.value
-        })
+    changeCount = (cartId, product, e) => {
+        let cart = { "cartId": cartId, "proNum": e.target.value }
+        this.handleChageProNum(cart, product);
+        this.setState({})
     }
 
-    decreaseCount = () => {
-        this.setState({ count: this.state.count - 1 })
+    decreaseCount = (cartId, product) => {
+        let cart = { "cartId": cartId, "proNum": product.cartInfo.proNum - 1 }
+        this.handleChageProNum(cart, product);
+        this.setState({})
     }
 
-    increaseCount = () => {
-        this.setState({ count: this.state.count + 1 })
+    increaseCount = (cartId, product) => {
+        let cart = { "cartId": cartId, "proNum": product.cartInfo.proNum + 1 }
+        this.handleChageProNum(cart, product);
+        this.setState({})
     }
 
-    handleGetCartInfo = () => {
+    handleChageProNum = (cart, product) => {
+        let totalCount = this.state.totalCount;
+        axios.post(SERVICE_URL + "/product/editCartNum", cart)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    totalCount += (cart.proNum - product.cartInfo.proNum) * product.price;
+                    product.cartInfo.proNum = cart.proNum;
+                    this.setState({ showLoading: false, totalCount: totalCount })
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("减少购物车商品失败1");
+                }
 
+            }).catch(error => {
+                message.error("减少购物车商品失败");
+                this.setState({ showLoading: false });
+            });
     }
 
     render() {
-        console.log("stateTest,", this.props.location.state);
-        const { shopList } = this.state;
+        const { shopList, totalCount, buyList } = this.state;
         return (
             <div className="buy-item">
                 <Layout>
@@ -50,6 +71,27 @@ class BuyItem extends Component {
                         <AddressItem />
                         {/* {this.renderBuyItem()} */}
                         {shopList.length == 0 ? null : this.renderProduct()}
+                        <div className="summary-text">
+                            <div className="real-pay">
+                                <div className="pay-info">
+                                    <div className="pay-info-content">
+                                        <span className="real-pay-title">实付款：</span>
+                                        <span className="real-pay-price">￥{this.state.totalCount}</span>
+                                    </div>
+                                    <div className="pay-info-content">
+                                        <span className="real-pay-title">寄送至：</span>
+                                        <span className="real-pay-text">江苏省南通市崇川区狼山镇街道啬园路9号南通大学主校区</span>
+                                    </div>
+                                    <div>
+                                        <span className="real-pay-title">收货人：</span>
+                                        <span className="real-pay-text">张三12345678909</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="submit-btn">
+                                <Button>提交订单</Button>
+                            </div>
+                        </div>
                     </Content>
                     <Footer>Footer</Footer>
                 </Layout>
@@ -59,7 +101,7 @@ class BuyItem extends Component {
     }
 
     renderBuyItem() {
-        const { count, cartIds, buyList, shopList } = this.state;
+        const { cartIds, buyList, shopList } = this.state;
         let titleDiv =
             <div className="card-title">
                 <div className="card-title-text">2018-04-15</div>
@@ -85,7 +127,7 @@ class BuyItem extends Component {
                         </div>
                         <div className="item-count">
                             <Button onClick={this.decreaseCount}>-</Button>
-                            <Input value={count} onChange={this.changeCount} />
+                            <Input onChange={this.handleChageProNum} />
                             <Button onClick={this.increaseCount}>+</Button>
                         </div>
                         <div className="item-total-price">
@@ -119,10 +161,10 @@ class BuyItem extends Component {
     }
 
     renderProduct() {
-        const { count, buyList, shopList } = this.state;
-        console.log("buyList", buyList)
+        const { buyList, shopList } = this.state;
         let cartDiv = [];
         let tempProductList = [];
+        let totalCount = 0;
         shopList.forEach(shop => {
             let titleDiv =
                 <div className="card-title">
@@ -141,6 +183,8 @@ class BuyItem extends Component {
             buyList.forEach(cart => {
                 let cartItemDiv = [];
                 if (cart.product.shopInfo.shopId == shop.shopId) {
+                    totalCount += cart.product.price * cart.product.cartInfo.proNum;
+                    this.state.totalCount = totalCount;
                     cartItemDiv = this.renderProductContent(cart.product);
                 }
                 cartDiv.push(cartItemDiv)
@@ -160,7 +204,7 @@ class BuyItem extends Component {
             <div className="cart-card">
                 <div className="card-item-content">
                     <div className="left-img">
-                        <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+                        <img alt="example" src={product.imgCode} />
                     </div>
                     <div className="item-info">
                         {product.proName} {product.description}
@@ -173,9 +217,9 @@ class BuyItem extends Component {
                         {product.price}
                     </div>
                     <div className="item-count">
-                        {/* <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)}>-</Button> */}
-                        {/* <Input value={product.cartInfo.proNum} onChange={this.changeCount.bind(this, product.cartInfo.cartId, product)} /> */}
-                        {/* <Button onClick={this.increaseCount.bind(this, product.cartInfo.cartId, product)}>+</Button> */}
+                        <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)}>-</Button>
+                        <Input value={product.cartInfo.proNum} onChange={this.changeCount.bind(this, product.cartInfo.cartId, product)} />
+                        <Button onClick={this.increaseCount.bind(this, product.cartInfo.cartId, product)}>+</Button>
                     </div>
                     <div className="item-total-price">
                         ￥{product.price * product.cartInfo.proNum}

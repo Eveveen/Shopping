@@ -4,8 +4,10 @@ export AccountMenu from "./Menu/accountMenu";
 export AddressList from "./Product/addressList";
 export AdminHeader from "./Admin/header";
 export BuyItem from "./Product/buyItem";
+export BuyNow from "./Product/buyNow";
 export Collect from "./Product/collect";
 export CartPage from "./Product/cartPage";
+export DetailInfo from "./Product/detailInfo";
 export EditAddress from "./Product/editAddress";
 export EditProduct from "./Shop/editProduct";
 export HomePage from './Product/homePage';
@@ -22,4 +24,3 @@ export Seller from "./Admin/Seller/seller";
 export ShopIndex from "./Shop/shopIndex";
 export UploadItem from "./Product/uploadItem";
 export User from "./Admin/User/user";
-
