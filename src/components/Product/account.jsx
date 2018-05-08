@@ -63,7 +63,7 @@ class Account extends Component {
     }
 
     componentWillMount() {
-        const { role } = this.props;
+        const { role } = this.props.params;
         role == "user" ?
             axios.get(SERVICE_URL + "/user/getUserInfo")
                 .then(response => {
@@ -105,7 +105,6 @@ class Account extends Component {
             data.imgId = imgId;
             data.avatar = '';
             data.role = 1;
-            console.log("0000", data);
             if (!err) {
                 role == "user" ?
                     axios.post(SERVICE_URL + "/user/updateUser", { data })

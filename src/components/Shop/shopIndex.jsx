@@ -3,22 +3,28 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/shopIndex.sass';
 import './Style/main.sass';
-import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message } from 'antd';
+import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message, Popconfirm } from 'antd';
 const { Meta } = Card;
 const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import AddProduct from './addProduct';
 
 class ShopIndex extends Component {
     state = {
         shopInfo: {},
         productList: [],
-        imgCode: ''
+        imgCode: '',
+        showAddModal: false
     }
 
     componentWillMount() {
+        this.handleGetSellerShop();
+    }
+
+    handleGetSellerShop = () => {
         axios.get(SERVICE_URL + "/shop/getSellerShop")
             .then(response => {
                 const resData = response.data;
@@ -73,17 +79,58 @@ class ShopIndex extends Component {
             });
     }
 
-    handleEditProduct = () => {
-        browserHistory.push(BASE_URL + "/shop/editProduct");
+    handleEditProduct = (proId) => {
+        browserHistory.push(BASE_URL + "/shop/editProduct/" + proId);
+    }
+
+    handleShowAddProduct = () => {
+        this.setState({ showAddModal: true })
+    }
+
+    handleCancelAddProduct = () => {
+        this.setState({
+            showAddModal: false
+        })
+    }
+
+    handleDeleteProduct = (proId) => {
+        axios.get(SERVICE_URL + "/product/deleteProduct/" + proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    message.success('删除成功');
+                    this.setState({ showLoading: false });
+                    this.handleGetSellerShop();
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleCancelDelete = () => {
+        console.log("canceldelte");
     }
 
     render() {
+        const { showAddModal } = this.state;
         return (
-            <div className="collect">
+            <div className="shop-index">
                 <Layout>
                     <Header>{this.renderCollectHeader()}</Header>
                     <Content>
                         {this.renderCollectTreasureContent()}
+                        {showAddModal ?
+                            <AddProduct
+                                visible={this.state.showAddModal}
+                                handleCancel={this.handleCancelAddProduct}
+                                handleGetSellerShop={this.handleGetSellerShop}
+                                shopInfo={this.state.shopInfo}
+                            /> : null}
                     </Content>
                     <Footer>Footer</Footer>
                 </Layout>
@@ -114,6 +161,9 @@ class ShopIndex extends Component {
                         />
                     </AutoComplete>
                 </div>
+                <div className="add-product" onClick={this.handleShowAddProduct}>
+                    <Icon type="appstore" />添加商品
+                </div>
             </div>
         )
     }
@@ -127,7 +177,12 @@ class ShopIndex extends Component {
                     <Card
                         style={{ width: 300 }}
                         cover={<img alt="example" src={product.imgCode} />}
-                        actions={[<Icon type="setting" />, <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />, <Icon type="ellipsis" />]}
+                        actions={[
+                            <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />,
+                            <Icon type="ellipsis" />,
+                            <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteProduct.bind(this, product.proId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                                <a href="#">Delete</a>
+                            </Popconfirm>]}
                     >
                         <div className="card-text">
                             <Meta

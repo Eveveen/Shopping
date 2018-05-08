@@ -43,7 +43,7 @@ const routes = (
             <Route path={"/shop"} component={ShopMenu}>
                 <IndexRoute component={ShopIndex} />
                 <Route path="product" component={ShopProduct} />
-                <Route path="editProduct" component={EditProduct} />
+                <Route path="editProduct/:proId" component={EditProduct} />
             </Route>
             <Route path={"/admin"} component={AdminHeader}>
                 <IndexRoute component={Seller} />

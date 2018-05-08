@@ -37,7 +37,6 @@ router.post("/uploadImg", paramsMulter.any(), function (req, res) {
  */
 router.post("/addProduct", function (req, res) {
     const { data } = req.body;
-    data.userId = req.session.user.userId;
     const path = utils.PROJECT + "/addProduct";
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (resData) {
         res.send(resData);
@@ -51,7 +50,7 @@ router.post("/addProduct", function (req, res) {
  */
 router.post("/editProduct", function (req, res) {
     const { data } = req.body;
-    data.userId = req.session.user.userId;
+    // data.sellerId = req.session.seller.sellerId;
     const path = utils.PROJECT + "/editProduct";
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
         res.send(resData);
@@ -165,6 +164,18 @@ router.get("/getAllCart", function (req, res) {
 router.get("/getShop/:id", function (req, res) {
     const path = utils.PROJECT + "/getShop";
     httpAgent.httpRequest({ shopId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据商品编号获取商品信息
+ */
+router.get("/getProductByProId/:proId", function (req, res) {
+    const path = utils.PROJECT + "/getProductByProId";
+    httpAgent.httpRequest({ proId: req.params.proId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

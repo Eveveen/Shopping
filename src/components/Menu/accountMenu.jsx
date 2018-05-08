@@ -33,8 +33,8 @@ class AccountMenu extends Component {
                         theme="light"
                     >
                         <SubMenu key="sub1" title={<span><Icon type="mail" /><span>帐号管理</span></span>}>
-                            <Menu.Item key="member">个人资料</Menu.Item>
-                            <Menu.Item key="address">收货地址</Menu.Item>
+                            <Menu.Item key="user/member">个人资料</Menu.Item>
+                            <Menu.Item key="user/address">收货地址</Menu.Item>
                         </SubMenu>
                     </Menu>
                 </div>

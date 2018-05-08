@@ -40,7 +40,7 @@ class AddressList extends Component {
 
     handleEditAddress = (id) => {
         console.log("id,,=", id);
-        browserHistory.push(BASE_URL + "/account/editAddress/" + id);
+        browserHistory.push(BASE_URL + "/account/user/editAddress/" + id);
         // this.setState({
         //     addressAction: "edit"
         // })

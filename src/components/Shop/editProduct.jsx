@@ -3,9 +3,10 @@ import { Button, Input, Select, Upload, Modal, message, Icon, Form, Cascader } f
 const FormItem = Form.Item;
 import axios from 'axios';
 import intl from 'react-intl-universal';
-// import './Style/main.sass';
+import './Style/editProduct.sass';
 import { getBase64, contains, messageText, getCookie } from '../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import { Link, browserHistory } from 'react-router';
 
 const formItemLayout = {
     labelCol: {
@@ -45,18 +46,55 @@ const residences = [{
 class EditProduct extends Component {
     state = {
         submitLoading: false,
-        imgId: "",
-        imgCode: "",
         loading: false,
+        productInfo: {}
     }
 
-    handleSavePersonInfo = (e) => {
+    componentWillMount() {
+        const { proId } = this.props.params;
+        axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
+            .then(response => {
+                const resData = response.data;
+                console.log(resData);
+                if (response.status == 200 && !resData.error) {
+                    this.handleGetImg(resData);
+                    this.setState({ showLoading: false, productInfo: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetImg = (product) => {
+        axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    product.imgCode = resData.imgCode;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleEditProduct = (e) => {
         e.preventDefault();
+        const { productInfo } = this.state;
         this.props.form.validateFields((err, data) => {
             if (!err) {
-                console.log('Received values of form: ', data);
-                data.shopId = 1;
-                axios.post(SERVICE_URL + '/product/addProduct', { data })
+                data.proId = productInfo.proId;
+                data.imgId = productInfo.imgId;
+                axios.post(SERVICE_URL + '/product/editProduct', { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
@@ -70,22 +108,24 @@ class EditProduct extends Component {
                         message.error(intl.get("editFailed"));
                         this.setState({ submitLoading: false });
                     });
-                // this.next();
             }
         });
     }
 
-    eforeUpload = () => {
-        this.setState({ imgCode: "", loading: false });
+    handleBackToIndex = () => {
+        browserHistory.push(BASE_URL + '/shop');
+    }
+
+    beforeUpload = () => {
+        this.state.productInfo.imgCode = "";
+        this.setState({ loading: false });
     }
 
     handleIconDelete = (e) => {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        this.setState({
-            imgId: null,
-            imgCode: null
-        });
+        this.state.productInfo.imgCode = null;
+        this.state.productInfo.imgId = null;
     }
 
     handleChange = (info) => {
@@ -100,7 +140,7 @@ class EditProduct extends Component {
                 loading: false,
             }));
             if (!info.file.response.error) {
-                this.setState({ imgId: info.file.response.imgId });
+                this.state.productInfo.imgId = info.file.response.imgId;
             }
         }
     }
@@ -115,7 +155,7 @@ class EditProduct extends Component {
 
     renderEditProduct() {
         const { getFieldDecorator } = this.props.form;
-        const { imgCode, loading, submitLoading } = this.state;
+        const { loading, submitLoading, productInfo } = this.state;
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
@@ -124,13 +164,14 @@ class EditProduct extends Component {
         );
         return (
             <div className="personal-info">
-                <Form onSubmit={this.handleSavePersonInfo} className="personal-info-form">
+                <Form onSubmit={this.handleEditProduct} className="personal-info-form">
                     <FormItem
                         {...formItemLayout}
                         label={"商品名称"}
                     >
                         {getFieldDecorator('proName', {
                             rules: [],
+                            initialValue: productInfo.proName
                         })(
                             <Input placeholder={"商品名称"} disabled={submitLoading} />
                         )}
@@ -146,6 +187,7 @@ class EditProduct extends Component {
                             }, {
                                 eq: 11, message: intl.get("telphoneLength")
                             }],
+                            initialValue: productInfo.description
                         })(
                             <Input placeholder={"description"} disabled={submitLoading} />
                         )}
@@ -158,6 +200,7 @@ class EditProduct extends Component {
                             rules: [{
                                 required: true, message: intl.get("telphoneNotnull")
                             }],
+                            initialValue: productInfo.price
                         })(
                             <Input placeholder={"price"} disabled={submitLoading} />
                         )}
@@ -169,7 +212,7 @@ class EditProduct extends Component {
                     >
                         {getFieldDecorator('proStatus', {
                             rules: [],
-                            initialValue: "0"
+                            initialValue: productInfo.proStatus
                         })(
                             <Select disabled={submitLoading}>
                                 <Option value="1">Active</Option>
@@ -194,15 +237,20 @@ class EditProduct extends Component {
                                 onChange={this.handleChange}
                                 disabled={submitLoading}
                             >
-                                {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
-                                {imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
+                                {productInfo.imgCode ? <img src={productInfo.imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
+                                {productInfo.imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
                             </Upload>
                         )}
                     </FormItem>
                     <FormItem>
-                        <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
-                            保存
+                        <div className="edit-product-footer">
+                            <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleEditProduct}>
+                                保存
                         </Button>
+                            <Button className="login-form-button" onClick={this.handleBackToIndex}>
+                                取消
+                        </Button>
+                        </div>
                     </FormItem>
                 </Form>
             </div>

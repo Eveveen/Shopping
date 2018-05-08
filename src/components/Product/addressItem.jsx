@@ -38,7 +38,7 @@ class AddressItem extends Component {
     }
 
     handleEditAddress = () => {
-        browserHistory.push(BASE_URL + "/account/editAddress");
+        browserHistory.push(BASE_URL + "/account/user/editAddress");
     }
 
     handleChageAddress = (e) => {

@@ -125,7 +125,7 @@ class EditAddress extends Component {
     }
 
     handleCancel = () => {
-        browserHistory.push(BASE_URL + "/account/address");
+        browserHistory.push(BASE_URL + "/account/user/address");
     }
 
     render() {
