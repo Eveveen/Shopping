@@ -18,7 +18,27 @@ router.post("/login", function (req, res) {
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         req.session.seller = data;
         res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
 
+/**
+ * 获取卖家信息
+ */
+router.get("/getSellerInfo", function (req, res) {
+    res.send(req.session.seller);
+});
+
+/**
+ * 编辑卖家信息
+ */
+router.post("/editSeller", function (req, res) {
+    const path = utils.PROJECT + "/seller/editSeller";
+    const { data } = req.body;
+    data.sellerId = req.session.seller.sellerId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })

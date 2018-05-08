@@ -14,6 +14,7 @@ export Login from './User/login';
 export MenuIndex from './Menu';
 export OrderItem from './Product/orderItem';
 export ProductIndex from './Product';
+export ShopMenu from "./Menu/shopMenu";
 export ShopProduct from "./Shop/shopProduct";
 export Register from './User/register';
 export Remark from './Product/remark';

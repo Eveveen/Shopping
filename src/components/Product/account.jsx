@@ -63,25 +63,43 @@ class Account extends Component {
     }
 
     componentWillMount() {
-        axios.get(SERVICE_URL + "/user/getUserInfo")
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
-                } else {
-                    this.setState({ showLoading: false })
+        const { role } = this.props;
+        role == "user" ?
+            axios.get(SERVICE_URL + "/user/getUserInfo")
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error(intl.get("editFailed"));
+                    }
+                }).catch(error => {
+                    console.log(error);
                     message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                console.log(error);
-                message.error(intl.get("editFailed"));
-                this.setState({ showLoading: false });
-            });
+                    this.setState({ showLoading: false });
+                })
+            :
+            axios.get(SERVICE_URL + "/shop/getSellerInfo")
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error(intl.get("editFailed"));
+                    }
+                }).catch(error => {
+                    console.log(error);
+                    message.error(intl.get("editFailed"));
+                    this.setState({ showLoading: false });
+                })
     }
 
     handleSavePersonInfo = (e) => {
         e.preventDefault();
         const { userInfo, imgId } = this.state;
+        const { role } = this.props.params;
         this.props.form.validateFields((err, data) => {
             data.userId = userInfo.userId;
             data.imgId = imgId;
@@ -89,20 +107,36 @@ class Account extends Component {
             data.role = 1;
             console.log("0000", data);
             if (!err) {
-                axios.post(SERVICE_URL + "/user/updateUser", { data })
-                    .then(response => {
-                        const resData = response.data;
-                        if (response.status == 200 && !resData.error) {
-                            message.success(intl.get("editSuccess"));
-                        } else {
-                            message.error(messageText(resData.error.code, intl.get("editFailed")));
-                        }
-                        this.setState({ editApplicationLoading: false });
-                    }).catch(error => {
-                        console.log(error);
-                        message.error(intl.get("editFailed"));
-                        this.setState({ editApplicationLoading: false });
-                    });
+                role == "user" ?
+                    axios.post(SERVICE_URL + "/user/updateUser", { data })
+                        .then(response => {
+                            const resData = response.data;
+                            if (response.status == 200 && !resData.error) {
+                                message.success(intl.get("editSuccess"));
+                            } else {
+                                message.error(messageText(resData.error.code, intl.get("editFailed")));
+                            }
+                            this.setState({ editApplicationLoading: false });
+                        }).catch(error => {
+                            console.log(error);
+                            message.error(intl.get("editFailed"));
+                            this.setState({ editApplicationLoading: false });
+                        })
+                    :
+                    axios.post(SERVICE_URL + "/shop/editSeller", { data })
+                        .then(response => {
+                            const resData = response.data;
+                            if (response.status == 200 && !resData.error) {
+                                message.success(intl.get("editSuccess"));
+                            } else {
+                                message.error(messageText(resData.error.code, intl.get("editFailed")));
+                            }
+                            this.setState({ editApplicationLoading: false });
+                        }).catch(error => {
+                            console.log(error);
+                            message.error(intl.get("editFailed"));
+                            this.setState({ editApplicationLoading: false });
+                        });
             }
         });
     }
@@ -157,6 +191,7 @@ class Account extends Component {
     renderPersonalInfo() {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading, imgCode, loading, userInfo } = this.state;
+        const { role } = this.props.params;
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
@@ -205,13 +240,13 @@ class Account extends Component {
                         label={"昵称"}
                         required="true"
                     >
-                        {getFieldDecorator('userName', {
+                        {getFieldDecorator(role == "user" ? 'userName' : 'sellerName', {
                             rules: [{
                                 required: true, message: intl.get("telphoneNotnull")
                             }, {
                                 eq: 11, message: intl.get("telphoneLength")
                             }],
-                            initialValue: userInfo.userName
+                            initialValue: role == "user" ? userInfo.userName : userInfo.sellerName
                         })(
                             <Input placeholder={"nickname"} disabled={submitLoading} />
                         )}
