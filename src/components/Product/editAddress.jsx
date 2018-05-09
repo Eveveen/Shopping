@@ -133,7 +133,7 @@ class EditAddress extends Component {
             <div className="manage">
                 <div className="manage-menu">
                     <AccountMenu
-                        keyMenu="address"
+                        keyMenu="user/address"
                     />
                 </div>
                 <div className="manage-menu-content">

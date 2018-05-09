@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, message } from 'antd';
+import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, message, Popconfirm } from 'antd';
 const FormItem = Form.Item;
 import axios from 'axios';
 import intl from 'react-intl-universal';
@@ -28,22 +28,18 @@ class AddressList extends Component {
                     console.log("addressData", resData);
                     this.setState({ showLoading: false, addressData: resData });
                 } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
+                    this.setState({ showLoading: false })
+                    message.error("获取地址失败");
                 }
             }).catch(error => {
                 console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
+                message.error("获取地址失败");
+                this.setState({ showLoading: false });
             });
     }
 
     handleEditAddress = (id) => {
-        console.log("id,,=", id);
         browserHistory.push(BASE_URL + "/account/user/editAddress/" + id);
-        // this.setState({
-        //     addressAction: "edit"
-        // })
     }
 
     handleDeleteAddress = (id) => {
@@ -54,13 +50,13 @@ class AddressList extends Component {
                     this.setState({ showLoading: false, address: resData });
                     this.handleGetAllAddress();
                 } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
+                    this.setState({ showLoading: false })
+                    message.error("删除失败");
                 }
             }).catch(error => {
                 console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
+                message.error("删除失败");
+                this.setState({ showLoading: false });
             });
     }
 
@@ -81,7 +77,7 @@ class AddressList extends Component {
             <div className="manage">
                 <div className="manage-menu">
                     <AccountMenu
-                        keyMenu="address"
+                        keyMenu="user/address"
                     />
                 </div>
                 <div className="manage-menu-content">
@@ -123,10 +119,16 @@ class AddressList extends Component {
             render: (data, record) => (
                 <span>
                     <Divider type="vertical" />
-                    <a href="javascript:;" onClick={this.handleEditAddress.bind(this, data.addressId)}>edit</a>
+                    <a href="javascript:;" onClick={this.handleEditAddress.bind(this, data.addressId)}>
+                        <Icon type="edit" />
+                    </a>
                     <Divider type="vertical" />
                     <Divider type="vertical" />
-                    <a href="javascript:;" onClick={this.handleDeleteAddress.bind(this, data.addressId)}>delete</a>
+                    <a href="javascript:;" >
+                        <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteAddress.bind(this, data.addressId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                            <Icon type="delete" className="delete-icon" />
+                        </Popconfirm>
+                    </a>
                     <Divider type="vertical" />
                 </span>
             ),
@@ -134,10 +136,12 @@ class AddressList extends Component {
 
         return (
             <div className="address-list">
+                <div className="add-icon" onClick={this.handleShowAddUser}>
+                    <Icon type="plus-circle" style={{ fontSize: 24 }} onClick={this.handleShowAddAddress} />
+                </div>
                 <div className="address-table">
                     <Table columns={columns} dataSource={this.state.addressData} />
                 </div>
-                <Icon type="plus-circle" onClick={this.handleShowAddAddress} />
                 <AddAddress
                     visible={this.state.showAddAddress}
                     handleCancel={this.handleCancelAddress}

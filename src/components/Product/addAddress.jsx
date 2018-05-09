@@ -65,13 +65,13 @@ class AddAddress extends Component {
                     console.log("--", resData);
                     this.setState({ showLoading: false });
                 } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
+                    this.setState({ showLoading: false })
+                    message.error("更改默认地址失败");
                 }
             }).catch(error => {
                 console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
+                message.error("更改默认地址失败");
+                this.setState({ showLoading: false });
             });
     }
 
@@ -90,18 +90,18 @@ class AddAddress extends Component {
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            console.log("--", resData);
                             this.setState({ showLoading: false });
                             this.handleCancel();
+                            message.success("添加成功");
                             this.props.handleGetAllAddress();
                         } else {
-                            // this.setState({ showLoading: false })
-                            // message.error(intl.get("editFailed"));
+                            this.setState({ showLoading: false })
+                            message.error("添加失败");
                         }
                     }).catch(error => {
                         console.log(error);
-                        // message.error(intl.get("editFailed"));
-                        // this.setState({ showLoading: false });
+                        message.error("添加失败");
+                        this.setState({ showLoading: false });
                     });
             }
         });
@@ -129,8 +129,8 @@ class AddAddress extends Component {
                     destroyOnClose={true}
                     maskClosable={false}
                     footer={<div>
-                        <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
-                        <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                        <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>保存</Button>
+                        <Button onClick={this.handleCancel} disabled={submitLoading} >取消</Button>
                     </div>}
                 >
                     <div className="personal-info">
@@ -142,12 +142,12 @@ class AddAddress extends Component {
                             >
                                 {getFieldDecorator('consignee', {
                                     rules: [{
-                                        required: true, message: intl.get("telphoneNotnull")
+                                        required: true, message: "收货人姓名不能为空"
                                     }, {
-                                        eq: 11, message: intl.get("telphoneLength")
+                                        eq: 11, message: "长度不正确"
                                     }],
                                 })(
-                                    <Input placeholder={"nickname"} disabled={submitLoading} />
+                                    <Input placeholder={"收货人姓名"} disabled={submitLoading} />
                                 )}
                             </FormItem>
                             <FormItem
@@ -155,7 +155,7 @@ class AddAddress extends Component {
                                 label="手机号码"
                             >
                                 {getFieldDecorator('telphone', {
-                                    rules: [{ required: true, message: 'Please input your phone number!' }],
+                                    rules: [{ required: true, message: '请输入手机号码' }],
                                 })(
                                     <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
                                 )}
@@ -167,12 +167,10 @@ class AddAddress extends Component {
                             >
                                 {getFieldDecorator('area', {
                                     rules: [{
-                                        required: true, message: intl.get("telphoneNotnull")
-                                    }, {
-                                        eq: 11, message: intl.get("telphoneLength")
+                                        required: true, message: "所在地区不能为空"
                                     }],
                                 })(
-                                    <Input placeholder={"nickname"} disabled={submitLoading} />
+                                    <Input placeholder={"所在地区"} disabled={submitLoading} />
                                 )}
                             </FormItem>
                             {/* <FormItem
@@ -193,12 +191,10 @@ class AddAddress extends Component {
                             >
                                 {getFieldDecorator('addressName', {
                                     rules: [{
-                                        required: true, message: intl.get("telphoneNotnull")
-                                    }, {
-                                        eq: 11, message: intl.get("telphoneLength")
+                                        required: true, message: "详细地址不能为空"
                                     }],
                                 })(
-                                    <Input placeholder={"nickname"} disabled={submitLoading} />
+                                    <Input placeholder={"详细地址"} disabled={submitLoading} />
                                 )}
                             </FormItem>
                             <FormItem
@@ -208,7 +204,7 @@ class AddAddress extends Component {
                                 {getFieldDecorator('zipCode', {
                                     rules: [],
                                 })(
-                                    <Input placeholder={"nickname"} disabled={submitLoading} />
+                                    <Input placeholder={"邮政编码"} disabled={submitLoading} />
                                 )}
                             </FormItem>
                             <FormItem

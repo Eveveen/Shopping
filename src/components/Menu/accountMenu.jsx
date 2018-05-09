@@ -11,10 +11,12 @@ import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class AccountMenu extends Component {
     state = {
+        current: "user/member"
     }
 
     handleClick = (e) => {
         console.log('click ', e);
+        // this.setState({ current: e.key })
         browserHistory.push(BASE_URL + "/account/" + e.key);
         // browserHistory.push(BASE_URL + "/" + e.key);
 
@@ -27,6 +29,7 @@ class AccountMenu extends Component {
                     <Menu
                         onClick={this.handleClick}
                         style={{ width: 256 }}
+                        // defaultSelectedKeys={[this.state.current]}
                         defaultSelectedKeys={[this.props.keyMenu]}
                         defaultOpenKeys={['sub1']}
                         mode="inline"

@@ -7,12 +7,14 @@ import '../Style/user.sass';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
 const SubMenu = Menu.SubMenu;
 import { Link, browserHistory } from 'react-router';
+import AddUser from './addUser';
 
 class User extends Component {
 
     state = {
         userList: [],
         current: 'user',
+        showAddUser: false
     }
 
     componentWillMount() {
@@ -67,6 +69,14 @@ class User extends Component {
             });
     }
 
+    handleShowAddUser = () => {
+        this.setState({ showAddUser: true })
+    }
+
+    handleCancelAddUser = () => {
+        this.setState({ showAddUser: false })
+    }
+
     render() {
         const columns = [{
             title: '姓名',
@@ -90,16 +100,26 @@ class User extends Component {
                         <Icon type="edit" onClick={this.handleEditUser.bind(this, user)} />
                     </a>
                     <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteUser.bind(this, user.userId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
-                        <Icon type="delete" />
+                        <Icon type="delete" className="delete-icon" />
                     </Popconfirm>
                 </span >
             ),
         }];
-        const { userList } = this.state;
+        const { userList, showAddUser } = this.state;
 
         return (
             <div className="admin-user">
+                <div className="add-icon" onClick={this.handleShowAddUser}>
+                    <Icon type="plus-circle" style={{ fontSize: 24 }} />
+                </div>
                 <Table columns={columns} dataSource={userList} />
+                {showAddUser ?
+                    <AddUser
+                        visible={this.state.showAddUser}
+                        handleCancel={this.handleCancelAddUser}
+                        handleGetAllUser={this.handleGetAllUser}
+                    />
+                    : null}
             </div>
         )
     }

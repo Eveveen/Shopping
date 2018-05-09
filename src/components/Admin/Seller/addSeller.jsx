@@ -5,7 +5,7 @@ const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import { getCookie, messageText, getBase64 } from '../../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
-import './Style/addAddress.sass'
+// import './Style/addAddress.sass'
 
 const formItemLayout = {
     labelCol: {
@@ -69,7 +69,7 @@ class AddSeller extends Component {
         const form = this.props.form;
         var password = form.getFieldValue('password')
         if (value != password) {
-            callback(intl.get("samepassword"));
+            callback("密码不一致");
         } else {
             callback();
         }
@@ -90,7 +90,7 @@ class AddSeller extends Component {
         return (
             <div className="add-address">
                 <Modal
-                    title={"Add Address"}
+                    title={"添加卖家"}
                     visible={visible}
                     onCancel={this.handleCancel}
                     width={850}
@@ -132,7 +132,7 @@ class AddSeller extends Component {
                             >
                                 {getFieldDecorator('password', {
                                     rules: [{
-                                        required: true, message: intl.get("passwordrequire"),
+                                        required: true, message: "请输入密码",
                                     }, {
                                         validator: this.validateToNextPassword,
                                     }],
@@ -146,7 +146,7 @@ class AddSeller extends Component {
                             >
                                 {getFieldDecorator('confirmPassword', {
                                     rules: [{
-                                        required: true, message: intl.get("verifypasswordrequire"),
+                                        required: true, message: "请输入确认密码",
                                     }, {
                                         validator: this.checkConfirmPassword,
                                     }],

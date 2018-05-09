@@ -7,12 +7,14 @@ import './Style/seller.sass';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
 const SubMenu = Menu.SubMenu;
 import { Link, browserHistory } from 'react-router';
+import AddSeller from './addSeller';
 
 class Seller extends Component {
 
     state = {
         current: 'seller',
-        sellerList: []
+        sellerList: [],
+        showAddSeller: false
     }
 
     componentWillMount() {
@@ -89,8 +91,16 @@ class Seller extends Component {
             });
     }
 
+    handleShowAddSeller = () => {
+        this.setState({ showAddSeller: true })
+    }
+
+    handleCancelAddSeller = () => {
+        this.setState({ showAddSeller: false })
+    }
+
     render() {
-        const { sellerList } = this.state;
+        const { sellerList, showAddSeller } = this.state;
         const columns = [{
             title: '姓名',
             dataIndex: 'sellerName',
@@ -121,36 +131,26 @@ class Seller extends Component {
                         <Icon type="edit" onClick={this.handleEditSeller.bind(this, seller)} />
                     </a>
                     <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteSeller.bind(this, seller.sellerId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
-                        <Icon type="delete" />
+                        <Icon type="delete" className="delete-icon" />
                     </Popconfirm>
                 </span >
             ),
         }];
-        const data = [{
-            key: '1',
-            name: 'John Brown',
-            telphone: 32,
-            email: 'New York No. 1 Lake Park',
-            shopName: 'John Brown',
-            shopStatus: '1',
-        }, {
-            key: '2',
-            name: 'Jim Green',
-            telphone: 42,
-            email: 'London No. 1 Lake Park',
-            shopName: 'John Brown',
-            shopStatus: '1',
-        }, {
-            key: '3',
-            name: 'Joe Black',
-            telphone: 32,
-            email: 'Sidney No. 1 Lake Park',
-            shopName: 'John Brown',
-            shopStatus: '1',
-        }];
         return (
-            <div className="admin-user">
-                <Table columns={columns} dataSource={sellerList} />
+            <div className="admin-seller">
+                <div className="add-icon" onClick={this.handleShowAddSeller}>
+                    <Icon type="plus-circle" style={{ fontSize: 24 }} />
+                </div>
+                <div>
+                    <Table columns={columns} dataSource={sellerList} />
+                </div>
+                {showAddSeller ?
+                    <AddSeller
+                        visible={this.state.showAddSeller}
+                        handleCancel={this.handleCancelAddSeller}
+                        handleGetAllSeller={this.handleGetAllSeller}
+                    />
+                    : null}
             </div>
         )
     }

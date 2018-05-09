@@ -24,6 +24,7 @@ class DetailInfo extends Component {
                 const resData = response.data;
                 console.log(resData);
                 if (response.status == 200 && !resData.error) {
+                    this.handleGetShopInfo(resData);
                     this.handleGetImg(resData);
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
@@ -33,6 +34,24 @@ class DetailInfo extends Component {
             }).catch(error => {
                 console.log(error);
                 message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetShopInfo = (product) => {
+        axios.get(SERVICE_URL + "/product/getShop/" + product.shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    product.shopInfo = resData;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取店铺信息失败");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("获取店铺信息失败");
                 this.setState({ showLoading: false });
             })
     }
@@ -156,6 +175,7 @@ class DetailInfo extends Component {
 
     render() {
         const { count, productInfo } = this.state;
+        console.log(productInfo);
         return (
             <div className="detail">
                 <div className="summary-info">
@@ -201,6 +221,11 @@ class DetailInfo extends Component {
                                 <Button onClick={this.handleIsCartExist}>加入购物车</Button>
                             </div>
                         </div>
+                    </div>
+                    <div className="shop-info">
+                        <div className="shop-name">{productInfo.shopInfo == null ? null : productInfo.shopInfo.shopName}</div>
+                        <div className="shop-btn"><Button>进入店铺</Button></div>
+                        <div className="shop-btn"><Button>收藏店铺</Button></div>
                     </div>
                 </div >
                 <div className="detailed-info">

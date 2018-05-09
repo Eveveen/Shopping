@@ -5,7 +5,7 @@ const FormItem = Form.Item;
 import intl from 'react-intl-universal';
 import { getCookie, messageText, getBase64 } from '../../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
-import './Style/addAddress.sass'
+// import './Style/addAddress.sass'
 
 const formItemLayout = {
     labelCol: {
@@ -42,6 +42,7 @@ class AddUser extends Component {
                         if (response.status == 200 && !resData.error) {
                             this.setState({ showLoading: false });
                             this.handleCancel();
+                            message.success("添加成功");
                             this.props.handleGetAllUser();
                         } else {
                             this.setState({ showLoading: false })
@@ -68,7 +69,7 @@ class AddUser extends Component {
         const form = this.props.form;
         var password = form.getFieldValue('password')
         if (value != password) {
-            callback(intl.get("samepassword"));
+            callback("密码不一致");
         } else {
             callback();
         }
@@ -89,15 +90,15 @@ class AddUser extends Component {
         return (
             <div className="add-address">
                 <Modal
-                    title={"Add Address"}
+                    title={"添加用户"}
                     visible={visible}
                     onCancel={this.handleCancel}
                     width={850}
                     destroyOnClose={true}
                     maskClosable={false}
                     footer={<div>
-                        <Button type="primary" onClick={this.handleAddUser} loading={submitLoading}>{intl.get("save")}</Button>
-                        <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                        <Button type="primary" onClick={this.handleAddUser} loading={submitLoading}>保存</Button>
+                        <Button onClick={this.handleCancel} disabled={submitLoading} >取消</Button>
                     </div>}
                 >
                     <div className="personal-info">
@@ -107,9 +108,9 @@ class AddUser extends Component {
                                 label={"姓名"}
                                 required="true"
                             >
-                                {getFieldDecorator('sellerName', {
+                                {getFieldDecorator('userName', {
                                     rules: [{
-                                        required: true, message: "sellerName不能为空"
+                                        required: true, message: "用户名不能为空"
                                     }],
                                 })(
                                     <Input placeholder={"姓名"} disabled={submitLoading} />
@@ -131,7 +132,7 @@ class AddUser extends Component {
                             >
                                 {getFieldDecorator('password', {
                                     rules: [{
-                                        required: true, message: intl.get("passwordrequire"),
+                                        required: true, message: "请输入密码",
                                     }, {
                                         validator: this.validateToNextPassword,
                                     }],
@@ -145,7 +146,7 @@ class AddUser extends Component {
                             >
                                 {getFieldDecorator('confirmPassword', {
                                     rules: [{
-                                        required: true, message: intl.get("verifypasswordrequire"),
+                                        required: true, message: "请输入确认密码",
                                     }, {
                                         validator: this.checkConfirmPassword,
                                     }],
@@ -159,9 +160,9 @@ class AddUser extends Component {
                             >
                                 {getFieldDecorator('email', {
                                     rules: [{
-                                        required: true, message: intl.get("requireemail"),
+                                        required: true, message: "请输入邮箱",
                                     }, {
-                                        type: 'email', message: intl.get("formatemail")
+                                        type: 'email', message: "邮箱格式不正确"
                                     }, {
                                         max: 50, message: intl.get("emailmax")
                                     }],

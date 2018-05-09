@@ -177,7 +177,7 @@ class Account extends Component {
             <div className="manage">
                 <div className="manage-menu">
                     <AccountMenu
-                        keyMenu="member"
+                        keyMenu="user/member"
                     />
                 </div>
                 <div className="manage-menu-content">

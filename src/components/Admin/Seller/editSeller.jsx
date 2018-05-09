@@ -96,7 +96,7 @@ class EditSeller extends Component {
     }
 
     render() {
-        const { shopId } = this.props.params;
+        const { shopId, sellerId } = this.props.params;
         return (
             <Tabs defaultActiveKey="seller" onChange={this.callback}>
                 <TabPane tab={<span><Icon type="apple" />卖家</span>} key="seller">
@@ -104,7 +104,7 @@ class EditSeller extends Component {
                 </TabPane>
                 <TabPane tab={<span><Icon type="android" />店铺</span>} key="shop">
                     {/* {this.renderLogin()} */}
-                    <SellerShop shopId={shopId} />
+                    <SellerShop shopId={shopId} sellerId={sellerId} />
                 </TabPane>
             </Tabs>
         )

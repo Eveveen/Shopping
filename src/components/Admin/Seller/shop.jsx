@@ -28,70 +28,77 @@ class SellerShop extends Component {
     }
 
     componentWillMount() {
+        console.log(this.props);
         const { shopId } = this.props;
-        axios.get(SERVICE_URL + "/admin/getSellerShop/" + shopId)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, shopInfo: resData });
-                } else {
-                    message.error("获取店铺失败");
+        console.log(shopId);
+        if (shopId != "undefined") {
+            axios.get(SERVICE_URL + "/admin/getSellerShop/" + shopId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        this.setState({ showLoading: false, shopInfo: resData });
+                    } else {
+                        message.error("获取店铺失败");
+                        this.setState({ showLoading: false })
+                    }
+                }).catch(error => {
+                    console.log(error);
                     this.setState({ showLoading: false })
-                }
-            }).catch(error => {
-                console.log(error);
-                this.setState({ showLoading: false })
-                message.error("获取店铺失败");
-            });
+                    message.error("获取店铺失败");
+                });
+        }
     }
 
     handleCancel = () => {
         browserHistory.push(BASE_URL + "/admin/seller");
     }
 
-    handleChageAddressStatus = () => {
-        axios.post(SERVICE_URL + "/product/changeAddressStatus")
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    console.log("--", resData);
-                    this.setState({ showLoading: false });
-                } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
-            });
-    }
-
-    handleAddAddress = (e) => {
+    handleEditShop = (e) => {
         e.preventDefault();
+        const { shopInfo } = this.state;
         this.props.form.validateFields((err, data) => {
             if (!err) {
-                console.log(data);
-                if (data.addressStatus == true) {
-                    this.handleChageAddressStatus();
-                    data.addressStatus = 1;
-                } else {
-                    data.addressStatus = 0;
-                }
-                axios.post(SERVICE_URL + "/product/addAddress", { data })
+                data.sellerId = shopInfo.sellerId;
+                data.shopId = shopInfo.shopId;
+                axios.post(SERVICE_URL + "/admin/editShop", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            console.log("--", resData);
                             this.setState({ showLoading: false });
+                            message.success("编辑成功");
                         } else {
-                            // this.setState({ showLoading: false })
-                            // message.error(intl.get("editFailed"));
+                            this.setState({ showLoading: false })
+                            message.error("编辑失败");
                         }
                     }).catch(error => {
                         console.log(error);
-                        // message.error(intl.get("editFailed"));
-                        // this.setState({ showLoading: false });
+                        message.error("编辑失败");
+                        this.setState({ showLoading: false });
+                    });
+            }
+        });
+    }
+
+    handleAddShop = (e) => {
+        e.preventDefault();
+        const { sellerId } = this.props;
+        this.props.form.validateFields((err, data) => {
+            if (!err) {
+                data.sellerId = sellerId;
+                axios.post(SERVICE_URL + "/admin/addShop", { data })
+                    .then(response => {
+                        const resData = response.data;
+                        if (response.status == 200 && !resData.error) {
+                            this.setState({ showLoading: false });
+                            message.success("添加成功");
+                        } else {
+                            this.setState({ showLoading: false })
+                            message.error("添加失败");
+                        }
+                    }).catch(error => {
+                        console.log(error);
+                        message.error("添加失败");
+                        this.setState({ showLoading: false });
                     });
             }
         });
@@ -116,7 +123,7 @@ class SellerShop extends Component {
     }
 
     render() {
-        const { visible } = this.props;
+        const { visible, shopId } = this.props;
         const { iconImg, loading, submitLoading, shopInfo } = this.state;
         const { getFieldDecorator } = this.props.form;
         const prefixSelector = getFieldDecorator('prefix', {
@@ -130,7 +137,7 @@ class SellerShop extends Component {
         return (
             <div className="add-address">
                 <div className="personal-info">
-                    <Form onSubmit={this.handleAddAddress} className="personal-info-form">
+                    <Form className="personal-info-form">
                         <FormItem
                             {...formItemLayout}
                             label={"店铺名称"}
@@ -180,7 +187,7 @@ class SellerShop extends Component {
                         </FormItem>
                         <FormItem>
                             <div className="edit-shop-footer">
-                                <Button type="primary" onClick={this.handleAddAddress} loading={submitLoading}>{intl.get("save")}</Button>
+                                <Button type="primary" onClick={shopId == "undefined" ? this.handleAddShop : this.handleEditShop} loading={submitLoading}>{intl.get("save")}</Button>
                                 <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
                             </div>
                         </FormItem>
