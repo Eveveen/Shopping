@@ -28,12 +28,15 @@ class FirstStep extends Component {
         // const { telphone } = this.state; 
         const { getFieldDecorator, getFieldValue } = this.props.form;
         let telphone = getFieldValue('telphone');
+        console.log(telphone)
         //发送短信验证码
         httpRequestPost(SERVICE_URL + "/user/getCode", { telphone: telphone }, (resData) => {
             this.setState({ showLoading: false });
+            message.success("发送成功");
         }, (errorData) => {
+            console.log(errorData);
             this.setState({ showLoading: false })
-            message.error(intl.get("createApplicationFailed"));
+            message.error("发送短信验证码失败");
         })
     }
 
@@ -66,10 +69,9 @@ class FirstStep extends Component {
                     }
                 }, (errorData) => {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("createApplicationFailed"));
+                    message.error("验证码不正确");
                 })
             }
-            console.log("addUserFlag", typeof addUserFlag)
         });
         if (addUserFlag == true) {
 
@@ -92,17 +94,17 @@ class FirstStep extends Component {
                 <Form onSubmit={this.handleSubmit}>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("telphone")}
+                        label={"手机号码"}
                         required="true"
                     >
                         {getFieldDecorator('telphone', {
                             rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
+                                required: true, message: "手机号码不能为空"
                             }, {
-                                eq: 11, message: intl.get("telphoneLength")
+                                eq: 11, message: "手机号码长度不正确"
                             }],
                         })(
-                            <Input placeholder={intl.get("telphone")}
+                            <Input placeholder={"手机号码"}
                                 setFieldsValue={this.state.telphone}
                                 onChange={(e) => { this.setState({ telphone: e.target.value }) }}
                                 disabled={submitLoading}
@@ -111,23 +113,23 @@ class FirstStep extends Component {
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("validateCode")}
+                        label={"验证码"}
                         required="true"
                     >
                         {getFieldDecorator('validateCode', {
                             rules: [{
-                                required: true, message: intl.get("validateCodeNotnull")
+                                required: true, message: "验证码不能为空"
                             }],
                         })(
                             <div>
-                                <Input placeholder={intl.get("validateCode")} disabled={submitLoading} />
+                                <Input placeholder={"验证码"} disabled={submitLoading} />
                                 <Button type="primary" onClick={this.getCode} loading={submitLoading}>点击获取验证码</Button>
                             </div>
                         )}
                     </FormItem>
                     <FormItem>
                         <div className="footer-btn">
-                            <Button type="primary" onClick={this.handleFirstStep} loading={submitLoading}>{intl.get("login")}</Button>
+                            <Button type="primary" onClick={this.handleFirstStep} loading={submitLoading}>下一步</Button>
                         </div>
                     </FormItem>
                 </Form>

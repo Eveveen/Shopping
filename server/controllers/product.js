@@ -303,6 +303,19 @@ router.post("/addOrder", function (req, res) {
 });
 
 /**
+ * 更改订单评价状态
+ */
+router.post("/editOrderCommentStatus", function (req, res) {
+    const path = utils.PROJECT + "/editOrderCommentStatus";
+    const { order } = req.body;
+    httpAgent.httpRequest(order, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 删除订单的一条记录
  */
 router.get("/deleteOrder/:id", function (req, res) {
@@ -331,9 +344,10 @@ router.post("/addComment", function (req, res) {
 /**
  * 获取该商品的所有评论
  */
-router.get("/getAllComment", function (req, res) {
+router.get("/getAllComment/:id", function (req, res) {
     const path = utils.PROJECT + "/getAllComment";
-    httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+    console.log("proId,", req.params.id);
+    httpAgent.httpRequest({ proId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

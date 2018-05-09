@@ -26,7 +26,6 @@ class HomePage extends Component {
 
     render() {
         const { pageStatus } = this.state;
-        console.log(pageStatus);
         return (
             <div>
                 {/* <Account /> */}
@@ -36,7 +35,6 @@ class HomePage extends Component {
     }
 
     renderHomePage() {
-        console.log("===");
         const { pageStatus } = this.state;
         return (
             <div className="home-page">

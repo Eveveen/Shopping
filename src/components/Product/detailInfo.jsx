@@ -9,12 +9,14 @@ const { Meta } = Card;
 const TabPane = Tabs.TabPane;
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import moment from 'moment';
 
 class DetailInfo extends Component {
     state = {
         count: 1,
         productInfo: {},
-        showLoading: false
+        showLoading: false,
+        commentList: []
     }
 
     componentWillMount() {
@@ -73,6 +75,42 @@ class DetailInfo extends Component {
             });
     }
 
+    handleGetComment = (proId) => {
+        axios.get(SERVICE_URL + "/product/getAllComment/" + proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(comment => {
+                        this.handleGetUser(comment);
+                    });
+                    this.setState({ showLoading: false, commentList: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取评论失败");
+                }
+            }).catch(error => {
+                message.error("获取评论失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleGetUser = (comment) => {
+        axios.get(SERVICE_URL + "/user/getUser/" + comment.userId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    comment.userName = resData.userName;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取用户失败");
+                }
+            }).catch(error => {
+                message.error("获取用户失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
 
     handleImgFocus = () => {
         console.log("focus");
@@ -95,6 +133,10 @@ class DetailInfo extends Component {
 
     callback = (key) => {
         console.log(key);
+        const { productInfo } = this.state;
+        if (key == "comment") {
+            this.handleGetComment(productInfo.proId);
+        }
     }
 
     handleBuyNow = () => {
@@ -173,6 +215,10 @@ class DetailInfo extends Component {
             });
     }
 
+    handleViewShop = (shopId) => {
+        browserHistory.push(BASE_URL + "/viewShop/" + shopId);
+    }
+
     render() {
         const { count, productInfo } = this.state;
         console.log(productInfo);
@@ -224,30 +270,41 @@ class DetailInfo extends Component {
                     </div>
                     <div className="shop-info">
                         <div className="shop-name">{productInfo.shopInfo == null ? null : productInfo.shopInfo.shopName}</div>
-                        <div className="shop-btn"><Button>进入店铺</Button></div>
+                        <div className="shop-btn"><Button onClick={productInfo.shopInfo == null ? null : this.handleViewShop.bind(this, productInfo.shopInfo.shopId)}>进入店铺</Button></div>
                         <div className="shop-btn"><Button>收藏店铺</Button></div>
                     </div>
                 </div >
                 <div className="detailed-info">
                     <Tabs onChange={this.callback} type="card">
-                        <TabPane tab="宝贝详情" key="1">
+                        <TabPane tab="宝贝详情" key="basic">
                             <div className="detailed-header">商品基本信息</div>
                         </TabPane>
-                        <TabPane tab="累计评论" key="2">
-                            <div className="remark">
-                                <div className="user-info">
-                                    <Avatar shape="square" size="large" icon="user" />
-                                    <div className="user-name">匿名</div>
-                                </div>
-                                <div className="remark-info">
-                                    <div className="remark-text">好评</div>
-                                    <div className="remark-time">2018年04月17日 09:52</div>
-                                </div>
-                            </div>
+                        <TabPane tab="累计评论" key="comment">
+                            {this.renderComment()}
                         </TabPane>
                     </Tabs>
                 </div>
             </div>
+        )
+    }
+
+    renderComment() {
+        const { commentList } = this.state;
+        let commentDiv = [];
+        commentList.forEach(comment => {
+            commentDiv.push(<div className="remark">
+                <div className="user-info">
+                    <Avatar shape="square" size="large" icon="user" />
+                    <div className="user-name">{comment.userName}</div>
+                </div>
+                <div className="remark-info">
+                    <div className="remark-text">{comment.description}</div>
+                    <div className="remark-time">{moment(comment.createTime).format("YYYY年MM月DD日 HH:mm:ss")}</div>
+                </div>
+            </div>)
+        });
+        return (
+            <div>{commentDiv}</div>
         )
     }
 }

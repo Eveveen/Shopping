@@ -35,11 +35,6 @@ class Register extends Component {
         // console.log(this.state.current)
     }
 
-    alertMsg = (msg) => {
-        var alert = { isShow: true, type: "error", message: msg }
-        this.setState({ alert: alert })
-    }
-
     next = () => {
         const current = this.state.current + 1;
         this.setState({ current });
@@ -118,8 +113,8 @@ class Register extends Component {
                 <div className="steps-action">
                     {
                         current < steps.length - 1
-                        &&
-                        <Button type="primary" onClick={() => this.next()}>Next</Button>
+                            &&
+                            current == 0 ? null : <Button type="primary" onClick={() => this.next()}>Next</Button>
                     }
                     {
                         current === steps.length - 1
