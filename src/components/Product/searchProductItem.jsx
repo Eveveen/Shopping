@@ -25,11 +25,8 @@ class SearchProductItem extends Component {
 
     handleSearchProduct = () => {
         let data = {};
-        // const { name } = this.props.params;
         const { searchName } = this.state;
-        // this.props.params.name = searchName;
         if (searchName == this.props.params.name) {
-
             let searchProNameList = [];
             data.proName = searchName;
             axios.post(SERVICE_URL + "/product/searchProduct", { data })

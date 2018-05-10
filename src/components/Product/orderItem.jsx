@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Layout, AutoComplete } from 'antd';
+import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Layout, AutoComplete, Menu } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
 const FormItem = Form.Item;
 import axios from 'axios';
@@ -9,16 +9,46 @@ import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import moment from 'moment';
 import { _ } from 'underscore';
+const SubMenu = Menu.SubMenu;
+const MenuItemGroup = Menu.ItemGroup;
 
 class OrderItem extends Component {
     state = {
         orderList: [],
         orderNumList: [],
-        orderNums: []
+        orderNums: [],
+        searchName: '',
+        productList: [],
+        current: "all"
     }
 
     componentWillMount() {
         this.handleGetAllOrder();
+    }
+
+    handleClick = (e) => {
+        // const {orderList} = this.state;
+        this.setState({ current: e.key });
+        if (e.key == "all") {
+            this.handleGetAllOrder();
+            return;
+        }
+        if (e.key == "waitPay") {
+            this.handleGetOrderByStatus(2);
+            return;
+        }
+        if (e.key == "waitSend") {
+            this.handleGetOrderByStatus(3);
+            return;
+        }
+        if (e.key == "waitConfirm") {
+            this.handleGetOrderByStatus(4);
+            return;
+        }
+        if (e.key == "waitComment") {
+            this.handleGetOrderByStatus(0);
+            return;
+        }
     }
 
     handleGetAllOrder = () => {
@@ -33,6 +63,36 @@ class OrderItem extends Component {
                         if (!_.contains(orderNums, order.orderNum)) {
                             orderNums.push(order.orderNum)
                             orderNumList.push({ "orderNum": order.orderNum, "order": order });
+                        }
+                    });
+                    this.setState({ showLoading: false, orderList: resData, orderNumList: orderNumList });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetOrderByStatus = (commentStatus) => {
+        this.state.orderNumList = [];
+        this.state.orderNums = [];
+        const { orderNumList, orderNums } = this.state;
+        let data = {};
+        data.commentStatus = commentStatus;
+        axios.post(SERVICE_URL + "/product/getOrderByStatus", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(order => {
+                        this.handleGetProduct(order);
+                        this.handleGetShopInfo(order);
+                        if (!_.contains(orderNums, order.orderNum)) {
+                            this.state.orderNums.push(order.orderNum)
+                            this.state.orderNumList.push({ "orderNum": order.orderNum, "order": order });
                         }
                     });
                     this.setState({ showLoading: false, orderList: resData, orderNumList: orderNumList });
@@ -75,11 +135,11 @@ class OrderItem extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取商品失败");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("获取商品失败");
                 this.setState({ showLoading: false });
             })
     }
@@ -118,7 +178,6 @@ class OrderItem extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    // order.imgCode = resData.imgCode;
                     order.productInfo.imgCode = resData.imgCode;
                     this.setState({ showLoading: false });
                 } else {
@@ -131,12 +190,53 @@ class OrderItem extends Component {
             });
     }
 
+    handleChangeSearchName = (value) => {
+        this.setState({ searchName: value })
+    }
+
+    handleSearchOrder = () => {
+        let data = {};
+        this.state.orderNumList = [];
+        this.state.orderNums = [];
+        const { searchName, orderNums, orderNumList } = this.state;
+        // let orderNums = [];
+        // let orderNumList = [];
+        data.proName = searchName;
+        axios.post(SERVICE_URL + "/product/searchOrder", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(order => {
+                        this.handleGetProduct(order);
+                        this.handleGetShopInfo(order);
+                        if (!_.contains(orderNums, order.orderNum)) {
+                            this.state.orderNums.push(order.orderNum)
+                            this.state.orderNumList.push({ "orderNum": order.orderNum, "order": order });
+                        }
+                    });
+                    this.setState({ showLoading: false, orderList: resData });
+                    // this.setState({ showLoading: false, orderList: resData, orderNumList: orderNumList, orderNums: orderNums });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("搜索失败");
+                }
+            }).catch(error => {
+                message.error("搜索失败");
+                console.log(error)
+                this.setState({ showLoading: false });
+            });
+
+    }
+
     render() {
         return (
             <div className="order-item">
                 <Layout>
                     <Header>{this.renderHeader()}</Header>
-                    <Content>{this.renderOrderItem()}</Content>
+                    <Content>
+                        {this.renderOrderMenu()}
+                        {this.renderOrderItem()}
+                    </Content>
                     <Footer>Footer</Footer>
                 </Layout>
 
@@ -150,19 +250,48 @@ class OrderItem extends Component {
             <div className="global-search-wrapper">
                 <AutoComplete
                     style={{ width: 200 }}
-                    dataSource={dataSource}
-                    placeholder="try to type `b`"
+                    // dataSource={dataSource}
+                    onChange={this.handleChangeSearchName}
+                    placeholder="输入要查询的关键字"
                     className="global-search"
                     filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
                 >
                     <Input
                         suffix={(
-                            <Button className="search-btn" type="primary">
+                            <Button className="search-btn" type="primary" onClick={this.handleSearchOrder}>
                                 <Icon type="search" />
                             </Button>
                         )}
                     />
                 </AutoComplete>
+            </div>
+        )
+    }
+
+    renderOrderMenu() {
+        return (
+            <div>
+                <Menu
+                    onClick={this.handleClick}
+                    selectedKeys={[this.state.current]}
+                    mode="horizontal"
+                >
+                    <Menu.Item key="all">
+                        <Icon type="appstore" />全部订单
+                    </Menu.Item>
+                    <Menu.Item key="waitPay">
+                        <Icon type="appstore" />待付款
+                    </Menu.Item>
+                    <Menu.Item key="waitSend">
+                        <Icon type="appstore" />待发货
+                    </Menu.Item>
+                    <Menu.Item key="waitConfirm">
+                        <Icon type="appstore" />待收货
+                    </Menu.Item>
+                    <Menu.Item key="waitComment">
+                        <Icon type="appstore" />待评价
+                    </Menu.Item>
+                </Menu>
             </div>
         )
     }

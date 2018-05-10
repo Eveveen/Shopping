@@ -316,6 +316,35 @@ router.post("/addOrder", function (req, res) {
 });
 
 /**
+ * 搜索订单
+ */
+router.post("/searchOrder", function (req, res) {
+    const path = utils.PROJECT + "/searchOrder";
+    const { data } = req.body;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据评价状态查询该用户的订单
+ */
+router.post("/getOrderByStatus", function (req, res) {
+    const path = utils.PROJECT + "/getOrderByStatus";
+    const { data } = req.body;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+
+/**
  * 更改订单评价状态
  */
 router.post("/editOrderCommentStatus", function (req, res) {
