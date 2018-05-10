@@ -8,6 +8,7 @@ import './Style/buyItem.sass';
 import AddressItem from './addressItem';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import moment from 'moment';
 
 class BuyNow extends Component {
     state = {
@@ -20,7 +21,7 @@ class BuyNow extends Component {
 
     componentWillMount() {
         const { productInfo } = this.props.location.state;
-        this.setState({})
+        this.setState({ productInfo: productInfo })
     }
 
     changeCount = (cartId, product, e) => {
@@ -61,8 +62,19 @@ class BuyNow extends Component {
             });
     }
 
+    handleAddOrder = () => {
+        const { productInfo } = this.state;
+        let data = {};
+        let random = parseInt(Math.random() * 10000)
+        data.orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 4);
+        data.proId = productInfo.proId;
+        data.shopId = productInfo.shopInfo.shopId;
+        data.proNum = productInfo.count;
+        data.price = productInfo.price;
+    }
+
     render() {
-        const { shopList, totalCount, buyList } = this.state;
+        const { shopList, totalCount, buyList, productInfo } = this.state;
         return (
             <div className="buy-item">
                 <Layout>
@@ -76,7 +88,7 @@ class BuyNow extends Component {
                                 <div className="pay-info">
                                     <div className="pay-info-content">
                                         <span className="real-pay-title">实付款：</span>
-                                        <span className="real-pay-price">￥{this.state.totalCount}</span>
+                                        <span className="real-pay-price">￥{productInfo.price * productInfo.count}</span>
                                     </div>
                                     <div className="pay-info-content">
                                         <span className="real-pay-title">寄送至：</span>
@@ -89,7 +101,7 @@ class BuyNow extends Component {
                                 </div>
                             </div>
                             <div className="submit-btn">
-                                <Button>提交订单</Button>
+                                <Button onClick={this.handleAddOrder}>提交订单</Button>
                             </div>
                         </div>
                     </Content>
@@ -104,6 +116,14 @@ class BuyNow extends Component {
         const { productInfo } = this.state;
         console.log(productInfo);
         let cartItemDiv = [];
+        let titleDiv =
+            <div className="card-title">
+                <div className="card-title-text">
+                    <div className="card-title-text">店铺：</div>
+                    <div className="card-title-text">{productInfo.shopInfo ? productInfo.shopInfo.shopName : null}</div>
+                </div>
+            </div>
+        cartItemDiv.push(titleDiv);
         cartItemDiv.push(
             <div className="cart-card">
                 <div className="card-item-content">
@@ -121,12 +141,13 @@ class BuyNow extends Component {
                         {productInfo.price}
                     </div>
                     <div className="item-count">
-                        {/* <Button onClick={this.decreaseCount.bind(this, productInfo.cartInfo.cartId, productInfo)}>-</Button>
-                        <Input value={productInfo.cartInfo.proNum} onChange={this.changeCount.bind(this, productInfo.cartInfo.cartId, productInfo)} /> */}
+                        {/* <Button onClick={this.decreaseCount.bind(this, productInfo.cartInfo.cartId, productInfo)}>-</Button> */}
+                        <Input value={productInfo.count} />
+                        {/* <Input value={productInfo.cartInfo.proNum} onChange={this.changeCount.bind(this, productInfo.cartInfo.cartId, productInfo)} /> */}
                         {/* <Button onClick={this.increaseCount.bind(this, productInfo.cartInfo.cartId, productInfo)}>+</Button> */}
                     </div>
                     <div className="item-total-price">
-                        {/* ￥{productInfo.price * productInfo.cartInfo.proNum} */}
+                        ￥{productInfo.price * productInfo.count}
                     </div>
                     <div className="item-operation">
                         {/* <span onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</span> */}

@@ -391,6 +391,10 @@ class CartPage extends Component {
             });
     }
 
+    handleShowProductDetail = (proId) => {
+        browserHistory.push(BASE_URL + "/item/" + proId);
+    }
+
     render() {
         const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll, selectedCartIds } = this.state;
         return (
@@ -462,7 +466,7 @@ class CartPage extends Component {
                 <Checkbox checked={product.checked} onChange={this.handleCheckboxProduct.bind(this, product.proId, product.checked)}>
                 </Checkbox>
                 <div className="card-item-content">
-                    <div className="left-img">
+                    <div className="left-img" onClick={this.handleShowProductDetail.bind(this, product.proId)}>
                         <img alt="example" src={product.imgCode} />
                     </div>
                     <div className="item-info">

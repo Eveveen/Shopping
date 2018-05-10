@@ -141,6 +141,7 @@ class DetailInfo extends Component {
 
     handleBuyNow = () => {
         const { productInfo } = this.state;
+        productInfo.count = this.state.count;
 
         browserHistory.push({ pathname: BASE_URL + "/buyNow/" + productInfo.proId, state: { productInfo: productInfo } });
     }

@@ -27,7 +27,6 @@ class OrderItem extends Component {
     }
 
     handleClick = (e) => {
-        // const {orderList} = this.state;
         this.setState({ current: e.key });
         if (e.key == "all") {
             this.handleGetAllOrder();
