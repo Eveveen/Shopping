@@ -24,6 +24,7 @@ export ShopMenu from "./Menu/shopMenu";
 export ShopProduct from "./Shop/shopProduct";
 export Register from './User/register';
 export Remark from './Product/remark';
+export SearchProductItem from "./Product/searchProductItem";
 export Seller from "./Admin/Seller/seller";
 export ShopIndex from "./Shop/shopIndex";
 export UploadItem from "./Product/uploadItem";

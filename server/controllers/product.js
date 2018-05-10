@@ -72,6 +72,19 @@ router.get("/deleteProduct/:id", function (req, res) {
 });
 
 /**
+ * 搜索商品
+ */
+router.post("/searchProduct", function (req, res) {
+    const { data } = req.body;
+    const path = utils.PROJECT + "/searchProduct";
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 获取所有的地址
  */
 router.get("/getAllAddress", function (req, res) {
@@ -307,8 +320,8 @@ router.post("/addOrder", function (req, res) {
  */
 router.post("/editOrderCommentStatus", function (req, res) {
     const path = utils.PROJECT + "/editOrderCommentStatus";
-    const { order } = req.body;
-    httpAgent.httpRequest(order, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

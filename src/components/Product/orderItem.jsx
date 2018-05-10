@@ -18,14 +18,18 @@ class OrderItem extends Component {
     }
 
     componentWillMount() {
+        this.handleGetAllOrder();
+    }
+
+    handleGetAllOrder = () => {
         const { orderNumList, orderNums } = this.state;
         axios.get(SERVICE_URL + "/product/getAllOrder")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
                     resData.forEach(order => {
-                        this.handleGetShopInfo(order);
                         this.handleGetProduct(order);
+                        this.handleGetShopInfo(order);
                         if (!_.contains(orderNums, order.orderNum)) {
                             orderNums.push(order.orderNum)
                             orderNumList.push({ "orderNum": order.orderNum, "order": order });
@@ -67,6 +71,7 @@ class OrderItem extends Component {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
                     order.productInfo = resData;
+                    this.handleGetImg(order);
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
@@ -81,6 +86,49 @@ class OrderItem extends Component {
 
     handleRemark = (order) => {
         browserHistory.push({ pathname: BASE_URL + "/remark/" + order.orderId, state: { order: order } });
+    }
+
+    handleDeleteOrder = (order) => {
+        const { orderNums, orderNumList } = this.state;
+        axios.get(SERVICE_URL + "/product/deleteOrder/" + order.orderId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    orderNums.forEach((orderNum, index) => {
+                        if (order.orderNum == orderNum) {
+                            orderNums.splice(index, 1);
+                            orderNumList.splice(index, 1)
+                        }
+                    });
+                    this.handleGetAllOrder();
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("删除失败");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("删除失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetImg = (order) => {
+        axios.get(SERVICE_URL + "/shop/getImg/" + order.productInfo.imgId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    // order.imgCode = resData.imgCode;
+                    order.productInfo.imgCode = resData.imgCode;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
     }
 
     render() {
@@ -131,7 +179,7 @@ class OrderItem extends Component {
                     <div className="card-title-text">订单号: {orderNum.order.orderNum}</div>
                     <div className="card-title-text">{orderNum.order.shopInfo == null ? null : orderNum.order.shopInfo.shopName}</div>
                 </div>
-            orderDiv.push(<Card title={titleDiv} extra={<Icon type="delete" />}></Card>);
+            orderDiv.push(<Card title={titleDiv} extra={<Icon type="delete" onClick={this.handleDeleteOrder.bind(this, orderNum.order)} />}></Card>);
             orderList.forEach(order => {
                 if (order.orderNum == orderNum.orderNum) {
                     orderDiv.push(
@@ -139,7 +187,7 @@ class OrderItem extends Component {
                             <Card>
                                 <div className="card-item-content">
                                     <div className="left-img">
-                                        <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+                                        <img alt="example" src={order.productInfo == null ? null : order.productInfo.imgCode} />
                                     </div>
                                     <div className="item-info">
                                         {order.productInfo == null ? null : order.productInfo.proName} &nbsp;&nbsp;
@@ -159,7 +207,7 @@ class OrderItem extends Component {
                                         订单详情
                                     </div>
                                     <div className="item-remark">
-                                        {order.commentStatus == 0 ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button> : null}
+                                        {order.commentStatus == 0 ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button> : "已评价"}
                                     </div>
                                 </div>
                             </Card>

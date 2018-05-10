@@ -11,53 +11,70 @@ const MenuItemGroup = Menu.ItemGroup;
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
-class ShopItem extends Component {
+class SearchProductItem extends Component {
     state = {
         shopInfo: {},
         productList: [],
         imgCode: '',
+        searchName: this.props.params.name
     }
 
     componentWillMount() {
-        this.handleGetSellerShop();
+        this.handleSearchProduct();
     }
 
-    handleGetSellerShop = () => {
-        axios.get(SERVICE_URL + "/product/getShop/" + this.props.params.id)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.handleGetProduct(resData.shopId);
-                    this.setState({ showLoading: false, shopInfo: resData });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                message.error(intl.get("editFailed"));
-                this.setState({ showLoading: false });
-            });
-    }
+    handleSearchProduct = () => {
+        let data = {};
+        // const { name } = this.props.params;
+        const { searchName } = this.state;
+        // this.props.params.name = searchName;
+        if (searchName == this.props.params.name) {
 
-    handleGetProduct = (id) => {
-        axios.get(SERVICE_URL + "/product/getProduct/" + id)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    resData.forEach(product => {
-                        if (product.imgId != null) {
+            let searchProNameList = [];
+            data.proName = searchName;
+            axios.post(SERVICE_URL + "/product/searchProduct", { data })
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        resData.forEach(product => {
                             this.handleGetImg(product);
-                        }
-                    });
-                    this.setState({ showLoading: false, productList: resData });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                message.error(intl.get("editFailed"));
-                this.setState({ showLoading: false });
-            });
+                        });
+                        this.setState({ showLoading: false, productList: resData })
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error("搜索失败");
+                    }
+                }).catch(error => {
+                    message.error("搜索失败");
+                    console.log(error)
+                    this.setState({ showLoading: false });
+                });
+        } else {
+            let searchProNameList = [];
+            data.proName = searchName;
+            axios.post(SERVICE_URL + "/product/searchProduct", { data })
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        resData.forEach(product => {
+                            this.handleGetImg(product);
+                        });
+                        this.setState({ showLoading: false, productList: resData })
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error("搜索失败");
+                    }
+                }).catch(error => {
+                    message.error("搜索失败");
+                    console.log(error)
+                    this.setState({ showLoading: false });
+                });
+            browserHistory.push(BASE_URL + "/searchProduct/" + searchName);
+        }
+    }
+
+    handleChangeSearchName = (value) => {
+        this.setState({ searchName: value })
     }
 
     handleGetImg = (product) => {
@@ -85,13 +102,43 @@ class ShopItem extends Component {
         return (
             <div className="shop-item">
                 <Layout>
-                    <Header>{this.renderCollectHeader()}</Header>
+                    <Header>{this.renderHeader()}</Header>
+                    {/* <Header>{this.renderCollectHeader()}</Header> */}
                     <Content>
                         {this.renderCollectTreasureContent()}
                     </Content>
                     <Footer>Footer</Footer>
                 </Layout>
             </div >
+        )
+    }
+
+    renderHeader() {
+        const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
+        const { searchData, searchProNameList } = this.state;
+        const { name } = this.props.params;
+        return (
+            <div className="global-search-wrapper">
+                <AutoComplete
+                    style={{ width: 200 }}
+                    onChange={this.handleChangeSearchName}
+                    // onSearch={this.handleSearchProduct}
+                    // onSelect={this.handleChangeSelect}
+                    // dataSource={searchProNameList.length == 0 ? null : searchProNameList}
+                    placeholder="输入要搜索的词"
+                    className="global-search"
+                    defaultValue={name}
+                    filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                >
+                    <Input
+                        suffix={(
+                            <Button className="search-btn" type="primary" onClick={this.handleSearchProduct}>
+                                <Icon type="search" />
+                            </Button>
+                        )}
+                    />
+                </AutoComplete>
+            </div>
         )
     }
 
@@ -152,4 +199,4 @@ class ShopItem extends Component {
     }
 }
 
-export default ShopItem;
+export default SearchProductItem;

@@ -141,6 +141,7 @@ class EditProduct extends Component {
             }));
             if (!info.file.response.error) {
                 this.state.productInfo.imgId = info.file.response.imgId;
+                this.handleGetImg(this.state.productInfo);
             }
         }
     }

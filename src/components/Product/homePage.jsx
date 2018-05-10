@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Account from './account';
-import { Layout, Menu, Icon, Carousel, AutoComplete, Input, Button } from 'antd';
+import { Layout, Menu, Icon, Carousel, AutoComplete, Input, Button, message } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
@@ -13,38 +13,62 @@ import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class HomePage extends Component {
     state = {
-        pageStatus: "homePage"
-    }
-
-    handlePageStatus = (e) => {
-        this.setState({ pageStatus: e.key })
+        searchName: '',
+        searchData: [],
+        searchProNameList: []
     }
 
     handleShowDetail = (proId) => {
         browserHistory.push(BASE_URL + "/item/" + proId);
     }
 
+    handleChangeSelect = (value) => {
+        browserHistory.push(BASE_URL + "/searchProduct/" + value);
+        this.setState({ searchName: value })
+    }
+
+    handleSearchProduct = (value) => {
+        let data = {};
+        let searchProNameList = [];
+        data.proName = value;
+        axios.post(SERVICE_URL + "/product/searchProduct", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    console.log("resData,", resData);
+                    resData.forEach(product => {
+                        searchProNameList.push(product.proName)
+                    });
+                    this.setState({ showLoading: false, searchData: resData, searchProNameList: searchProNameList })
+                } else {
+                    this.setState({ showLoading: false })
+                    console.log(resData.error)
+                    message.error("搜索失败");
+                }
+            }).catch(error => {
+                message.error("搜索失败");
+                console.log(error)
+                this.setState({ showLoading: false });
+            });
+    }
+
     render() {
-        const { pageStatus } = this.state;
         return (
             <div>
                 {/* <Account /> */}
-                {pageStatus == "homePage" || pageStatus == "detailInfo" ? this.renderHomePage() : null}
+                {this.renderHomePage()}
             </div>
         )
     }
 
     renderHomePage() {
-        const { pageStatus } = this.state;
         return (
             <div className="home-page">
                 <Layout>
                     <Header>{this.renderHeader()}</Header>
                     <Layout>
-                        {pageStatus == "homePage" ? <Sider> {this.renderLeftMenu()}</Sider> : null}
-                        {pageStatus == "homePage" ? <Content>{this.renderContent()}</Content> : null}
-                        {pageStatus == "detailInfo" ? <Content><DetailInfo /></Content> : null}
-                        {/* <Content><DetailInfo /></Content> */}
+                        <Sider> {this.renderLeftMenu()}</Sider>
+                        <Content>{this.renderContent()}</Content>
                     </Layout>
                     <Footer>Footer</Footer>
                 </Layout>
@@ -54,12 +78,15 @@ class HomePage extends Component {
 
     renderHeader() {
         const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
+        const { searchData, searchProNameList } = this.state;
         return (
             <div className="global-search-wrapper">
                 <AutoComplete
                     style={{ width: 200 }}
-                    dataSource={dataSource}
-                    placeholder="try to type `b`"
+                    onSearch={this.handleSearchProduct}
+                    onSelect={this.handleChangeSelect}
+                    dataSource={searchProNameList.length == 0 ? null : searchProNameList}
+                    placeholder="输入要搜索的词"
                     className="global-search"
                     filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
                 >

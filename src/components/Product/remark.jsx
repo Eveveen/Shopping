@@ -75,8 +75,10 @@ class Remark extends Component {
 
     handleChangeCommentStatus = () => {
         const { order } = this.state;
-        order.commentStatus = 1;
-        axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { order })
+        let data = {};
+        data.orderId = order.orderId;
+        data.commentStatus = 1;
+        axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { data })
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
