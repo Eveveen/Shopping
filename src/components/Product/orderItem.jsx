@@ -11,6 +11,7 @@ import moment from 'moment';
 import { _ } from 'underscore';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
+import { commentTypeEnum } from './data/enum';
 
 class OrderItem extends Component {
     state = {
@@ -33,19 +34,19 @@ class OrderItem extends Component {
             return;
         }
         if (e.key == "waitPay") {
-            this.handleGetOrderByStatus(2);
+            this.handleGetOrderByStatus(commentTypeEnum.WAITPAY);
             return;
         }
         if (e.key == "waitSend") {
-            this.handleGetOrderByStatus(3);
+            this.handleGetOrderByStatus(commentTypeEnum.WAITSEND);
             return;
         }
         if (e.key == "waitConfirm") {
-            this.handleGetOrderByStatus(4);
+            this.handleGetOrderByStatus(commentTypeEnum.WAITCONFIRM);
             return;
         }
         if (e.key == "waitComment") {
-            this.handleGetOrderByStatus(0);
+            this.handleGetOrderByStatus(commentTypeEnum.WAITCOMMENT);
             return;
         }
     }
@@ -227,6 +228,10 @@ class OrderItem extends Component {
 
     }
 
+    handlePay = (orderNum) => {
+        browserHistory.push(BASE_URL + "/pay/" + orderNum);
+    }
+
     render() {
         return (
             <div className="order-item">
@@ -335,7 +340,14 @@ class OrderItem extends Component {
                                         订单详情
                                     </div>
                                     <div className="item-remark">
-                                        {order.commentStatus == 0 ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button> : "已评价"}
+                                        {order.commentStatus == commentTypeEnum.WAITCOMMENT
+                                            ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button>
+                                            : order.commentStatus == commentTypeEnum.WAITCONFIRM
+                                                ? <Button onClick={this.handleRemark.bind(this, order)}>确认收货</Button>
+                                                : order.commentStatus == commentTypeEnum.WAITPAY
+                                                    ? <Button onClick={this.handlePay.bind(this, order.orderNum)}>付款</Button>
+                                                    : order.commentStatus == commentTypeEnum.WAITSEND
+                                                        ? "待发货" : "已评价"}
                                     </div>
                                 </div>
                             </Card>

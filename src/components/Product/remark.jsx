@@ -8,6 +8,7 @@ const { TextArea } = Input;
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { Link, browserHistory } from 'react-router';
 import moment from 'moment';
+import { commentTypeEnum } from './data/enum';
 
 class Remark extends Component {
     state = {
@@ -77,7 +78,7 @@ class Remark extends Component {
         const { order } = this.state;
         let data = {};
         data.orderId = order.orderId;
-        data.commentStatus = 1;
+        data.commentStatus = commentTypeEnum.COMMENTED;
         axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { data })
             .then(response => {
                 const resData = response.data;

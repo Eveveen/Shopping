@@ -396,6 +396,32 @@ router.get("/getAllComment/:id", function (req, res) {
     })
 });
 
+/**
+ * 验证付款手机号和密码是否匹配
+ */
+router.post("/verifyCard", function (req, res) {
+    const path = utils.PROJECT + "/verifyCard";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 修改余额
+ */
+router.post("/updateCardBalance", function (req, res) {
+    const path = utils.PROJECT + "/updateCardBalance";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
 function checkIsRole(req) {
     const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
     for (var i = 0; i < roles.length; i++) {

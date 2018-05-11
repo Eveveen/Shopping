@@ -12,29 +12,12 @@ class AddressItem extends Component {
 
     state = {
         addressData: [],
-        orderAddressId: ''
     }
 
     componentWillMount() {
-        axios.get(SERVICE_URL + "/product/getAllAddress")
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    resData.forEach(address => {
-                        if (address.addressStatus == 1) {
-                            this.state.orderAddressId = address.addressId;
-                        }
-                    });
-                    this.setState({ showLoading: false, addressData: resData });
-                } else {
-                    message.error("获取地址失败");
-                    this.setState({ showLoading: false })
-                }
-            }).catch(error => {
-                console.log(error);
-                this.setState({ showLoading: false })
-                message.error("获取地址失败");
-            });
+        this.setState({
+            addressData: this.props.addressData,
+        })
     }
 
     handleEditAddress = () => {
@@ -42,9 +25,10 @@ class AddressItem extends Component {
     }
 
     handleChageAddress = (e) => {
-        this.setState({
-            orderAddressId: e.target.value
-        })
+        // this.setState({
+        //     orderAddressId: e.target.value
+        // })
+        this.props.handleChageAddress(e);
     }
 
     render() {
@@ -58,7 +42,8 @@ class AddressItem extends Component {
         )
     }
     renderAddressItem() {
-        const { addressData, orderAddressId } = this.state;
+        const { addressData } = this.state;
+        const { orderAddressId } = this.props;
         let addressDiv = [];
         let tempAddressDiv = [];
         let defaultAddressId = '';

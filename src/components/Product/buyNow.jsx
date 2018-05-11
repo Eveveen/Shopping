@@ -9,6 +9,7 @@ import AddressItem from './addressItem';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import moment from 'moment';
+import { commentTypeEnum } from './data/enum';
 
 class BuyNow extends Component {
     state = {
@@ -16,11 +17,14 @@ class BuyNow extends Component {
         buyList: [],
         shopList: [],
         totalCount: 0,
-        productInfo: {}
+        productInfo: {},
+        orderAddressId: '',
+        addressData: []
     }
 
     componentWillMount() {
         const { productInfo } = this.props.location.state;
+        this.handleGetAllAddress();
         this.setState({ productInfo: productInfo })
     }
 
@@ -63,7 +67,7 @@ class BuyNow extends Component {
     }
 
     handleAddOrder = () => {
-        const { productInfo } = this.state;
+        const { productInfo, orderAddressId } = this.state;
         let data = {};
         let random = parseInt(Math.random() * 10000)
         data.orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 4);
@@ -71,16 +75,69 @@ class BuyNow extends Component {
         data.shopId = productInfo.shopInfo.shopId;
         data.proNum = productInfo.count;
         data.price = productInfo.price;
+        data.addressId = orderAddressId;
+        data.commentStatus = commentTypeEnum.WAITPAY;
+        let totalPrice = productInfo.price * productInfo.count;
+        axios.post(SERVICE_URL + "/product/addOrder", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    browserHistory.push({ pathname: BASE_URL + "/pay/" + data.orderNum, state: { totalPrice: totalPrice } });
+                    this.setState({ showLoading: false })
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("添加订单失败");
+                    console.log(resData.error);
+                }
+
+            }).catch(error => {
+                console.log(error);
+                message.error("添加订单失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleGetAllAddress = () => {
+        axios.get(SERVICE_URL + "/product/getAllAddress")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(address => {
+                        if (address.addressStatus == 1) {
+                            this.state.orderAddressId = address.addressId;
+                        }
+                    });
+                    this.state.addressData = resData;
+                    this.setState({ showLoading: false });
+                } else {
+                    message.error("获取地址失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                this.setState({ showLoading: false })
+                message.error("获取地址失败");
+            });
+    }
+
+    handleChageAddress = (e) => {
+        this.setState({
+            orderAddressId: e.target.value
+        })
     }
 
     render() {
-        const { shopList, totalCount, buyList, productInfo } = this.state;
+        const { shopList, totalCount, buyList, productInfo, orderAddressId, addressData } = this.state;
+        console.log(orderAddressId);
         return (
             <div className="buy-item">
                 <Layout>
                     <Header>Header</Header>
                     <Content>
-                        <AddressItem />
+                        {addressData.length == 0 ? null : <AddressItem
+                            handleChageAddress={this.handleChageAddress}
+                            orderAddressId={orderAddressId}
+                            addressData={addressData}
+                        />}
                         {/* {this.renderBuyItem()} */}
                         {this.renderProductContent()}
                         <div className="summary-text">
@@ -114,7 +171,6 @@ class BuyNow extends Component {
 
     renderProductContent = () => {
         const { productInfo } = this.state;
-        console.log(productInfo);
         let cartItemDiv = [];
         let titleDiv =
             <div className="card-title">

@@ -17,6 +17,7 @@ export LoginIndex from './User';
 export Login from './User/login';
 export MenuIndex from './Menu';
 export OrderItem from './Product/orderItem';
+export Pay from './Product/pay';
 export ProductIndex from './Product';
 export SellerShop from "./Admin/Seller/shop";
 export ShopItem from "./Product/shopItem";

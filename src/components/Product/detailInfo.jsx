@@ -24,7 +24,6 @@ class DetailInfo extends Component {
         axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
             .then(response => {
                 const resData = response.data;
-                console.log(resData);
                 if (response.status == 200 && !resData.error) {
                     this.handleGetShopInfo(resData);
                     this.handleGetImg(resData);
@@ -34,7 +33,6 @@ class DetailInfo extends Component {
                     message.error(intl.get("editFailed"));
                 }
             }).catch(error => {
-                console.log(error);
                 message.error(intl.get("editFailed"));
                 this.setState({ showLoading: false });
             })
@@ -52,7 +50,6 @@ class DetailInfo extends Component {
                     message.error("获取店铺信息失败");
                 }
             }).catch(error => {
-                console.log(error);
                 message.error("获取店铺信息失败");
                 this.setState({ showLoading: false });
             })
@@ -117,7 +114,6 @@ class DetailInfo extends Component {
     }
 
     changeCount = (e) => {
-        console.log(e.target.value);
         this.setState({
             count: e.target.value
         })
@@ -132,7 +128,6 @@ class DetailInfo extends Component {
     }
 
     callback = (key) => {
-        console.log(key);
         const { productInfo } = this.state;
         if (key == "comment") {
             this.handleGetComment(productInfo.proId);
@@ -165,7 +160,6 @@ class DetailInfo extends Component {
                     message.error(intl.get("editFailed"));
                 }
             }).catch(error => {
-                console.log(error);
                 message.error(intl.get("editFailed"));
                 this.setState({ showLoading: false });
             });
@@ -189,7 +183,6 @@ class DetailInfo extends Component {
                     message.error(intl.get("editFailed"));
                 }
             }).catch(error => {
-                console.log(error);
                 message.error(intl.get("editFailed"));
                 this.setState({ showLoading: false });
             });
@@ -222,7 +215,6 @@ class DetailInfo extends Component {
 
     render() {
         const { count, productInfo } = this.state;
-        console.log(productInfo);
         return (
             <div className="detail">
                 <div className="summary-info">
