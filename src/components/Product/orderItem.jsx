@@ -228,8 +228,10 @@ class OrderItem extends Component {
 
     }
 
-    handlePay = (orderNum) => {
-        browserHistory.push(BASE_URL + "/pay/" + orderNum);
+    handlePay = (order) => {
+        let totalPrice = order.proNum * order.price;
+        // browserHistory.push(BASE_URL + "/pay/" + order.orderNum);
+        browserHistory.push({ pathname: BASE_URL + "/pay/" + order.orderNum, state: { totalPrice: totalPrice } });
     }
 
     render() {
@@ -302,7 +304,6 @@ class OrderItem extends Component {
 
     renderOrderItem() {
         const { orderList, orderNumList, orderNums } = this.state;
-        console.log("orderNumList,", orderNumList);
         let titleDiv = '';
         let orderDiv = [];
         orderNumList.forEach(orderNum => {
@@ -345,7 +346,7 @@ class OrderItem extends Component {
                                             : order.commentStatus == commentTypeEnum.WAITCONFIRM
                                                 ? <Button onClick={this.handleRemark.bind(this, order)}>确认收货</Button>
                                                 : order.commentStatus == commentTypeEnum.WAITPAY
-                                                    ? <Button onClick={this.handlePay.bind(this, order.orderNum)}>付款</Button>
+                                                    ? <Button onClick={this.handlePay.bind(this, order)}>付款</Button>
                                                     : order.commentStatus == commentTypeEnum.WAITSEND
                                                         ? "待发货" : "已评价"}
                                     </div>

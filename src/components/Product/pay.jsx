@@ -146,6 +146,7 @@ class Pay extends Component {
                 }
 
             }).catch(error => {
+                console.log(error);
                 message.error("修改失败");
                 this.setState({ showLoading: false });
             });

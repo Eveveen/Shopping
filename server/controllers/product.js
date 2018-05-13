@@ -97,6 +97,18 @@ router.get("/getAllAddress", function (req, res) {
 });
 
 /**
+ * 获取默认地址
+ */
+router.get("/getDefaultAddress", function (req, res) {
+    const path = utils.PROJECT + "/getDefaultAddress";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 根据地址id获取地址
  */
 router.get("/getAddress/:id", function (req, res) {
@@ -388,7 +400,6 @@ router.post("/addComment", function (req, res) {
  */
 router.get("/getAllComment/:id", function (req, res) {
     const path = utils.PROJECT + "/getAllComment";
-    console.log("proId,", req.params.id);
     httpAgent.httpRequest({ proId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {

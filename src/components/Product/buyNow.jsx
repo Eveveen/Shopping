@@ -69,7 +69,7 @@ class BuyNow extends Component {
     handleAddOrder = () => {
         const { productInfo, orderAddressId } = this.state;
         let data = {};
-        let random = parseInt(Math.random() * 10000)
+        let random = parseInt(Math.random() * 100 + 10);
         data.orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 4);
         data.proId = productInfo.proId;
         data.shopId = productInfo.shopInfo.shopId;
@@ -77,12 +77,12 @@ class BuyNow extends Component {
         data.price = productInfo.price;
         data.addressId = orderAddressId;
         data.commentStatus = commentTypeEnum.WAITPAY;
-        let totalPrice = productInfo.price * productInfo.count;
+
         axios.post(SERVICE_URL + "/product/addOrder", { data })
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    browserHistory.push({ pathname: BASE_URL + "/pay/" + data.orderNum, state: { totalPrice: totalPrice } });
+                    this.handleChangeProNum(data.orderNum);
                     this.setState({ showLoading: false })
                 } else {
                     this.setState({ showLoading: false })
@@ -94,6 +94,38 @@ class BuyNow extends Component {
                 console.log(error);
                 message.error("添加订单失败");
                 this.setState({ showLoading: false });
+            });
+    }
+
+    handleChangeProNum = (orderNum) => {
+        const { productInfo } = this.state;
+        let totalPrice = productInfo.price * productInfo.count;
+        let data = {};
+        data.proId = productInfo.proId;
+        data.proName = productInfo.proName;
+        data.imgId = productInfo.imgId;
+        data.description = productInfo.description;
+        data.price = productInfo.price;
+        data.scanNum = productInfo.scanNum;
+        data.category = productInfo.category;
+        data.updataTime = productInfo.updataTime;
+        data.proStatus = productInfo.proStatus;
+        data.shopId = productInfo.shopId;
+        data.proNum = productInfo.proNum - 1;
+        axios.post(SERVICE_URL + '/product/editProduct', { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    browserHistory.push({ pathname: BASE_URL + "/pay/" + orderNum, state: { totalPrice: totalPrice } });
+                } else {
+                    console.log(resData.error);
+                    message.error("修改商品数量失败");
+                }
+                this.setState({ submitLoading: false });
+            }).catch(error => {
+                console.log(error);
+                message.error("修改商品数量失败");
+                this.setState({ submitLoading: false });
             });
     }
 
@@ -127,7 +159,6 @@ class BuyNow extends Component {
 
     render() {
         const { shopList, totalCount, buyList, productInfo, orderAddressId, addressData } = this.state;
-        console.log(orderAddressId);
         return (
             <div className="buy-item">
                 <Layout>

@@ -16,7 +16,8 @@ class DetailInfo extends Component {
         count: 1,
         productInfo: {},
         showLoading: false,
-        commentList: []
+        commentList: [],
+        defaultAddress: ''
     }
 
     componentWillMount() {
@@ -27,6 +28,7 @@ class DetailInfo extends Component {
                 if (response.status == 200 && !resData.error) {
                     this.handleGetShopInfo(resData);
                     this.handleGetImg(resData);
+                    this.handleGetDefaultAddress();
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
                     this.setState({ showLoading: false })
@@ -62,6 +64,22 @@ class DetailInfo extends Component {
                 if (response.status == 200 && !resData.error) {
                     product.imgCode = resData.imgCode;
                     this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleGetDefaultAddress = () => {
+        axios.get(SERVICE_URL + "/product/getDefaultAddress")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, defaultAddress: resData });
                 } else {
                     this.setState({ showLoading: false })
                     message.error(intl.get("editFailed"));
@@ -214,7 +232,7 @@ class DetailInfo extends Component {
     }
 
     render() {
-        const { count, productInfo } = this.state;
+        const { count, productInfo, defaultAddress } = this.state;
         return (
             <div className="detail">
                 <div className="summary-info">
@@ -242,7 +260,11 @@ class DetailInfo extends Component {
                         </div>
                         <div className="text-detail">
                             <div className="left-text">配送</div>
-                            <div className="right-text">河南洛阳 至 江苏南通</div>
+                            <div className="right-text">
+                                {productInfo.shopInfo == null ? null : productInfo.shopInfo.addressArea}
+                                至
+                                {defaultAddress}
+                            </div>
                         </div>
                         <div className="text-detail">
                             <div className="left-text">数量</div>
