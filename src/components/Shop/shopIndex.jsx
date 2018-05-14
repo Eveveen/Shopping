@@ -17,7 +17,8 @@ class ShopIndex extends Component {
         shopInfo: {},
         productList: [],
         imgCode: '',
-        showAddModal: false
+        showAddModal: false,
+        searchName: ''
     }
 
     componentWillMount() {
@@ -116,6 +117,40 @@ class ShopIndex extends Component {
         console.log("canceldelte");
     }
 
+    handleSearchProduct = () => {
+        let data = {};
+        const { shopInfo, searchName } = this.state;
+        data.proName = searchName;
+        data.shopId = shopInfo.shopId;
+        axios.post(SERVICE_URL + "/shop/searchShopProduct", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(product => {
+                        this.handleGetImg(product);
+                    });
+                    this.setState({ showLoading: false, productList: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("搜索失败");
+                }
+            }).catch(error => {
+                message.error("搜索失败");
+                console.log(error)
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleChangeSearchName = (value) => {
+        this.setState({ searchName: value })
+    }
+
+    handleEnter = (e) => {
+        if (e.which == 13) {
+            this.handleSearchProduct();
+        }
+    }
+
     render() {
         const { showAddModal } = this.state;
         return (
@@ -140,21 +175,20 @@ class ShopIndex extends Component {
 
     renderCollectHeader() {
         const { shopInfo } = this.state;
-        const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
         return (
             <div className="collect-header">
                 店铺名称：{shopInfo.shopName}
                 <div className="global-search-wrapper">
                     <AutoComplete
                         style={{ width: 200 }}
-                        dataSource={dataSource}
-                        placeholder="try to type `b`"
+                        placeholder="请输入要查询的关键字"
                         className="global-search"
+                        onChange={this.handleChangeSearchName}
                         filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
                     >
-                        <Input
+                        <Input onKeyPress={this.handleEnter}
                             suffix={(
-                                <Button className="search-btn" type="primary">
+                                <Button className="search-btn" type="primary" onClick={this.handleSearchProduct} >
                                     <Icon type="search" />
                                 </Button>
                             )}

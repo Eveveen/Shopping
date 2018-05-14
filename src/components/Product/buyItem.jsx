@@ -8,19 +8,47 @@ import './Style/buyItem.sass';
 import AddressItem from './addressItem';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import moment from 'moment';
+import { commentTypeEnum } from './data/enum';
+import { _ } from 'underscore';
 
 class BuyItem extends Component {
     state = {
         cartIds: [],
         buyList: [],
         shopList: [],
-        totalCount: 0
+        totalCount: 0,
+        orderAddressId: '',
+        addressData: []
     }
 
     componentWillMount() {
         let cartIds = this.props.params.id.split(",");
         const { cartList, shopList } = this.props.location.state;
+        this.handleGetAllAddress();
         this.setState({ cartIds: cartIds, buyList: cartList, shopList: shopList })
+    }
+
+    handleGetAllAddress = () => {
+        axios.get(SERVICE_URL + "/product/getAllAddress")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(address => {
+                        if (address.addressStatus == 1) {
+                            this.state.orderAddressId = address.addressId;
+                        }
+                    });
+                    this.state.addressData = resData;
+                    this.setState({ showLoading: false });
+                } else {
+                    message.error("获取地址失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                this.setState({ showLoading: false })
+                message.error("获取地址失败");
+            });
     }
 
     changeCount = (cartId, product, e) => {
@@ -61,14 +89,106 @@ class BuyItem extends Component {
             });
     }
 
+    handleChageAddress = (e) => {
+        this.setState({
+            orderAddressId: e.target.value
+        })
+    }
+
+    handleSubmitOrder = () => {
+        const { buyList, totalCount, shopList } = this.state;
+        let random = parseInt(Math.random() * 100 + 10);
+        let orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 2);
+        let buyShopIds = [];
+        let orderNums = [];
+        buyList.forEach(cart => {
+            if (_.contains(buyShopIds, cart.product.shopInfo.shopId)) {
+                orderNums.push(orderNum);
+                this.handleAddOrder(cart.product, orderNum);
+            } else {
+                buyShopIds.push(cart.product.shopInfo.shopId);
+                random = parseInt(Math.random() * 100 + 10)
+                orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 2);
+                orderNums.push(orderNum);
+                this.handleAddOrder(cart.product, orderNum);
+            }
+            console.log("buyShopIds,", buyShopIds)
+            browserHistory.push({ pathname: BASE_URL + "/pay/" + orderNums, state: { totalPrice: totalCount } });
+        })
+    }
+
+    handleAddOrder = (productInfo, orderNum) => {
+        const { orderAddressId } = this.state;
+        let data = {};
+        data.orderNum = orderNum;
+        data.proId = productInfo.proId;
+        data.shopId = productInfo.shopInfo.shopId;
+        data.proNum = productInfo.cartInfo.proNum;
+        data.price = productInfo.price;
+        data.addressId = orderAddressId;
+        data.commentStatus = commentTypeEnum.WAITPAY;
+        axios.post(SERVICE_URL + "/product/addOrder", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.handleChangeProNum(productInfo, data.orderNum);
+                    this.setState({ showLoading: false })
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("添加订单失败");
+                    console.log(resData.error);
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("添加订单失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleChangeProNum = (productInfo, orderNum) => {
+        let totalPrice = productInfo.price * productInfo.count;
+        let data = {};
+        data.proId = productInfo.proId;
+        data.proName = productInfo.proName;
+        data.imgId = productInfo.imgId;
+        data.description = productInfo.description;
+        data.price = productInfo.price;
+        data.scanNum = productInfo.scanNum;
+        data.category = productInfo.category;
+        data.updataTime = productInfo.updataTime;
+        data.proStatus = productInfo.proStatus;
+        data.shopId = productInfo.shopId;
+        data.proNum = productInfo.proNum - 1;
+        axios.post(SERVICE_URL + '/product/editProduct', { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    // browserHistory.push({ pathname: BASE_URL + "/pay/" + orderNum, state: { totalPrice: totalPrice } });
+                } else {
+                    console.log(resData.error);
+                    message.error("修改商品数量失败");
+                }
+                this.setState({ submitLoading: false });
+            }).catch(error => {
+                console.log(error);
+                message.error("修改商品数量失败");
+                this.setState({ submitLoading: false });
+            });
+    }
+
     render() {
-        const { shopList, totalCount, buyList } = this.state;
+        const { shopList, totalCount, buyList, orderAddressId, addressData } = this.state;
+        console.log(buyList);
         return (
             <div className="buy-item">
                 <Layout>
                     <Header>Header</Header>
                     <Content>
-                        <AddressItem />
+                        {addressData.length == 0 ? null : <AddressItem
+                            handleChageAddress={this.handleChageAddress}
+                            orderAddressId={orderAddressId}
+                            addressData={addressData}
+                        />}
                         {/* {this.renderBuyItem()} */}
                         {shopList.length == 0 ? null : this.renderProduct()}
                         <div className="summary-text">
@@ -89,7 +209,7 @@ class BuyItem extends Component {
                                 </div>
                             </div>
                             <div className="submit-btn">
-                                <Button>提交订单</Button>
+                                <Button onClick={this.handleSubmitOrder}>提交订单</Button>
                             </div>
                         </div>
                     </Content>

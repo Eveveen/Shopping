@@ -78,6 +78,7 @@ class Remark extends Component {
         const { order } = this.state;
         let data = {};
         data.orderId = order.orderId;
+        data.orderNum = order.orderNum;
         data.commentStatus = commentTypeEnum.COMMENTED;
         axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { data })
             .then(response => {

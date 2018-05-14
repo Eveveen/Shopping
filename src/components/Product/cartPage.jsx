@@ -444,7 +444,6 @@ class CartPage extends Component {
             tempProductList = shop.productList;
             let flag = false;
             shop.productList.forEach(product => {
-                console.log(product);
                 cartItemDiv = this.renderProductContent(product);
                 cartDiv.push(cartItemDiv)
             })

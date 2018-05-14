@@ -17,7 +17,7 @@ class DetailInfo extends Component {
         productInfo: {},
         showLoading: false,
         commentList: [],
-        defaultAddress: ''
+        defaultAddress: {}
     }
 
     componentWillMount() {
@@ -32,10 +32,10 @@ class DetailInfo extends Component {
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取商品失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取商品失败");
                 this.setState({ showLoading: false });
             })
     }
@@ -65,11 +65,13 @@ class DetailInfo extends Component {
                     product.imgCode = resData.imgCode;
                     this.setState({ showLoading: false });
                 } else {
+                    // console.log(resData.error);
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    // message.error("获取图片失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                console.log(error);
+                message.error("获取图片失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -82,10 +84,11 @@ class DetailInfo extends Component {
                     this.setState({ showLoading: false, defaultAddress: resData });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取默认地址失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                // console.log(error);
+                // message.error("获取默认地址失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -198,10 +201,10 @@ class DetailInfo extends Component {
                     message.success("已加入购物车");
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("加入购物车失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("加入购物车失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -262,8 +265,8 @@ class DetailInfo extends Component {
                             <div className="left-text">配送</div>
                             <div className="right-text">
                                 {productInfo.shopInfo == null ? null : productInfo.shopInfo.addressArea}
-                                至
-                                {defaultAddress}
+                                &nbsp;至&nbsp;
+                                {defaultAddress.area} {defaultAddress.addressName}
                             </div>
                         </div>
                         <div className="text-detail">

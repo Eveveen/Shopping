@@ -57,6 +57,31 @@ router.get("/getSellerShop", function (req, res) {
 });
 
 /**
+ * 获取该店铺的所有订单
+ */
+router.get("/getShopOrder/:shopId", function (req, res) {
+    const path = utils.PROJECT + "/getShopOrder";
+    httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据评价状态查询该店铺的订单
+ */
+router.post("/getOrderByShopIdAndStatus", function (req, res) {
+    const path = utils.PROJECT + "/getOrderByShopIdAndStatus";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 获取商品首页图片
  */
 router.get("/getImg/:id", function (req, res) {
@@ -68,6 +93,18 @@ router.get("/getImg/:id", function (req, res) {
     })
 });
 
+/**
+ * 搜索店铺内商品
+ */
+router.post("/searchShopProduct", function (req, res) {
+    const { data } = req.body;
+    const path = utils.PROJECT + "/searchShopProduct";
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
 
 function checkIsRole(req) {
     const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];

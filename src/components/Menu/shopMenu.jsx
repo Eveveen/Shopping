@@ -42,7 +42,7 @@ class ShopMenu extends Component {
                         <Menu.Item key="message">
                             <Icon type="appstore" />消息
                         </Menu.Item>
-                        <Menu.Item key="order">
+                        <Menu.Item key="shop/order">
                             <Icon type="appstore" />我的订单
                         </Menu.Item>
                     </Menu>

@@ -70,7 +70,7 @@ class BuyNow extends Component {
         const { productInfo, orderAddressId } = this.state;
         let data = {};
         let random = parseInt(Math.random() * 100 + 10);
-        data.orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 4);
+        data.orderNum = moment(Date.now()).format("YYYYMMDDHHMMSS") + random.toString().slice(0, 2);
         data.proId = productInfo.proId;
         data.shopId = productInfo.shopInfo.shopId;
         data.proNum = productInfo.count;

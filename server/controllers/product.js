@@ -362,8 +362,8 @@ router.post("/getOrderByStatus", function (req, res) {
 router.post("/editOrderCommentStatus", function (req, res) {
     const path = utils.PROJECT + "/editOrderCommentStatus";
     const { data } = req.body;
-    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })

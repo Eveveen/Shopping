@@ -111,8 +111,8 @@ class Login extends Component {
         const { submitLoading } = this.state;
         return (
             <div className="login-background" style={{
-                backgroundImage: "url(assets/img/login.jpg)", height: "100%",
-                backgroundRepeat: "no-repeat", backgroundSize: "100% 100%", MozBackgroundSize: "100% 100%"
+                // backgroundImage: "url(assets/img/login.jpg)", height: "100%",
+                // backgroundRepeat: "no-repeat", backgroundSize: "100% 100%", MozBackgroundSize: "100% 100%"
             }}>
                 <div className="login">
                     &nbsp;

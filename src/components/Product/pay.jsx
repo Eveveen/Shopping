@@ -108,6 +108,7 @@ class Pay extends Component {
     handleUpdataCardBalance = (balance) => {
         const { totalPrice } = this.props.location.state;
         const { getFieldValue } = this.props.form;
+        const { orderNum } = this.props.params;
         let data = {};
         data.telphone = getFieldValue('telphone');
         data.balance = balance - totalPrice;
@@ -115,7 +116,16 @@ class Pay extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    this.handleChangeCommentStatus();
+                    let orderNums = orderNum.split(",");
+                    if (orderNums.length > 1) {
+                        console.log("orderNums", orderNums);
+                        orderNums.forEach(oNum => {
+                            console.log("oNum", oNum);
+                            this.handleChangeCommentStatus(oNum);
+                        });
+                    } else {
+                        this.handleChangeCommentStatus(orderNum);
+                    }
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
@@ -128,10 +138,9 @@ class Pay extends Component {
             });
     }
 
-    handleChangeCommentStatus = () => {
-        const { order } = this.state;
-        const { orderNum } = this.props.params;
+    handleChangeCommentStatus = (orderNum) => {
         let data = {};
+        console.log(orderNum);
         data.orderNum = orderNum;
         data.commentStatus = commentTypeEnum.WAITSEND;
         axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { data })

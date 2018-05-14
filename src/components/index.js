@@ -22,6 +22,7 @@ export ProductIndex from './Product';
 export SellerShop from "./Admin/Seller/shop";
 export ShopItem from "./Product/shopItem";
 export ShopMenu from "./Menu/shopMenu";
+export ShopOrder from "./Shop/shopOrder";
 export ShopProduct from "./Shop/shopProduct";
 export Register from './User/register';
 export Remark from './Product/remark';

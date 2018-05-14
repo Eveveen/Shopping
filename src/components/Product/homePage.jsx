@@ -52,6 +52,12 @@ class HomePage extends Component {
             });
     }
 
+    handleEnter = (e) => {
+        if (e.which == 13) {
+            this.handleSearchOrder();
+        }
+    }
+
     render() {
         return (
             <div>
@@ -90,7 +96,7 @@ class HomePage extends Component {
                     className="global-search"
                     filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
                 >
-                    <Input
+                    <Input onKeyPress={this.handleEnter}
                         suffix={(
                             <Button className="search-btn" type="primary">
                                 <Icon type="search" />

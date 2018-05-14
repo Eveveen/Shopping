@@ -52,7 +52,8 @@ class OrderItem extends Component {
     }
 
     handleGetAllOrder = () => {
-        const { orderNumList, orderNums } = this.state;
+        this.state.orderNumList = [];
+        this.state.orderNums = [];
         axios.get(SERVICE_URL + "/product/getAllOrder")
             .then(response => {
                 const resData = response.data;
@@ -60,12 +61,12 @@ class OrderItem extends Component {
                     resData.forEach(order => {
                         this.handleGetProduct(order);
                         this.handleGetShopInfo(order);
-                        if (!_.contains(orderNums, order.orderNum)) {
-                            orderNums.push(order.orderNum)
-                            orderNumList.push({ "orderNum": order.orderNum, "order": order });
+                        if (!_.contains(this.state.orderNums, order.orderNum)) {
+                            this.state.orderNums.push(order.orderNum)
+                            this.state.orderNumList.push({ "orderNum": order.orderNum, "order": order });
                         }
                     });
-                    this.setState({ showLoading: false, orderList: resData, orderNumList: orderNumList });
+                    this.setState({ showLoading: false, orderList: resData });
                 } else {
                     this.setState({ showLoading: false })
                     message.error(intl.get("editFailed"));
@@ -225,7 +226,36 @@ class OrderItem extends Component {
                 console.log(error)
                 this.setState({ showLoading: false });
             });
+    }
 
+    handleChangeCommentStatus = (order) => {
+        let data = {};
+        data.orderNum = order.orderNum;
+        data.commentStatus = commentTypeEnum.WAITCOMMENT;
+        axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { data })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    let e = {};
+                    e.key = this.state.current;
+                    this.handleClick(e);
+                    this.setState({ showLoading: false })
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("修改失败");
+                }
+
+            }).catch(error => {
+                console.log(error);
+                message.error("修改失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleEnter = (e) => {
+        if (e.which == 13) {
+            this.handleSearchOrder();
+        }
     }
 
     handlePay = (order) => {
@@ -262,7 +292,7 @@ class OrderItem extends Component {
                     className="global-search"
                     filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
                 >
-                    <Input
+                    <Input onKeyPress={this.handleEnter}
                         suffix={(
                             <Button className="search-btn" type="primary" onClick={this.handleSearchOrder}>
                                 <Icon type="search" />
@@ -344,7 +374,7 @@ class OrderItem extends Component {
                                         {order.commentStatus == commentTypeEnum.WAITCOMMENT
                                             ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button>
                                             : order.commentStatus == commentTypeEnum.WAITCONFIRM
-                                                ? <Button onClick={this.handleRemark.bind(this, order)}>确认收货</Button>
+                                                ? <Button onClick={this.handleChangeCommentStatus.bind(this, order)}>确认收货</Button>
                                                 : order.commentStatus == commentTypeEnum.WAITPAY
                                                     ? <Button onClick={this.handlePay.bind(this, order)}>付款</Button>
                                                     : order.commentStatus == commentTypeEnum.WAITSEND
