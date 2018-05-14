@@ -9,11 +9,77 @@ const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import CollectShopChild from './collectShopChild';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class Collect extends Component {
     state = {
         pageStatus: this.props.pageStatus,
-        current: this.props.pageStatus
+        current: this.props.pageStatus,
+        collectProductList: [],
+        productList: [],
+        shopList: []
+    }
+
+    componentWillMount() {
+        console.log(this.props.location.pathname)
+        this.handleGetCollectProduct();
+        this.setState({ pageStatus: this.props.location.pathname })
+    }
+
+    handleGetCollectProduct = () => {
+        axios.get(SERVICE_URL + "/product/getCollectProduct")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(collectProduct => {
+                        this.handleGetProduct(collectProduct);
+                        this.handleGetShopInfo(collectProduct);
+                    });
+                    this.setState({ showLoading: false, collectProductList: resData });
+                } else {
+                    console.log(error)
+                    this.setState({ showLoading: false })
+                    message.error("获取收藏的宝贝失败");
+                }
+            }).catch(error => {
+                message.error("获取收藏的宝贝失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetProduct = (collectProduct) => {
+        axios.get(SERVICE_URL + "/product/getProductByProId/" + collectProduct.proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    // this.handleGetImg(resData);
+                    this.state.productList.push(resData);
+                    this.setState({ showLoading: false, productInfo: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取商品失败");
+                }
+            }).catch(error => {
+                message.error("获取商品失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetShopInfo = (collectProduct) => {
+        axios.get(SERVICE_URL + "/product/getShop/" + collectProduct.shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    product.shopInfo = resData;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取店铺信息失败");
+                }
+            }).catch(error => {
+                message.error("获取店铺信息失败");
+                this.setState({ showLoading: false });
+            })
     }
 
     handleClick = (e) => {
@@ -32,7 +98,7 @@ class Collect extends Component {
             <div className="collect">
                 <Layout>
                     <Header>{this.renderCollectHeader()}</Header>
-                    <Content>{this.props.pageStatus == "collectTreasure" ?
+                    <Content>{this.props.location.pathname == "/collectTreasure" ?
                         this.renderCollectTreasureContent() : this.renderCollectShopContent()}</Content>
                     <Footer>Footer</Footer>
                 </Layout>
@@ -95,29 +161,14 @@ class Collect extends Component {
                         </div>
                     </Card>
                 </div>
-                <div className="collect-card">
-                    <Card
-                        style={{ width: 300 }}
-                        cover={<img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />}
-                        actions={[<Icon type="setting" />, <Icon type="edit" />, <Icon type="ellipsis" />]}
-                    >
-                        <div className="card-text">
-                            <Meta
-                                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                title="Card title"
-                                description="This is the description"
-                            />
-                        </div>
-                    </Card>
-                </div>
-            </div>
+            </div >
         )
     }
 
     renderCollectShopContent() {
         return (
             <div>
-                <CollectShopChild />
+                <CollectShopChild />aaaa
             </div>
         )
     }

@@ -433,6 +433,115 @@ router.post("/updateCardBalance", function (req, res) {
     })
 });
 
+/**
+ * 获取该用户收藏的商品
+ */
+router.get("/getCollectProduct", function (req, res) {
+    const path = utils.PROJECT + "/getCollectProduct";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 添加一个收藏的商品
+ */
+router.get("/addCollectProduct/:shopId/:proId", function (req, res) {
+    const path = utils.PROJECT + "/addCollectProduct";
+    let data = {};
+    data.shopId = req.params.shopId;
+    data.proId = req.params.proId;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据用户id和商品id查询该商品是否已经被收藏
+ */
+router.get("/isCollectProductExist/:proId", function (req, res) {
+    const path = utils.PROJECT + "/isCollectProductExist";
+    let data = {};
+    data.proId = req.params.proId;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 移除一个收藏的商品
+ */
+router.get("/deleteCollectProduct/:cpId", function (req, res) {
+    const path = utils.PROJECT + "/deleteCollectProduct";
+    httpAgent.httpRequest({ cpId: req.params.cpId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 获取该用户收藏的店铺
+ */
+router.get("/getCollectShop", function (req, res) {
+    const path = utils.PROJECT + "/getCollectShop";
+    httpAgent.httpRequest({ userId: req.session.user.userId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 添加一个收藏的店铺
+ */
+router.get("/addCollectShop/:shopId", function (req, res) {
+    const path = utils.PROJECT + "/addCollectShop";
+    let data = {};
+    data.shopId = req.params.shopId;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据用户id和店铺id查询该店铺是否已经被收藏
+ */
+router.get("/isCollectShopExist/:shopId", function (req, res) {
+    const path = utils.PROJECT + "/isCollectShopExist";
+    let data = {};
+    data.shopId = req.params.shopId;
+    data.userId = req.session.user.userId;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 移除一个收藏的店铺
+ */
+router.get("/deleteCollectProduct/:cpId", function (req, res) {
+    const path = utils.PROJECT + "/deleteCollectProduct";
+    httpAgent.httpRequest({ cpId: req.params.cpId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
 function checkIsRole(req) {
     const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
     for (var i = 0; i < roles.length; i++) {

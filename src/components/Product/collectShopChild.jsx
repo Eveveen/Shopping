@@ -7,6 +7,7 @@ const FormItem = Form.Item;
 import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/collectShopChild.sass';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
 class CollectShopChild extends Component {
     render() {

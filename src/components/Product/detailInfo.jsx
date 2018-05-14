@@ -234,6 +234,87 @@ class DetailInfo extends Component {
         browserHistory.push(BASE_URL + "/viewShop/" + shopId);
     }
 
+    handleAddCollectProduct = () => {
+        const { productInfo } = this.state;
+        axios.get(SERVICE_URL + "/product/addCollectProduct/" + productInfo.shopInfo.shopId + "/" + productInfo.proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    message.success("收藏成功");
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("收藏商品失败");
+                }
+            }).catch(error => {
+                message.error("收藏商品失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleIsCollectProductExist = () => {
+        const { productInfo } = this.state;
+        axios.get(SERVICE_URL + "/product/isCollectProductExist/" + productInfo.proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    if (resData == true) {
+                        message.warning("商品已收藏");
+                    } else {
+                        this.handleAddCollectProduct();
+                    }
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("判断商品收藏失败");
+                }
+            }).catch(error => {
+                message.error("判断商品收藏失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleIsCollectShopExist = () => {
+        const { productInfo } = this.state;
+        axios.get(SERVICE_URL + "/product/isCollectShopExist/" + productInfo.shopInfo.shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    if (resData == true) {
+                        message.warning("店铺已收藏");
+                    } else {
+                        this.handleAddCollectShop();
+                    }
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("判断商品收藏失败");
+                }
+            }).catch(error => {
+                message.error("判断商品收藏失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleAddCollectShop = () => {
+        const { productInfo } = this.state;
+        axios.get(SERVICE_URL + "/product/addCollectShop/" + productInfo.shopInfo.shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    message.success("收藏成功");
+                    this.setState({ showLoading: false });
+                } else {
+                    console.log(error)
+                    this.setState({ showLoading: false })
+                    message.error("收藏店铺失败");
+                }
+            }).catch(error => {
+                message.error("收藏商品失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
     render() {
         const { count, productInfo, defaultAddress } = this.state;
         return (
@@ -285,11 +366,14 @@ class DetailInfo extends Component {
                                 <Button onClick={this.handleIsCartExist}>加入购物车</Button>
                             </div>
                         </div>
+                        <div>
+                            <Button onClick={this.handleIsCollectProductExist}>收藏宝贝</Button>
+                        </div>
                     </div>
                     <div className="shop-info">
                         <div className="shop-name">{productInfo.shopInfo == null ? null : productInfo.shopInfo.shopName}</div>
                         <div className="shop-btn"><Button onClick={productInfo.shopInfo == null ? null : this.handleViewShop.bind(this, productInfo.shopInfo.shopId)}>进入店铺</Button></div>
-                        <div className="shop-btn"><Button>收藏店铺</Button></div>
+                        <div className="shop-btn"><Button onClick={this.handleIsCollectShopExist}>收藏店铺</Button></div>
                     </div>
                 </div >
                 <div className="detailed-info">

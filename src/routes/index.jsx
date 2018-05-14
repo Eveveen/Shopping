@@ -5,7 +5,7 @@ import {
     OrderItem, MenuIndex, CartPage, Account, Collect, BuyItem, AddressList, AccountMenu,
     EditAddress, EditProduct, UploadItem, AdminHeader, User, Seller, ShopProduct, ShopIndex,
     ShopMenu, BuyNow, EditUser, EditSeller, SellerShop, ShopItem, SearchProductItem, Pay,
-    ShopOrder
+    ShopOrder, CollectShopChild
 } from '../components';
 import { BASE_URL } from '../../conf/config';
 import { adminOperationTypeEnum } from '../data/enum';
