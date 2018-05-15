@@ -17,11 +17,13 @@ class DetailInfo extends Component {
         productInfo: {},
         showLoading: false,
         commentList: [],
-        defaultAddress: {}
+        defaultAddress: {},
+        overRange: false
     }
 
     componentWillMount() {
         const { proId } = this.props.params;
+        this.handleChageProductScanNum();
         axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
             .then(response => {
                 const resData = response.data;
@@ -36,6 +38,23 @@ class DetailInfo extends Component {
                 }
             }).catch(error => {
                 message.error("获取商品失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleChageProductScanNum = () => {
+        const { proId } = this.props.params;
+        axios.get(SERVICE_URL + "/product/updateProductScanNum/" + proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false, productInfo: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("更新浏览次数失败");
+                }
+            }).catch(error => {
+                message.error("更新浏览次数失败");
                 this.setState({ showLoading: false });
             })
     }
@@ -67,7 +86,7 @@ class DetailInfo extends Component {
                 } else {
                     // console.log(resData.error);
                     this.setState({ showLoading: false })
-                    // message.error("获取图片失败");
+                    message.error("获取图片失败");
                 }
             }).catch(error => {
                 console.log(error);
@@ -135,17 +154,15 @@ class DetailInfo extends Component {
     }
 
     changeCount = (e) => {
-        this.setState({
-            count: e.target.value
-        })
+        this.setState({ count: e.target.value, overRange: false })
     }
 
     decreaseCount = () => {
-        this.setState({ count: this.state.count - 1 })
+        this.setState({ count: parseInt(this.state.count) - 1, overRange: false })
     }
 
     increaseCount = () => {
-        this.setState({ count: this.state.count + 1 })
+        this.setState({ count: parseInt(this.state.count) + 1, overRange: false })
     }
 
     callback = (key) => {
@@ -172,7 +189,12 @@ class DetailInfo extends Component {
                 if (response.status == 200 && !resData.error) {
                     this.setState({ showLoading: false });
                     if (resData.cartId != null) {
-                        this.handleChageProNum(resData);
+                        if (resData.proNum + count > productInfo.proNum) {
+                            this.setState({ overRange: true })
+                        } else {
+                            this.setState({ overRange: false })
+                            this.handleChageProNum(resData);
+                        }
                     } else {
                         this.handleAddCart();
                     }
@@ -316,7 +338,7 @@ class DetailInfo extends Component {
     }
 
     render() {
-        const { count, productInfo, defaultAddress } = this.state;
+        const { count, productInfo, defaultAddress, overRange } = this.state;
         return (
             <div className="detail">
                 <div className="summary-info">
@@ -357,13 +379,17 @@ class DetailInfo extends Component {
                                 <Input value={count} onChange={this.changeCount} />
                                 <Button onClick={this.increaseCount}>+</Button>
                             </div>
+                            <div className="pro-text">库存：{productInfo.proNum}</div>
                         </div>
+                        {count > productInfo.proNum ?
+                            <div className="text-detail range-tip">您所填写的商品数量超过库存！</div> : null}
+                        {overRange ? <div className="text-detail range-tip" style={{ width: "265px" }}>商品加购件数(含已加购件数)已超过库存</div> : null}
                         <div className="text-detail">
-                            <div className="left-btn">
-                                <Button onClick={this.handleBuyNow}>立即购买</Button>
+                            <div className={count > productInfo.proNum ? "left-btn-disabled" : "left-btn"}>
+                                <Button onClick={this.handleBuyNow} disabled={count > productInfo.proNum ? true : false}>立即购买</Button>
                             </div>
-                            <div className="right-btn">
-                                <Button onClick={this.handleIsCartExist}>加入购物车</Button>
+                            <div className={count > productInfo.proNum ? "right-btn-disabled" : "right-btn"}>
+                                <Button onClick={this.handleIsCartExist} disabled={count > productInfo.proNum ? true : false}>加入购物车</Button>
                             </div>
                         </div>
                         <div>

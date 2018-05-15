@@ -542,6 +542,30 @@ router.get("/deleteCollectShop/:csId", function (req, res) {
     })
 });
 
+/**
+ * 商品下架
+ */
+router.get("/updateProductStatus/:proId", function (req, res) {
+    const path = utils.PROJECT + "/updateProductStatus";
+    httpAgent.httpRequest({ proId: req.params.proId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 更改浏览次数
+ */
+router.get("/updateProductScanNum/:proId", function (req, res) {
+    const path = utils.PROJECT + "/updateProductScanNum";
+    httpAgent.httpRequest({ proId: req.params.proId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
 function checkIsRole(req) {
     const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
     for (var i = 0; i < roles.length; i++) {

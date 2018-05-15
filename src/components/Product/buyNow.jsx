@@ -66,6 +66,8 @@ class BuyNow extends Component {
             });
     }
 
+    // han
+
     handleAddOrder = () => {
         const { productInfo, orderAddressId } = this.state;
         let data = {};

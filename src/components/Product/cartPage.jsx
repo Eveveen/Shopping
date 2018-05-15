@@ -24,7 +24,8 @@ class CartPage extends Component {
         shopIdList: [],
         checkedAll: false,
         selectedCartIds: [],
-        totalCount: 0
+        totalCount: 0,
+        overRange: false
     };
 
     componentWillMount() {
@@ -119,19 +120,31 @@ class CartPage extends Component {
     }
 
     changeCount = (cartId, product, e) => {
-        let cart = { "cartId": cartId, "proNum": e.target.value }
+        let proNum = parseInt(e.target.value);
+        product.overRange = false;
+        // this.setState({ overRange: false })
+        if (proNum > product.proNum) {
+            proNum = product.proNum;
+            product.overRange = true;
+            // this.setState({ overRange: true })
+        }
+        if (proNum <= 0 || isNaN(proNum) == true) {
+            proNum = 1;
+        }
+        let cart = { "cartId": cartId, "proNum": proNum }
         this.handleChageProNum(cart, product);
         this.setState({})
     }
 
     decreaseCount = (cartId, product) => {
-        let cart = { "cartId": cartId, "proNum": product.cartInfo.proNum - 1 }
+        let cart = { "cartId": cartId, "proNum": parseInt(product.cartInfo.proNum) - 1 }
+        product.overRange = false;
         this.handleChageProNum(cart, product);
         this.setState({})
     }
 
     increaseCount = (cartId, product) => {
-        let cart = { "cartId": cartId, "proNum": product.cartInfo.proNum + 1 }
+        let cart = { "cartId": cartId, "proNum": parseInt(product.cartInfo.proNum) + 1 }
         this.handleChageProNum(cart, product);
         this.setState({})
     }
@@ -448,7 +461,6 @@ class CartPage extends Component {
                 cartDiv.push(cartItemDiv)
             })
         });
-        // });
 
         return (
             <div>
@@ -459,11 +471,13 @@ class CartPage extends Component {
 
 
     renderProductContent = (product) => {
+        const { overRange } = this.state;
         let cartItemDiv = [];
         cartItemDiv.push(
             <div className="cart-card">
-                <Checkbox checked={product.checked} onChange={this.handleCheckboxProduct.bind(this, product.proId, product.checked)}>
-                </Checkbox>
+                {product.proNum == 0 || product.proStatus == 0 ? <div className="cart-disabled-bg"></div> : null}
+                {product.proNum == 0 || product.proStatus == 0 ? <span className="cart-disabled-text">失效</span> : <Checkbox disabled={product.proNum == 0 ? true : false} checked={product.checked} onChange={this.handleCheckboxProduct.bind(this, product.proId, product.checked)}>
+                </Checkbox>}
                 <div className="card-item-content">
                     <div className="left-img" onClick={this.handleShowProductDetail.bind(this, product.proId)}>
                         <img alt="example" src={product.imgCode} />
@@ -478,10 +492,17 @@ class CartPage extends Component {
                     <div className="item-price">
                         {product.price}
                     </div>
-                    <div className="item-count">
-                        <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)}>-</Button>
-                        <Input value={product.cartInfo.proNum} onChange={this.changeCount.bind(this, product.cartInfo.cartId, product)} />
-                        <Button onClick={this.increaseCount.bind(this, product.cartInfo.cartId, product)}>+</Button>
+                    <div className="range-count">
+                        {product.proNum == 0 ?
+                            <div className="item-count">{product.cartInfo.proNum}</div>
+                            :
+                            <div className="item-count">
+                                <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)} disabled={product.cartInfo.proNum <= 1 ? true : false}>-</Button>
+                                <Input value={product.cartInfo.proNum} onChange={this.changeCount.bind(this, product.cartInfo.cartId, product)} />
+                                <Button onClick={this.increaseCount.bind(this, product.cartInfo.cartId, product)} disabled={product.cartInfo.proNum >= product.proNum || overRange ? true : false}>+</Button>
+                            </div>
+                        }
+                        {product.overRange ? <div className="range-tip">最多只能购买{product.proNum}件</div> : null}
                     </div>
                     <div className="item-total-price">
                         ￥{product.price * product.cartInfo.proNum}
