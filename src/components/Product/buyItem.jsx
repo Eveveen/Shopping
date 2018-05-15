@@ -112,7 +112,7 @@ class BuyItem extends Component {
                 orderNums.push(orderNum);
                 this.handleAddOrder(cart.product, orderNum);
             }
-            console.log("buyShopIds,", buyShopIds)
+            this.handleDeleteMoreItem();
             browserHistory.push({ pathname: BASE_URL + "/pay/" + orderNums, state: { totalPrice: totalCount } });
         })
     }
@@ -173,6 +173,25 @@ class BuyItem extends Component {
                 console.log(error);
                 message.error("修改商品数量失败");
                 this.setState({ submitLoading: false });
+            });
+    }
+
+    handleDeleteMoreItem = () => {
+        let cartIds = this.props.params.id.split(",");
+        axios.post(SERVICE_URL + "/product/deleteMoreCart", { selectedCartIds: cartIds })
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false })
+                } else {
+                    console.log(resData.error);
+                    this.setState({ showLoading: false })
+                    message.error("删除购物车商品失败1");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("删除购物车商品失败");
+                this.setState({ showLoading: false });
             });
     }
 

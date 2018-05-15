@@ -214,11 +214,8 @@ class CartPage extends Component {
                                     shopIdList.splice(index, 1)
                                 }
                             });
-
                         });
-
                     });
-
                     this.setState({ showLoading: false, productList: [] })
                     this.handleGetAllCart();
                 } else {
@@ -232,7 +229,6 @@ class CartPage extends Component {
                 message.error("删除购物车商品失败");
                 this.setState({ showLoading: false });
             });
-
         this.setState({})
     }
 
@@ -408,6 +404,10 @@ class CartPage extends Component {
         browserHistory.push(BASE_URL + "/item/" + proId);
     }
 
+    handleViewShop = (shopId) => {
+        browserHistory.push(BASE_URL + "/viewShop/" + shopId);
+    }
+
     render() {
         const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll, selectedCartIds } = this.state;
         return (
@@ -447,11 +447,11 @@ class CartPage extends Component {
             let titleDiv =
                 <div className="card-title">
                     <Checkbox checked={shop.checked} onChange={this.handleCheckboxShop.bind(this, shop.shopId, shop.checked)}>
-                        <div className="card-title-text">
-                            <div className="card-title-text">店铺：</div>
-                            <div className="card-title-text">{shop.shopInfo ? shop.shopInfo.shopName : null}</div>
-                        </div>
                     </Checkbox>
+                    <div className="card-title-text">
+                        <div className="card-title-text">店铺：</div>
+                        <div className="card-title-text" onClick={this.handleViewShop.bind(this, shop.shopId)}>{shop.shopInfo ? shop.shopInfo.shopName : null}</div>
+                    </div>
                 </div>
             cartDiv.push(titleDiv);
             tempProductList = shop.productList;
