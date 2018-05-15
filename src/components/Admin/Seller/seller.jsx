@@ -31,13 +31,13 @@ class Seller extends Component {
                     });
                     this.setState({ showLoading: false, sellerList: resData });
                 } else {
-                    message.error("获取地址失败");
+                    message.error("获取卖家失败");
                     this.setState({ showLoading: false })
                 }
             }).catch(error => {
                 console.log(error);
                 this.setState({ showLoading: false })
-                message.error("获取地址失败");
+                message.error("获取卖家失败");
             });
     }
 

@@ -39,8 +39,8 @@ class ShopItem extends Component {
             });
     }
 
-    handleGetProduct = (id) => {
-        axios.get(SERVICE_URL + "/product/getProduct/" + id)
+    handleGetProduct = (shopId) => {
+        axios.get(SERVICE_URL + "/product/getProduct/" + shopId)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {

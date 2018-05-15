@@ -213,9 +213,9 @@ router.get("/getProduct/:shopId/:proId", function (req, res) {
 /**
  * 查看本店铺所有商品
  */
-router.get("/getProduct/:id", function (req, res) {
+router.get("/getProduct/:shopId", function (req, res) {
     const path = utils.PROJECT + "/getAllProduct";
-    httpAgent.httpRequest({ shopId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+    httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
@@ -533,9 +533,9 @@ router.get("/isCollectShopExist/:shopId", function (req, res) {
 /**
  * 移除一个收藏的店铺
  */
-router.get("/deleteCollectProduct/:cpId", function (req, res) {
-    const path = utils.PROJECT + "/deleteCollectProduct";
-    httpAgent.httpRequest({ cpId: req.params.cpId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+router.get("/deleteCollectShop/:csId", function (req, res) {
+    const path = utils.PROJECT + "/deleteCollectShop";
+    httpAgent.httpRequest({ csId: req.params.csId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
         res.send(resData);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

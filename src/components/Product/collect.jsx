@@ -3,13 +3,14 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/collect.sass';
 import './Style/main.sass';
-import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar } from 'antd';
+import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message } from 'antd';
 const { Meta } = Card;
 const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import CollectShopChild from './collectShopChild';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import { Link, browserHistory } from 'react-router';
 
 class Collect extends Component {
     state = {
@@ -17,12 +18,16 @@ class Collect extends Component {
         current: this.props.pageStatus,
         collectProductList: [],
         productList: [],
-        shopList: []
+        shopList: [],
+        showDeletePop: false,
+        collectShopList: []
     }
 
     componentWillMount() {
-        console.log(this.props.location.pathname)
         this.handleGetCollectProduct();
+        if (this.props.location.pathname == "/collectShop") {
+            this.handleGetCollectShop();
+        }
         this.setState({ pageStatus: this.props.location.pathname })
     }
 
@@ -53,6 +58,8 @@ class Collect extends Component {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
                     // this.handleGetImg(resData);
+                    this.handleGetImg(resData);
+                    collectProduct.productInfo = resData;
                     this.state.productList.push(resData);
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
@@ -70,7 +77,10 @@ class Collect extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    product.shopInfo = resData;
+                    collectProduct.shopInfo = resData;
+                    if (this.props.location.pathname == "/collectShop") {
+                        this.handleGetSeller(collectProduct);
+                    }
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
@@ -82,18 +92,130 @@ class Collect extends Component {
             })
     }
 
+    handleGetImg = (product) => {
+        axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    product.imgCode = resData.imgCode;
+                    this.setState({ showLoading: false });
+                } else {
+                    // console.log(resData.error);
+                    this.setState({ showLoading: false })
+                    // message.error("获取图片失败");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("获取图片失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
     handleClick = (e) => {
-        console.log('click ', e);
         this.setState({
             pageStatus: e.key,
             current: e.key
         });
     }
 
+    handleGoToShop = (shopId) => {
+        browserHistory.push(BASE_URL + "/viewShop/" + shopId);
+    }
+
+    handleShowDeletePop = () => {
+        this.setState({ showDeletePop: true })
+    }
+
+    handleHideDeletePop = () => {
+        this.setState({ showDeletePop: false })
+    }
+
+    handleDeleteCollectProduct = (cpId) => {
+        axios.get(SERVICE_URL + "/product/deleteCollectProduct/" + cpId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.handleGetCollectProduct();
+                    message.success("删除宝贝成功");
+                    this.setState({ showLoading: false, productInfo: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("删除宝贝失败");
+                }
+            }).catch(error => {
+                message.error("删除宝贝失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetCollectShop = () => {
+        axios.get(SERVICE_URL + "/product/getCollectShop")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(collectShop => {
+                        this.handleGetShopInfo(collectShop);
+                        this.handleGetShopProduct(collectShop);
+                        // this.handleGetSeller(collectShop);
+                    });
+                    this.setState({ showLoading: false, collectShopList: resData });
+                } else {
+                    console.log(error)
+                    this.setState({ showLoading: false })
+                    message.error("获取收藏的店铺失败");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("获取收藏的店铺失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
+    handleGetShopProduct = (collectShop) => {
+        axios.get(SERVICE_URL + "/product/getProduct/" + collectShop.shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(product => {
+                        if (product.imgId != null) {
+                            this.handleGetImg(product);
+                        }
+                    });
+                    collectShop.productList = resData;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleGetSeller = (collectShop) => {
+        axios.get(SERVICE_URL + "/admin/getSeller/" + collectShop.shopInfo.sellerId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.imgId = resData.avatar;
+                    collectShop.sellerInfo = resData;
+                    this.handleGetImg(resData);
+                    // console.log("collectShop", collectShop);
+                    this.setState({ showLoading: false, sellerInfo: resData });
+                } else {
+                    message.error("获取用户失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                console.log(error);
+                this.setState({ showLoading: false })
+                message.error("获取用户失败");
+            });
+    }
+
     render() {
         const { pageStatus } = this.state;
-        console.log("prop", this.props.pageStatus);
-        console.log("state", this.state.pageStatus);
         return (
             <div className="collect">
                 <Layout>
@@ -145,30 +267,66 @@ class Collect extends Component {
     }
 
     renderCollectTreasureContent() {
-        return (
-            <div className="collect-treasure-content">
-                <div className="collect-card">
-                    <Card
-                        hoverable
-                        style={{ width: 240 }}
-                        cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-                    >
+        const { collectProductList, showDeletePop } = this.state;
+        let collectProductDiv = [];
+        collectProductList.forEach(collectProduct => {
+            console.log(collectProduct);
+            collectProductDiv.push(
+                <div className="collect-treasure-content">
+                    <div className="collect-card">
+                        <Card
+                            hoverable
+                            style={{ width: 148 }}
+                            cover={<img alt="example" src={collectProduct.productInfo.imgCode} />}
+                        >
+                        </Card>
+                        {showDeletePop == false ?
+                            <div>
+                                <div className="go-shop-btn" onClick={this.handleGoToShop.bind(this, collectProduct.shopInfo.shopId)}>
+                                    <span>进入店铺</span>
+                                </div>
+                                <div className="delete-btn" onClick={this.handleShowDeletePop}>
+                                    <Icon type="delete" />
+                                </div>
+
+                            </div>
+                            : null}
+                        {showDeletePop == true ?
+                            <div className="delete-pop-show">
+                                <div className="delete-pop">
+                                    <div className="del-pop-bg"></div>
+                                    <div className="del-pop-box">
+                                        <div className="txt">确定删除？</div>
+                                        <div className="btns">
+                                            <Button type="primary" className="btn-ok" onClick={this.handleDeleteCollectProduct.bind(this, collectProduct.cpId)}>确定</Button>
+                                            <Button className="btn-close" onClick={this.handleHideDeletePop}>取消</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> : null
+                        }
+
                         <div className="card-text">
                             <Meta
-                                title="Europe Street beat"
-                                description="www.instagram.com"
+                                title={collectProduct.productInfo.proName}
+                                description={collectProduct.productInfo.price}
                             />
                         </div>
-                    </Card>
+                    </div>
                 </div>
-            </div >
+            );
+        });
+
+        return (
+            <div>{collectProductDiv}</div>
         )
     }
 
     renderCollectShopContent() {
+        const { collectShopList } = this.state;
         return (
             <div>
-                <CollectShopChild />aaaa
+                <CollectShopChild collectShopList={collectShopList} />
             </div>
         )
     }
