@@ -100,9 +100,8 @@ class Collect extends Component {
                     product.imgCode = resData.imgCode;
                     this.setState({ showLoading: false });
                 } else {
-                    // console.log(resData.error);
                     this.setState({ showLoading: false })
-                    // message.error("获取图片失败");
+                    message.error("获取图片失败");
                 }
             }).catch(error => {
                 console.log(error);
@@ -172,7 +171,7 @@ class Collect extends Component {
     }
 
     handleGetShopProduct = (collectShop) => {
-        axios.get(SERVICE_URL + "/product/getProduct/" + collectShop.shopId)
+        axios.get(SERVICE_URL + "/product/getShopProduct/" + collectShop.shopId)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
@@ -201,7 +200,6 @@ class Collect extends Component {
                     resData.imgId = resData.avatar;
                     collectShop.sellerInfo = resData;
                     this.handleGetImg(resData);
-                    // console.log("collectShop", collectShop);
                     this.setState({ showLoading: false, sellerInfo: resData });
                 } else {
                     message.error("获取用户失败");
@@ -212,6 +210,10 @@ class Collect extends Component {
                 this.setState({ showLoading: false })
                 message.error("获取用户失败");
             });
+    }
+
+    handleShowProductDetail = (proId) => {
+        browserHistory.push(BASE_URL + "/item/" + proId);
     }
 
     render() {
@@ -270,17 +272,17 @@ class Collect extends Component {
         const { collectProductList, showDeletePop } = this.state;
         let collectProductDiv = [];
         collectProductList.forEach(collectProduct => {
-            console.log(collectProduct);
             collectProductDiv.push(
                 <div className="collect-treasure-content">
                     <div className="collect-card">
                         <Card
                             hoverable
+                            onClick={this.handleShowProductDetail.bind(this, collectProduct.proId)}
                             style={{ width: 148 }}
-                            cover={<img alt="example" src={collectProduct.productInfo.imgCode} />}
+                            cover={<img alt="example" src={collectProduct.productInfo == null ? null : collectProduct.productInfo.imgCode} />}
                         >
                         </Card>
-                        {showDeletePop == false ?
+                        {showDeletePop == false && collectProduct.shopInfo != null ?
                             <div>
                                 <div className="go-shop-btn" onClick={this.handleGoToShop.bind(this, collectProduct.shopInfo.shopId)}>
                                     <span>进入店铺</span>
@@ -307,10 +309,10 @@ class Collect extends Component {
                         }
 
                         <div className="card-text">
-                            <Meta
+                            {collectProduct.productInfo == null ? null : <Meta
                                 title={collectProduct.productInfo.proName}
                                 description={collectProduct.productInfo.price}
-                            />
+                            />}
                         </div>
                     </div>
                 </div>

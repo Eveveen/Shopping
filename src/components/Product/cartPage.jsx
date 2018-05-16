@@ -151,6 +151,7 @@ class CartPage extends Component {
 
     handleChageProNum = (cart, product) => {
         let totalCount = this.state.totalCount;
+        delete cart.updateTime;
         axios.post(SERVICE_URL + "/product/editCartNum", cart)
             .then(response => {
                 const resData = response.data;
@@ -159,6 +160,7 @@ class CartPage extends Component {
                     product.cartInfo.proNum = cart.proNum;
                     this.setState({ showLoading: false, totalCount: totalCount })
                 } else {
+                    console.log(resData.error);
                     this.setState({ showLoading: false })
                     message.error("减少购物车商品失败1");
                 }

@@ -43,7 +43,7 @@ class ShopIndex extends Component {
     }
 
     handleGetProduct = (id) => {
-        axios.get(SERVICE_URL + "/product/getProduct/" + id)
+        axios.get(SERVICE_URL + "/product/getShopProduct/" + id)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {

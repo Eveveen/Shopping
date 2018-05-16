@@ -213,10 +213,35 @@ router.get("/getProduct/:shopId/:proId", function (req, res) {
 /**
  * 查看本店铺所有商品
  */
-router.get("/getProduct/:shopId", function (req, res) {
+router.get("/getShopProduct/:shopId", function (req, res) {
     const path = utils.PROJECT + "/getAllProduct";
     httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 查看本店铺所有未失效的商品
+ */
+router.get("/getShopActiveProduct/:shopId", function (req, res) {
+    const path = utils.PROJECT + "/getShopActiveProduct";
+    httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 搜索店铺内未失效商品
+ */
+router.post("/searchShopActiveProduct", function (req, res) {
+    const { data } = req.body;
+    const path = utils.PROJECT + "/searchShopActiveProduct";
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })
@@ -376,6 +401,18 @@ router.get("/deleteOrder/:id", function (req, res) {
     const path = utils.PROJECT + "/deleteOrder";
     httpAgent.httpRequest({ orderId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
+ * 根据商品id查询订单，用于查询已售出多少件商品
+ */
+router.get("/getOrderByProId/:proId", function (req, res) {
+    const path = utils.PROJECT + "/getOrderByProId";
+    httpAgent.httpRequest({ proId: req.params.proId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+        res.send(resData);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })

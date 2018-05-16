@@ -33,8 +33,8 @@ class DetailInfo extends Component {
                     this.handleGetDefaultAddress();
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
-                    this.setState({ showLoading: false })
                     message.error("获取商品失败");
+                    this.setState({ showLoading: false })
                 }
             }).catch(error => {
                 message.error("获取商品失败");
@@ -48,7 +48,7 @@ class DetailInfo extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, productInfo: resData });
+                    this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
                     message.error("更新浏览次数失败");
@@ -84,7 +84,6 @@ class DetailInfo extends Component {
                     product.imgCode = resData.imgCode;
                     this.setState({ showLoading: false });
                 } else {
-                    // console.log(resData.error);
                     this.setState({ showLoading: false })
                     message.error("获取图片失败");
                 }
@@ -234,7 +233,7 @@ class DetailInfo extends Component {
     handleChageProNum = (cart) => {
         const { productInfo, count } = this.state;
         cart.proNum += count;
-
+        delete cart.updateTime;
         axios.post(SERVICE_URL + "/product/editCartNum", cart)
             .then(response => {
                 const resData = response.data;
@@ -243,11 +242,11 @@ class DetailInfo extends Component {
                     message.success("已加入购物车");
                 } else {
                     this.setState({ showLoading: false })
-                    message.error("减少购物车商品失败1");
+                    message.error("加入购物车商品失败1");
                 }
 
             }).catch(error => {
-                message.error("减少购物车商品失败");
+                message.error("加入购物车商品失败");
                 this.setState({ showLoading: false });
             });
     }

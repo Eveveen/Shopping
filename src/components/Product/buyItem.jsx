@@ -71,6 +71,7 @@ class BuyItem extends Component {
 
     handleChageProNum = (cart, product) => {
         let totalCount = this.state.totalCount;
+        delete cart.updateTime;
         axios.post(SERVICE_URL + "/product/editCartNum", cart)
             .then(response => {
                 const resData = response.data;
