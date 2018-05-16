@@ -225,9 +225,12 @@ router.get("/getShopProduct/:shopId", function (req, res) {
 /**
  * 查看本店铺所有未失效的商品
  */
-router.get("/getShopActiveProduct/:shopId", function (req, res) {
-    const path = utils.PROJECT + "/getShopActiveProduct";
-    httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+router.get("/getShopProductByProStatus/:shopId/:proStatus", function (req, res) {
+    const path = utils.PROJECT + "/getShopProductByProStatus";
+    let data = {};
+    data.shopId = req.params.shopId;
+    data.proStatus = req.params.proStatus;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });

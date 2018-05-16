@@ -155,7 +155,7 @@ class AddProduct extends Component {
         );
         return (
             <Modal
-                title={"Add Porduct"}
+                title={"添加商品"}
                 visible={visible}
                 onCancel={this.handleCancel}
                 width={850}
@@ -171,9 +171,12 @@ class AddProduct extends Component {
                         <FormItem
                             {...formItemLayout}
                             label={"商品名称"}
+                            required="true"
                         >
                             {getFieldDecorator('proName', {
-                                rules: [],
+                                rules: [{
+                                    required: true, message: "商品名称不能为空"
+                                }],
                             })(
                                 <Input placeholder={"商品名称"} disabled={submitLoading} />
                             )}
@@ -185,24 +188,36 @@ class AddProduct extends Component {
                         >
                             {getFieldDecorator('description', {
                                 rules: [{
-                                    required: true, message: intl.get("telphoneNotnull")
-                                }, {
-                                    eq: 11, message: intl.get("telphoneLength")
+                                    required: true, message: "商品描述不能为空"
                                 }],
                             })(
-                                <Input placeholder={"description"} disabled={submitLoading} />
+                                <Input placeholder={"商品描述"} disabled={submitLoading} />
                             )}
                         </FormItem>
                         <FormItem
                             {...formItemLayout}
                             label="价格"
+                            required="true"
                         >
                             {getFieldDecorator('price', {
                                 rules: [{
-                                    required: true, message: intl.get("telphoneNotnull")
+                                    required: true, message: "价格不能为空"
                                 }],
                             })(
-                                <Input placeholder={"price"} disabled={submitLoading} />
+                                <Input placeholder={"价格"} disabled={submitLoading} />
+                            )}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label="库存"
+                            required="true"
+                        >
+                            {getFieldDecorator('proNum', {
+                                rules: [{
+                                    required: true, message: "库存不能为空"
+                                }],
+                            })(
+                                <Input placeholder={"库存"} disabled={submitLoading} />
                             )}
                         </FormItem>
                         <FormItem
@@ -212,6 +227,7 @@ class AddProduct extends Component {
                         >
                             {getFieldDecorator('proStatus', {
                                 rules: [],
+                                initialValue: "1"
                             })(
                                 <Select disabled={submitLoading}>
                                     <Option value="1">Active</Option>

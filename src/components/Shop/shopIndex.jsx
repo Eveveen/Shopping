@@ -18,7 +18,9 @@ class ShopIndex extends Component {
         productList: [],
         imgCode: '',
         showAddModal: false,
-        searchName: ''
+        searchName: '',
+        current: "selling"
+
     }
 
     componentWillMount() {
@@ -42,26 +44,27 @@ class ShopIndex extends Component {
             });
     }
 
-    handleGetProduct = (id) => {
-        axios.get(SERVICE_URL + "/product/getShopProduct/" + id)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    resData.forEach(product => {
-                        if (product.imgId != null) {
-                            this.handleGetImg(product);
-                        }
-                    });
-                    this.setState({ showLoading: false, productList: resData });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
-                }
-            }).catch(error => {
-                message.error(intl.get("editFailed"));
-                this.setState({ showLoading: false });
-            });
-    }
+    // handleGetProduct = (id) => {
+    //     axios.get(SERVICE_URL + "/product/getShopProduct/" + id)
+    //         .then(response => {
+    //             const resData = response.data;
+    //             if (response.status == 200 && !resData.error) {
+    //                 resData.forEach(product => {
+    //                     if (product.imgId != null) {
+    //                         this.handleGetImg(product);
+    //                         this.handleGetProductOrder(product);
+    //                     }
+    //                 });
+    //                 this.setState({ showLoading: false, productList: resData });
+    //             } else {
+    //                 this.setState({ showLoading: false })
+    //                 message.error(intl.get("editFailed"));
+    //             }
+    //         }).catch(error => {
+    //             message.error(intl.get("editFailed"));
+    //             this.setState({ showLoading: false });
+    //         });
+    // }
 
     handleGetImg = (product) => {
         axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
@@ -128,6 +131,7 @@ class ShopIndex extends Component {
                 if (response.status == 200 && !resData.error) {
                     resData.forEach(product => {
                         this.handleGetImg(product);
+                        this.handleGetProductOrder(product);
                     });
                     this.setState({ showLoading: false, productList: resData });
                 } else {
@@ -151,6 +155,62 @@ class ShopIndex extends Component {
         }
     }
 
+    handleGetProductOrder = (product) => {
+        let selledNum = 0;
+        axios.get(SERVICE_URL + "/product/getOrderByProId/" + product.proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    console.log("red,", resData)
+                    resData.forEach(order => {
+                        selledNum += order.proNum;
+                    });
+                    product.selledNum = selledNum;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error(intl.get("editFailed"));
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
+    handleClick = (e) => {
+        const { shopInfo } = this.state;
+        this.handleGetProduct(shopInfo.shopId, e.key);
+        this.setState({ current: e.key });
+    }
+
+    handleGetProduct = (shopId, current) => {
+        // const { shopInfo } = this.state;
+        // let id = shopId == undefined ? shopInfo.shopId : shopId
+        let proStatus = 1;
+        if (current == "soldout") {
+            proStatus = 0;
+        }
+        axios.get(SERVICE_URL + "/product/getShopProductByProStatus/" + shopId + "/" + proStatus)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(product => {
+                        if (product.imgId != null) {
+                            this.handleGetImg(product);
+                            this.handleGetProductOrder(product);
+                        }
+                    });
+                    this.setState({ showLoading: false, productList: resData });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取商品失败");
+                }
+            }).catch(error => {
+                message.error(intl.get("editFailed"));
+                this.setState({ showLoading: false });
+            });
+    }
+
     render() {
         const { showAddModal } = this.state;
         return (
@@ -158,6 +218,7 @@ class ShopIndex extends Component {
                 <Layout>
                     <Header>{this.renderCollectHeader()}</Header>
                     <Content>
+                        {this.renderShopMenu()}
                         {this.renderCollectTreasureContent()}
                         {showAddModal ?
                             <AddProduct
@@ -209,7 +270,7 @@ class ShopIndex extends Component {
             productDiv.push(<div className="collect-treasure-content">
                 <div className="collect-card">
                     <Card
-                        style={{ width: 300 }}
+                        style={{ width: 240 }}
                         cover={<img alt="example" src={product.imgCode} />}
                         actions={[
                             <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />,
@@ -221,8 +282,13 @@ class ShopIndex extends Component {
                         <div className="card-text">
                             <Meta
                                 avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                title={product.proName}
-                                description={product.description}
+                                title={<div>{product.proName}&nbsp;{product.description}</div>}
+                                description={
+                                    <div className="pro-description">
+                                        <div className="descprition-price">￥{product.price}</div>
+                                        <div className="selled-num">已售出：{product.selledNum == null ? null : product.selledNum}&nbsp;件</div>
+                                    </div>
+                                }
                             />
                         </div>
                     </Card>
@@ -232,6 +298,25 @@ class ShopIndex extends Component {
         return (
             <div>
                 {productDiv}
+            </div>
+        )
+    }
+
+    renderShopMenu() {
+        return (
+            <div>
+                <Menu
+                    onClick={this.handleClick}
+                    selectedKeys={[this.state.current]}
+                    mode="horizontal"
+                >
+                    <Menu.Item key="selling">
+                        <Icon type="appstore" />出售中商品
+                    </Menu.Item>
+                    <Menu.Item key="soldout">
+                        <Icon type="appstore" />下架商品
+                    </Menu.Item>
+                </Menu>
             </div>
         )
     }

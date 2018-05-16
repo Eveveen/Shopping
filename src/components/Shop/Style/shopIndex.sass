@@ -3,16 +3,37 @@
     .collect-treasure-content
         display: inline-flex
         .collect-card 
-            margin-right: 15px
-            img
-                height: 240px
+            margin: 15px
+            width: 240px
+            .ant-card-cover
+                img
+                    height: 240px
         .ant-card-body
-            height: 80px
+            height: 46px
+            padding: 10px
+            .card-text
+                .ant-avatar
+                    width: 24px
+                    height: 18px
+                .ant-card-meta-title
+                    font-size: 12px
+                    margin-bottom: 0px
+                    color: #616161
+                .ant-card-meta-description
+                    font-size: 12px
+                    .pro-description
+                        display: flex
+                        .descprition-price
+                            color: #000000
+                            font-weight: 700
+                        .selled-num
+                            margin-left: 10px
     .collect-header
         display: flex
         color: white
         .add-product
             margin-left: 150px
+            cursor: pointer
     .ant-layout-header
         height: 100%
     .global-search-wrapper 

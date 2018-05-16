@@ -23,7 +23,7 @@ class CartPage extends Component {
         shopIds: [],
         shopIdList: [],
         checkedAll: false,
-        selectedCartIds: [],
+        selectedCartIds: [],  // 选中的购物车记录
         totalCount: 0,
         overRange: false
     };
@@ -150,13 +150,18 @@ class CartPage extends Component {
     }
 
     handleChageProNum = (cart, product) => {
+        const { selectedCartIds } = this.state;
         let totalCount = this.state.totalCount;
         delete cart.updateTime;
         axios.post(SERVICE_URL + "/product/editCartNum", cart)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    totalCount += (cart.proNum - product.cartInfo.proNum) * product.price;
+                    selectedCartIds.forEach(cartId => {
+                        if (cartId == cart.cartId) {
+                            totalCount += (cart.proNum - product.cartInfo.proNum) * product.price;
+                        }
+                    });
                     product.cartInfo.proNum = cart.proNum;
                     this.setState({ showLoading: false, totalCount: totalCount })
                 } else {
@@ -495,7 +500,7 @@ class CartPage extends Component {
                         {product.price}
                     </div>
                     <div className="range-count">
-                        {product.proNum == 0 ?
+                        {product.proNum == 0 || product.proStatus == 0 ?
                             <div className="item-count">{product.cartInfo.proNum}</div>
                             :
                             <div className="item-count">
@@ -510,7 +515,7 @@ class CartPage extends Component {
                         ￥{product.price * product.cartInfo.proNum}
                     </div>
                     <div className="item-operation">
-                        <span onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</span>
+                        <div className="delete-op" onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</div>
                     </div>
                 </div>
             </div>)

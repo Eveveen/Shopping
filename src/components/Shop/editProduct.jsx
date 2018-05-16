@@ -61,11 +61,11 @@ class EditProduct extends Component {
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取商品失败");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("获取商品失败");
                 this.setState({ showLoading: false });
             })
     }
@@ -79,10 +79,10 @@ class EditProduct extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取图片失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取图片失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -98,14 +98,14 @@ class EditProduct extends Component {
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            message.success(intl.get("editSuccess"));
+                            message.success("编辑成功");
                         } else {
-                            message.error(messageText(resData.error.code, intl.get("editFailed")));
+                            message.error("编辑失败");
                         }
                         this.setState({ submitLoading: false });
                     }).catch(error => {
                         console.log(error);
-                        message.error(intl.get("editFailed"));
+                        message.error("编辑失败");
                         this.setState({ submitLoading: false });
                     });
             }
@@ -160,7 +160,7 @@ class EditProduct extends Component {
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
-                <div className="ant-upload-text">{intl.get("upload")}</div>
+                <div className="ant-upload-text">{"上传"}</div>
             </div>
         );
         return (
@@ -168,10 +168,13 @@ class EditProduct extends Component {
                 <Form onSubmit={this.handleEditProduct} className="personal-info-form">
                     <FormItem
                         {...formItemLayout}
+                        required="true"
                         label={"商品名称"}
                     >
                         {getFieldDecorator('proName', {
-                            rules: [],
+                            rules: [{
+                                required: true, message: "商品名称不能为空"
+                            }],
                             initialValue: productInfo.proName
                         })(
                             <Input placeholder={"商品名称"} disabled={submitLoading} />
@@ -184,9 +187,7 @@ class EditProduct extends Component {
                     >
                         {getFieldDecorator('description', {
                             rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
-                            }, {
-                                eq: 11, message: intl.get("telphoneLength")
+                                required: true, message: "描述不能为空"
                             }],
                             initialValue: productInfo.description
                         })(
@@ -199,11 +200,25 @@ class EditProduct extends Component {
                     >
                         {getFieldDecorator('price', {
                             rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
+                                required: true, message: "价格不能为空"
                             }],
                             initialValue: productInfo.price
                         })(
                             <Input placeholder={"price"} disabled={submitLoading} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="库存"
+                        required="true"
+                    >
+                        {getFieldDecorator('proNum', {
+                            rules: [{
+                                required: true, message: "库存不能为空"
+                            }],
+                            initialValue: productInfo.proNum
+                        })(
+                            <Input placeholder={"库存"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
@@ -213,7 +228,7 @@ class EditProduct extends Component {
                     >
                         {getFieldDecorator('proStatus', {
                             rules: [],
-                            initialValue: productInfo.proStatus
+                            initialValue: productInfo.proStatus == 0 ? "0" : "1"
                         })(
                             <Select disabled={submitLoading}>
                                 <Option value="1">Active</Option>

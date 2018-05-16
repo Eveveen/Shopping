@@ -147,7 +147,7 @@ class BuyItem extends Component {
     }
 
     handleChangeProNum = (productInfo, orderNum) => {
-        let totalPrice = productInfo.price * productInfo.count;
+        // let totalPrice = productInfo.price * productInfo.count;
         let data = {};
         data.proId = productInfo.proId;
         data.proName = productInfo.proName;
@@ -159,7 +159,10 @@ class BuyItem extends Component {
         data.updataTime = productInfo.updataTime;
         data.proStatus = productInfo.proStatus;
         data.shopId = productInfo.shopId;
-        data.proNum = productInfo.proNum - 1;
+        data.proNum = productInfo.proNum - productInfo.cartInfo.proNum;
+        if (data.proNum == 0) {
+            this.handleChageProductStatus(productInfo);
+        }
         axios.post(SERVICE_URL + '/product/editProduct', { data })
             .then(response => {
                 const resData = response.data;
@@ -174,6 +177,24 @@ class BuyItem extends Component {
                 console.log(error);
                 message.error("修改商品数量失败");
                 this.setState({ submitLoading: false });
+            });
+    }
+
+    handleChageProductStatus = (productInfo) => {
+        axios.get(SERVICE_URL + "/product/updateProductStatus/" + productInfo.proId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    this.setState({ showLoading: false })
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("修改商品状态失败");
+                    console.log(resData.error);
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("修改商品状态失败");
+                this.setState({ showLoading: false });
             });
     }
 

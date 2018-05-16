@@ -16,7 +16,7 @@ class ShopItem extends Component {
         shopInfo: {},
         productList: [],
         imgCode: '',
-        searchName: ''
+        searchName: '',
     }
 
     componentWillMount() {
@@ -41,7 +41,7 @@ class ShopItem extends Component {
     }
 
     handleGetProduct = (shopId) => {
-        axios.get(SERVICE_URL + "/product/getShopActiveProduct/" + shopId)
+        axios.get(SERVICE_URL + "/product/getShopProductByProStatus/" + shopId + "/1")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
