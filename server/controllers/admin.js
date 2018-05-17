@@ -97,6 +97,18 @@ router.get("/getSellerShop/:id", function (req, res) {
 });
 
 /**
+ * 根据店铺的状态查询店铺
+ */
+router.get("/getShopByShopStatus/:shopStatus", function (req, res) {
+    const path = utils.PROJECT + "/getShopByShopStatus";
+    httpAgent.httpRequest({ shopStatus: req.params.shopStatus }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 添加店铺，一个卖家只能有一个店铺
  */
 router.post("/addShop", function (req, res) {

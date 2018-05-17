@@ -56,6 +56,7 @@ const routes = (
             <Route path={"/admin"} component={AdminHeader}>
                 <IndexRoute component={Seller} />
                 <Route path="seller" component={Seller} />
+                <Route path="shopApply" component={Seller} />
                 <Route path="editSeller/:sellerId/:shopId" component={EditSeller} />
                 <Route path="editShop/:id" component={SellerShop} />
                 <Route path="user" component={User} />

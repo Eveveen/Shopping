@@ -12,16 +12,30 @@ import AddSeller from './addSeller';
 class Seller extends Component {
 
     state = {
-        current: 'seller',
         sellerList: [],
+        applyShopList: [],
         showAddSeller: false
     }
 
     componentWillMount() {
-        this.handleGetAllSeller();
+        if (this.props.location.pathname == "/admin/shopApply") {
+            this.handleGetApplyShop();
+        } else {
+            this.handleGetAllSeller(this.props.location.pathname);
+        }
+        this.setState({})
     }
 
-    handleGetAllSeller = () => {
+    componentWillReceiveProps(props) {
+        // this.handleGetAllSeller(this.props.location.pathname);
+        if (props.location.pathname == "/admin/shopApply") {
+            this.handleGetApplyShop();
+        } else {
+            this.handleGetAllSeller();
+        }
+    }
+
+    handleGetAllSeller = (pathname) => {
         axios.get(SERVICE_URL + "/admin/getAllSeller")
             .then(response => {
                 const resData = response.data;
@@ -40,6 +54,71 @@ class Seller extends Component {
                 message.error("获取卖家失败");
             });
     }
+
+    handleGetApplyShop = () => {
+        axios.get(SERVICE_URL + "/admin/getShopByShopStatus/0")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    resData.forEach(shop => {
+                        this.handleGetSeller(shop);
+                        shop.shopInfo = shop;
+                        // shop.shopName = resData.shopName;
+                        // shop.shopStatus = resData.shopStatus;
+                    });
+                    console.log(resData);
+                    this.setState({ showLoading: false, sellerList: resData });
+                } else {
+                    message.error("获取卖家失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                console.log(error);
+                this.setState({ showLoading: false })
+                message.error("获取卖家失败");
+            });
+    }
+
+    handleGetSeller = (shop) => {
+        axios.get(SERVICE_URL + "/admin/getSeller/" + shop.sellerId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    shop.sellerId = resData.sellerId;
+                    shop.sellerName = resData.sellerName;
+                    shop.telphone = resData.telphone;
+                    shop.email = resData.email;
+                    this.setState({ showLoading: false });
+                } else {
+                    message.error("获取用户失败");
+                    this.setState({ showLoading: false })
+                }
+            }).catch(error => {
+                console.log(error);
+                this.setState({ showLoading: false })
+                message.error("获取用户失败");
+            });
+    }
+
+    // handleGetApplyShop = (seller) => {
+    //     axios.get(SERVICE_URL + "/admin/getShopByShopStatus/0")
+    //         .then(response => {
+    //             const resData = response.data;
+    //             if (response.status == 200 && !resData.error) {
+    //                 seller.shopInfo = resData;
+    //                 seller.shopName = resData.shopName;
+    //                 seller.shopStatus = resData.shopStatus;
+    //                 this.setState({ showLoading: false });
+    //             } else {
+    //                 message.error("获取店铺失败");
+    //                 this.setState({ showLoading: false })
+    //             }
+    //         }).catch(error => {
+    //             console.log(error);
+    //             this.setState({ showLoading: false })
+    //             message.error("获取店铺失败");
+    //         });
+    // }
 
     handleGetSellerShop = (seller) => {
         axios.get(SERVICE_URL + "/admin/getSellerShop/" + seller.sellerId)
@@ -69,6 +148,7 @@ class Seller extends Component {
     }
 
     handleEditSeller = (seller) => {
+        console.log(seller);
         browserHistory.push(BASE_URL + "/admin/editSeller/" + seller.sellerId + "/" + seller.shopInfo.shopId);
     }
 

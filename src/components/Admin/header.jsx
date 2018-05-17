@@ -38,6 +38,9 @@ class AdminHeader extends Component {
                     <Menu.Item key="seller">
                         <Icon type="appstore" />卖家
                     </Menu.Item>
+                    <Menu.Item key="shopApply">
+                        <Icon type="appstore" />店铺申请
+                    </Menu.Item>
                     <Menu.Item key="user">
                         <Icon type="appstore" />普通用户
                     </Menu.Item>
