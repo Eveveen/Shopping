@@ -11,6 +11,7 @@ import './Style/main.sass';
 import DetailInfo from './detailInfo';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
+import './Style/antd.sass';
 
 const gridStyle = {
     width: '25%',

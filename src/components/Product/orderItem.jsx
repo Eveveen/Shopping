@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Layout, AutoComplete, Menu } from 'antd';
+import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Layout, AutoComplete, Menu, Spin } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
 const FormItem = Form.Item;
 import axios from 'axios';
@@ -12,6 +12,8 @@ import { _ } from 'underscore';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import { commentTypeEnum } from './data/enum';
+import InfiniteScroll from 'react-infinite-scroller';
+import './Style/antd.sass';
 
 class OrderItem extends Component {
     state = {
@@ -20,11 +22,37 @@ class OrderItem extends Component {
         orderNums: [],
         searchName: '',
         productList: [],
-        current: "all"
+        current: "all",
+        showLoading: true,
+        showNum: 4
     }
 
     componentWillMount() {
         this.handleGetAllOrder();
+    }
+
+    componentDidMount() {
+        window.addEventListener('scroll', this.onScrollHandle.bind(this));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.onScrollHandle.bind(this));
+    }
+
+    onScrollHandle(event) {
+        const clientHeight = document.documentElement.clientHeight
+        const scrollTop = document.documentElement.scrollTop
+        const scrollHeight = document.documentElement.scrollHeight
+        const isBottom = (clientHeight + scrollTop === scrollHeight)
+        if (isBottom && this.state.showNum <= this.state.orderList.length) {
+            this.setState({ showNum: this.state.showNum + 4 })
+            console.log("aaaa", this.state.showNum)
+        }
+        // console.log("clientHeight", clientHeight)
+        // console.log("scrollHeight", scrollHeight)
+        // console.log("scrollTop", scrollTop)
+        // console.log('is bottom:', isBottom)
+        // console.log("scrollTop", document.documentElement.scrollTop)
     }
 
     handleClick = (e) => {
@@ -54,6 +82,7 @@ class OrderItem extends Component {
     handleGetAllOrder = () => {
         this.state.orderNumList = [];
         this.state.orderNums = [];
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getAllOrder")
             .then(response => {
                 const resData = response.data;
@@ -81,6 +110,7 @@ class OrderItem extends Component {
     handleGetOrderByStatus = (commentStatus) => {
         this.state.orderNumList = [];
         this.state.orderNums = [];
+        this.state.showLoading = true;
         const { orderNumList, orderNums } = this.state;
         let data = {};
         data.commentStatus = commentStatus;
@@ -109,6 +139,7 @@ class OrderItem extends Component {
     }
 
     handleGetShopInfo = (order) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getShop/" + order.shopId)
             .then(response => {
                 const resData = response.data;
@@ -127,6 +158,7 @@ class OrderItem extends Component {
     }
 
     handleGetProduct = (order) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getProductByProId/" + order.proId)
             .then(response => {
                 const resData = response.data;
@@ -151,6 +183,7 @@ class OrderItem extends Component {
 
     handleDeleteOrder = (order) => {
         const { orderNums, orderNumList } = this.state;
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/deleteOrder/" + order.orderId)
             .then(response => {
                 const resData = response.data;
@@ -175,6 +208,7 @@ class OrderItem extends Component {
     }
 
     handleGetImg = (order) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getImg/" + order.productInfo.imgId)
             .then(response => {
                 const resData = response.data;
@@ -199,6 +233,7 @@ class OrderItem extends Component {
         let data = {};
         this.state.orderNumList = [];
         this.state.orderNums = [];
+        this.state.showLoading = true;
         const { searchName, orderNums, orderNumList } = this.state;
         // let orderNums = [];
         // let orderNumList = [];
@@ -230,6 +265,7 @@ class OrderItem extends Component {
 
     handleChangeCommentStatus = (order) => {
         let data = {};
+        this.state.showLoading = true;
         data.orderNum = order.orderNum;
         data.commentStatus = commentTypeEnum.WAITCOMMENT;
         axios.post(SERVICE_URL + "/product/editOrderCommentStatus", { data })
@@ -267,15 +303,16 @@ class OrderItem extends Component {
     render() {
         return (
             <div className="order-item">
-                <Layout>
-                    <Header>{this.renderHeader()}</Header>
-                    <Content>
-                        {this.renderOrderMenu()}
-                        {this.renderOrderItem()}
-                    </Content>
-                    <Footer>Footer</Footer>
-                </Layout>
-
+                <Spin size="large" spinning={this.state.showLoading}>
+                    <Layout>
+                        <Header>{this.renderHeader()}</Header>
+                        <Content>
+                            {this.renderOrderMenu()}
+                            {this.renderOrderItem()}
+                        </Content>
+                        <Footer>Footer</Footer>
+                    </Layout>
+                </Spin>
             </div >
         )
     }
@@ -333,64 +370,80 @@ class OrderItem extends Component {
     }
 
     renderOrderItem() {
-        const { orderList, orderNumList, orderNums } = this.state;
+        const { orderList, orderNumList, orderNums, showNum } = this.state;
         let titleDiv = '';
         let orderDiv = [];
-        orderNumList.forEach(orderNum => {
-            titleDiv =
-                <div className="card-title">
-                    <div className="card-title-text">{moment(orderNum.order.createTime).format("YYYY-MM-DD")}</div>
-                    <div className="card-title-text">订单号: {orderNum.order.orderNum}</div>
-                    <div className="card-title-text">{orderNum.order.shopInfo == null ? null : orderNum.order.shopInfo.shopName}</div>
-                </div>
-            orderDiv.push(<Card title={titleDiv} extra={<Icon type="delete" onClick={this.handleDeleteOrder.bind(this, orderNum.order)} />}></Card>);
-            orderList.forEach(order => {
-                if (order.orderNum == orderNum.orderNum) {
-                    orderDiv.push(
-                        <div className="card">
-                            <Card>
-                                <div className="card-item-content">
-                                    <div className="left-img">
-                                        <img alt="example" src={order.productInfo == null ? null : order.productInfo.imgCode} />
-                                    </div>
-                                    <div className="item-info">
-                                        {order.productInfo == null ? null : order.productInfo.proName} &nbsp;&nbsp;
-                                        {order.productInfo == null ? null : order.productInfo.description}
-                                    </div>
-                                    <div className="item-price">
-                                        ￥{order.price}
-                                    </div>
-                                    <div className="item-count">
-                                        {order.proNum}
-                                    </div>
-                                    <div className="item-total-price">
-                                        ￥{order.price * order.proNum}
-                                    </div>
-                                    <div className="item-status">
-                                        交易成功<br />
-                                        订单详情
-                                    </div>
-                                    <div className="item-remark">
-                                        {order.commentStatus == commentTypeEnum.WAITCOMMENT
-                                            ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button>
-                                            : order.commentStatus == commentTypeEnum.WAITCONFIRM
-                                                ? <Button onClick={this.handleChangeCommentStatus.bind(this, order)}>确认收货</Button>
-                                                : order.commentStatus == commentTypeEnum.WAITPAY
-                                                    ? <Button onClick={this.handlePay.bind(this, order)}>付款</Button>
-                                                    : order.commentStatus == commentTypeEnum.WAITSEND
-                                                        ? "待发货" : "已评价"}
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-                    );
-                }
-            });
+        let olen = 0;
+
+        orderNumList.forEach((orderNum, index) => {
+            // if (olen < showNum) {
+            if (olen < showNum) {
+                titleDiv =
+                    <div className="card-title">
+                        <div className="card-title-text">{moment(orderNum.order.createTime).format("YYYY-MM-DD")}</div>
+                        <div className="card-title-text">订单号: {orderNum.order.orderNum}</div>
+                        <div className="card-title-text">{orderNum.order.shopInfo == null ? null : orderNum.order.shopInfo.shopName}</div>
+                    </div>
+                orderDiv.push(<Card title={titleDiv} extra={<Icon type="delete" onClick={this.handleDeleteOrder.bind(this, orderNum.order)} />}></Card>);
+                orderList.forEach((order, i) => {
+                    // console.log(showNum);
+                    if (order.orderNum == orderNum.orderNum && olen <= showNum) {
+                        orderDiv.push(this.renderOrder(order));
+                        olen = olen + 1;
+                    }
+                })
+            }
         });
 
         return (
-            <div>{orderDiv}</div>
+            <div>
+                {orderDiv}
+            </div>
         )
+    }
+
+    renderOrder(order) {
+        // orderList.forEach(order => {
+        // if (order.orderNum == orderNum.orderNum) {
+        // orderDiv.push(
+        return (
+            <div className="card">
+                <Card>
+                    <div className="card-item-content">
+                        <div className="left-img">
+                            <img alt="example" src={order.productInfo == null ? null : order.productInfo.imgCode} />
+                        </div>
+                        <div className="item-info">
+                            {order.productInfo == null ? null : order.productInfo.proName} &nbsp;&nbsp;
+                                    {order.productInfo == null ? null : order.productInfo.description}
+                        </div>
+                        <div className="item-price">
+                            ￥{order.price}
+                        </div>
+                        <div className="item-count">
+                            {order.proNum}
+                        </div>
+                        <div className="item-total-price">
+                            ￥{order.price * order.proNum}
+                        </div>
+                        <div className="item-status">
+                            交易成功<br />
+                            订单详情
+                                </div>
+                        <div className="item-remark">
+                            {order.commentStatus == commentTypeEnum.WAITCOMMENT
+                                ? <Button onClick={this.handleRemark.bind(this, order)}>评价</Button>
+                                : order.commentStatus == commentTypeEnum.WAITCONFIRM
+                                    ? <Button onClick={this.handleChangeCommentStatus.bind(this, order)}>确认收货</Button>
+                                    : order.commentStatus == commentTypeEnum.WAITPAY
+                                        ? <Button onClick={this.handlePay.bind(this, order)}>付款</Button>
+                                        : order.commentStatus == commentTypeEnum.WAITSEND
+                                            ? "待发货" : "已评价"}
+                        </div>
+                    </div>
+                </Card>
+            </div>
+        );
     }
 }
 

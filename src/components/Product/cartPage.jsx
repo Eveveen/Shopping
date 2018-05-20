@@ -10,6 +10,7 @@ import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { _ } from 'underscore';
 // import { withRouter } from 'react-router';
+import './Style/antd.sass';
 
 
 class CartPage extends Component {
@@ -26,11 +27,32 @@ class CartPage extends Component {
         selectedCartIds: [],  // 选中的购物车记录
         totalCount: 0,
         overRange: false,
-        showLoading: true
+        showLoading: true,
+        showNum: 3
     };
 
     componentWillMount() {
         this.handleGetAllCart();
+    }
+
+    componentDidMount() {
+        window.addEventListener('scroll', this.onScrollHandle.bind(this));
+        console.log("====");
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.onScrollHandle.bind(this));
+    }
+
+    onScrollHandle(event) {
+        const clientHeight = document.documentElement.clientHeight
+        const scrollTop = document.documentElement.scrollTop
+        const scrollHeight = document.documentElement.scrollHeight
+        const isBottom = (clientHeight + scrollTop === scrollHeight)
+        if (isBottom && this.state.showNum <= this.state.productList.length) {
+            this.setState({ showNum: this.state.showNum + 2 })
+            console.log("aaaa")
+        }
     }
 
     handleGetAllCart = () => {
@@ -429,7 +451,7 @@ class CartPage extends Component {
             <div className="cart-page">
                 <Spin size="large" spinning={this.state.showLoading}>
                     <Layout>
-                        <Header>Header</Header>
+                        <Header></Header>
                         <Content>
                             <Checkbox
                                 onChange={this.handleCheckAll}
@@ -456,27 +478,36 @@ class CartPage extends Component {
     }
 
     renderProduct() {
-        const { count, cartInfos, productInfo, shopIdList, productList } = this.state;
+        const { count, cartInfos, productInfo, shopIdList, productList, showNum } = this.state;
         let cartDiv = [];
         let tempProductList = [];
-        shopIdList.forEach(shop => {
-            let cartItemDiv = [];
-            let titleDiv =
-                <div className="card-title">
-                    <Checkbox checked={shop.checked} onChange={this.handleCheckboxShop.bind(this, shop.shopId, shop.checked)}>
-                    </Checkbox>
-                    <div className="card-title-text">
-                        <div className="card-title-text">店铺：</div>
-                        <div className="card-title-text" onClick={this.handleViewShop.bind(this, shop.shopId)}>{shop.shopInfo ? shop.shopInfo.shopName : null}</div>
+        let plen = 0;
+        shopIdList.forEach((shop, index) => {
+            console.log("showNum111,", showNum);
+            if (plen < showNum) {
+                console.log("aa");
+                let cartItemDiv = [];
+                let titleDiv =
+                    <div className="card-title">
+                        <Checkbox checked={shop.checked} onChange={this.handleCheckboxShop.bind(this, shop.shopId, shop.checked)}>
+                        </Checkbox>
+                        <div className="card-title-text">
+                            <div className="card-title-text">店铺：</div>
+                            <div className="card-title-text" onClick={this.handleViewShop.bind(this, shop.shopId)}>{shop.shopInfo ? shop.shopInfo.shopName : null}</div>
+                        </div>
                     </div>
-                </div>
-            cartDiv.push(titleDiv);
-            tempProductList = shop.productList;
-            let flag = false;
-            shop.productList.forEach(product => {
-                cartItemDiv = this.renderProductContent(product);
-                cartDiv.push(cartItemDiv)
-            })
+                cartDiv.push(titleDiv);
+                tempProductList = shop.productList;
+                let flag = false;
+                shop.productList.forEach((product, index) => {
+                    console.log("showNum2222,", showNum);
+                    if (plen < showNum) {
+                        cartItemDiv = this.renderProductContent(product);
+                        cartDiv.push(cartItemDiv)
+                    }
+                    plen += 1;
+                })
+            }
         });
 
         return (

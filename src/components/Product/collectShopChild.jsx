@@ -9,6 +9,7 @@ import intl from 'react-intl-universal';
 import './Style/collectShopChild.sass';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { Link, browserHistory } from 'react-router';
+import './Style/antd.sass';
 
 class CollectShopChild extends Component {
     componentWillReceiveProps(props) {

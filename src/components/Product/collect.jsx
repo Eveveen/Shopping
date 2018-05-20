@@ -11,6 +11,7 @@ const MenuItemGroup = Menu.ItemGroup;
 import CollectShopChild from './collectShopChild';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { Link, browserHistory } from 'react-router';
+import './Style/antd.sass';
 
 class Collect extends Component {
     state = {
