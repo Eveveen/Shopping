@@ -1,19 +1,86 @@
-.home-page
-    margin: 0 5%
-    .home-page-content
-        width: 70%
-        padding: 10px
-        height: 100%
-        .ant-carousel 
+.home-page-bg
+    background-color: #d2ddf9
+    .home-page
+        margin: 0 5%
+        box-shadow: 2px 2px 5px #424444, -1px 1px 20px #424444
+        .ant-layout-header
+            background: #4c80a5
+            box-shadow: 2px 2px 5px #333333, 1px 1px 10px #6f6c6c
+        .ant-layout-footer
+            background: #4c80a5
+            box-shadow: 2px 2px 5px #333333, 1px 1px 10px #6f6c6c
+        .home-page-content
             height: 100%
-            .slick-slide 
-                text-align: center
-                height: 260px
-                line-height: 160px
-                background: #364d79
-                overflow: hidden
-        .ant-carousel .slick-slide h3 
-            color: #fff
-    .global-search-wrapper 
-        text-align: center
-    
+            .home-carousel
+                img
+                    width: 100%
+                    height: 100%
+            .ant-carousel 
+                height: 100%
+                .slick-dots
+                    bottom: 22px
+                    li button
+                        background-color: #000
+                        height: 10px
+                        width: 40px
+                .slick-slide 
+                    text-align: center
+                    height: 460px
+                    line-height: 160px
+                    background: #364d79
+                    overflow: hidden
+            .ant-carousel .slick-slide h3 
+                color: #fff
+        .global-search-wrapper 
+            text-align: center
+        .small-product
+            width: 100%
+            display: flex
+            margin: 40px auto
+            padding: 0 100px
+            .pro-item
+                // width: 24%
+                height: 164px
+                display: flex
+                margin: 0px 10px
+                padding-right: 10px
+                cursor: pointer
+                box-shadow: 0 0 30px 10px rgba(193, 182, 182, 0.7) inset
+                .left-img
+                    flex: 2
+                    max-width: 120px
+                    padding: 10px
+                    img
+                        width: 100%
+                        height: 100%
+                .right-text
+                    flex: 1
+                    margin: 40px auto 40px auto 
+                    .pro-name
+                        text-align: center
+        .line-bg
+            width: 100%
+            height: 90px
+            background-color: #4c80a5
+            box-shadow: 2px 2px 5px #333333, 1px 1px 10px #6f6c6c
+        .arrange-product
+            margin: 20px 40px
+            display: flex
+            .arrange-item
+                flex: 1
+                padding: 20px
+                cursor: pointer
+                .item-title
+                    text-align: center
+                    padding: 12px
+                .item-price
+                    text-align: center
+                    padding-bottom: 5px
+                .ant-card-grid
+                    width: 100%
+                    padding: 0px
+                    border: 1px solid #b3aaaa
+                    img
+                        width: 100%
+                    &:hover
+                        box-shadow: 2px 2px 5px #333333, -1px 1px 20px #0f1010

@@ -3,7 +3,7 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/collect.sass';
 import './Style/main.sass';
-import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message } from 'antd';
+import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message, Spin } from 'antd';
 const { Meta } = Card;
 const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
@@ -20,7 +20,9 @@ class Collect extends Component {
         productList: [],
         shopList: [],
         showDeletePop: false,
-        collectShopList: []
+        collectShopList: [],
+        showLoading: true,
+        pathname: this.props.pageStatus
     }
 
     componentWillMount() {
@@ -28,10 +30,19 @@ class Collect extends Component {
         if (this.props.location.pathname == "/collectShop") {
             this.handleGetCollectShop();
         }
-        this.setState({ pageStatus: this.props.location.pathname })
+        this.setState({ pathname: this.props.location.pathname })
+    }
+
+    componentWillReceiveProps(props) {
+        console.log("props,", props);
+        if (props.location.pathname == "/collectShop") {
+            this.handleGetCollectShop();
+        }
+        this.setState({ pathname: props.location.pathname })
     }
 
     handleGetCollectProduct = () => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getCollectProduct")
             .then(response => {
                 const resData = response.data;
@@ -53,6 +64,7 @@ class Collect extends Component {
     }
 
     handleGetProduct = (collectProduct) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getProductByProId/" + collectProduct.proId)
             .then(response => {
                 const resData = response.data;
@@ -73,12 +85,13 @@ class Collect extends Component {
     }
 
     handleGetShopInfo = (collectProduct) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getShop/" + collectProduct.shopId)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
                     collectProduct.shopInfo = resData;
-                    if (this.props.location.pathname == "/collectShop") {
+                    if (this.state.pathname == "/collectShop") {
                         this.handleGetSeller(collectProduct);
                     }
                     this.setState({ showLoading: false });
@@ -93,6 +106,7 @@ class Collect extends Component {
     }
 
     handleGetImg = (product) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
             .then(response => {
                 const resData = response.data;
@@ -113,6 +127,7 @@ class Collect extends Component {
     handleClick = (e) => {
         this.setState({
             pageStatus: e.key,
+            pathname: e.key,
             current: e.key
         });
     }
@@ -130,6 +145,7 @@ class Collect extends Component {
     }
 
     handleDeleteCollectProduct = (cpId) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/deleteCollectProduct/" + cpId)
             .then(response => {
                 const resData = response.data;
@@ -148,6 +164,7 @@ class Collect extends Component {
     }
 
     handleGetCollectShop = () => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getCollectShop")
             .then(response => {
                 const resData = response.data;
@@ -171,6 +188,7 @@ class Collect extends Component {
     }
 
     handleGetShopProduct = (collectShop) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getShopProduct/" + collectShop.shopId)
             .then(response => {
                 const resData = response.data;
@@ -193,6 +211,7 @@ class Collect extends Component {
     }
 
     handleGetSeller = (collectShop) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/admin/getSeller/" + collectShop.shopInfo.sellerId)
             .then(response => {
                 const resData = response.data;
@@ -217,15 +236,19 @@ class Collect extends Component {
     }
 
     render() {
-        const { pageStatus } = this.state;
+        const { pageStatus, collectShopList } = this.state;
+        console.log(this.state.pathname);
         return (
             <div className="collect">
-                <Layout>
-                    <Header>{this.renderCollectHeader()}</Header>
-                    <Content>{this.props.location.pathname == "/collectTreasure" ?
-                        this.renderCollectTreasureContent() : this.renderCollectShopContent()}</Content>
-                    <Footer>Footer</Footer>
-                </Layout>
+                <Spin size="large" spinning={this.state.showLoading}>
+                    <Layout>
+                        <Header>{this.renderCollectHeader()}</Header>
+                        <Content>{this.state.pathname == "/collectTreasure" ?
+                            this.renderCollectTreasureContent() :
+                            this.state.pathname == "/collectShop" ? <CollectShopChild collectShopList={collectShopList} /> : null}</Content>
+                        <Footer>Footer</Footer>
+                    </Layout>
+                </Spin>
             </div >
         )
     }
@@ -326,6 +349,7 @@ class Collect extends Component {
 
     renderCollectShopContent() {
         const { collectShopList } = this.state;
+        console.log("shop");
         return (
             <div>
                 <CollectShopChild collectShopList={collectShopList} />

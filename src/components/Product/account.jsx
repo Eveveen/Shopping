@@ -84,7 +84,8 @@ class Account extends Component {
                 .then(response => {
                     const resData = response.data;
                     if (response.status == 200 && !resData.error) {
-                        this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
+                        // resData.imgId = resData.avatar;
+                        this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.avatar });
                     } else {
                         this.setState({ showLoading: false })
                         message.error(intl.get("editFailed"));

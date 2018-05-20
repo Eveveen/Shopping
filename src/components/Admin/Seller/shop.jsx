@@ -185,6 +185,17 @@ class SellerShop extends Component {
                                 <Input placeholder={"店铺状态"} disabled={submitLoading} />
                             )}
                         </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label="店铺地址"
+                        >
+                            {getFieldDecorator('addressArea', {
+                                rules: [{ required: true, message: "请输入店铺地址" }],
+                                initialValue: shopInfo.addressArea
+                            })(
+                                <Input placeholder={"店铺地址"} disabled={submitLoading} />
+                            )}
+                        </FormItem>
                         <FormItem>
                             <div className="edit-shop-footer">
                                 <Button type="primary" onClick={shopId == "undefined" ? this.handleAddShop : this.handleEditShop} loading={submitLoading}>{intl.get("save")}</Button>

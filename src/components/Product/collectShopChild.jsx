@@ -11,6 +11,12 @@ import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { Link, browserHistory } from 'react-router';
 
 class CollectShopChild extends Component {
+    componentWillReceiveProps(props) {
+        if (props.collectShopList != null) {
+
+            this.setState({})
+        }
+    }
 
     handleGetShopInfo = (collectShop) => {
         axios.get(SERVICE_URL + "/product/getShop/" + collectShop.shopId)

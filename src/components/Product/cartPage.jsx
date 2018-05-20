@@ -25,7 +25,8 @@ class CartPage extends Component {
         checkedAll: false,
         selectedCartIds: [],  // 选中的购物车记录
         totalCount: 0,
-        overRange: false
+        overRange: false,
+        showLoading: true
     };
 
     componentWillMount() {
@@ -34,6 +35,7 @@ class CartPage extends Component {
 
     handleGetAllCart = () => {
         const { shopIds, shopIdList } = this.state;
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getAllCart")
             .then(response => {
                 const resData = response.data;
@@ -58,6 +60,7 @@ class CartPage extends Component {
 
     handleGetShop = () => {
         const { shopIdList, cartInfos, shopIds } = this.state;
+        this.state.showLoading = true;
         cartInfos.forEach(cartInfo => {
             axios.get(SERVICE_URL + "/product/getShop/" + cartInfo.shopId)
                 .then(response => {
@@ -73,12 +76,12 @@ class CartPage extends Component {
                         this.setState({ showLoading: false });
                         this.handleGetProduct(cartInfo, shopInfo);
                     } else {
-                        this.setState({ showLoading: false })
+                        // this.setState({ showLoading: false })
                         message.error("获取店铺失败");
                     }
                 }).catch(error => {
                     message.error("获取店铺失败");
-                    this.setState({ showLoading: false });
+                    // this.setState({ showLoading: false });
                 });
         });
 
@@ -89,6 +92,7 @@ class CartPage extends Component {
         shopIdList.forEach(shop => {
             shop.productList = [];
         });
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getProduct/" + cartInfo.shopId + "/" + cartInfo.proId)
             .then(response => {
                 const resData = response.data;
@@ -110,12 +114,12 @@ class CartPage extends Component {
                     });
                     this.setState({ productInfo: resData })
                 } else {
-                    this.setState({ showLoading: false })
+                    // this.setState({ showLoading: false })
                     message.error("获取商品失败1");
                 }
             }).catch(error => {
                 message.error("获取商品失败2");
-                this.setState({ showLoading: false });
+                // this.setState({ showLoading: false });
             });
     }
 
@@ -151,6 +155,7 @@ class CartPage extends Component {
 
     handleChageProNum = (cart, product) => {
         const { selectedCartIds } = this.state;
+        this.state.showLoading = true;
         let totalCount = this.state.totalCount;
         delete cart.updateTime;
         axios.post(SERVICE_URL + "/product/editCartNum", cart)
@@ -178,6 +183,7 @@ class CartPage extends Component {
 
     handleDeleteItem = (cartId) => {
         const { shopIdList, cartInfos, productList } = this.state;
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/deleteOneCart/" + cartId)
             .then(response => {
                 const resData = response.data;
@@ -209,6 +215,7 @@ class CartPage extends Component {
 
     handleDeleteMoreItem = () => {
         const { shopIdList, cartInfos, productList, selectedCartIds } = this.state;
+        this.state.showLoading = true;
         axios.post(SERVICE_URL + "/product/deleteMoreCart", { selectedCartIds: selectedCartIds })
             .then(response => {
                 const resData = response.data;
@@ -391,6 +398,7 @@ class CartPage extends Component {
     }
 
     handleGetImg = (product) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
             .then(response => {
                 const resData = response.data;
@@ -419,28 +427,30 @@ class CartPage extends Component {
         const { cartItemDiv, productInfo, cartInfos, shopIdList, productList, checkedAll, selectedCartIds } = this.state;
         return (
             <div className="cart-page">
-                <Layout>
-                    <Header>Header</Header>
-                    <Content>
-                        <Checkbox
-                            onChange={this.handleCheckAll}
-                            checked={this.state.checkedAll}
-                        >
-                            全选
+                <Spin size="large" spinning={this.state.showLoading}>
+                    <Layout>
+                        <Header>Header</Header>
+                        <Content>
+                            <Checkbox
+                                onChange={this.handleCheckAll}
+                                checked={this.state.checkedAll}
+                            >
+                                全选
                         </Checkbox>
-                        {productInfo.proId == null ? null : this.renderProduct()}
-                    </Content>
-                    <Footer>
-                    </Footer>
-                    <div className="cart-footer">
-                        <CartFooter
-                            footerShow={true}
-                            footerContent={this.renderFooterContent()}
-                            handleBuy={this.handleBuy}
-                        />
-                    </div>
+                            {productInfo.proId == null ? null : this.renderProduct()}
+                        </Content>
+                        <Footer>
+                        </Footer>
+                        <div className="cart-footer">
+                            <CartFooter
+                                footerShow={true}
+                                footerContent={this.renderFooterContent()}
+                                handleBuy={this.handleBuy}
+                            />
+                        </div>
 
-                </Layout>
+                    </Layout>
+                </Spin>
             </div >
         )
     }
