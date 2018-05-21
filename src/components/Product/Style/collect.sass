@@ -1,5 +1,7 @@
 .collect
     margin: 0 5%
+    .collect-product
+        margin: 10px
     .collect-treasure-content
         display: inline-flex
         .collect-card 
@@ -8,10 +10,12 @@
             .go-shop-btn
                 margin-top: -25px
                 position: absolute
+                cursor: pointer
                 span
                     display: none
                     color: white
             .delete-btn
+                cursor: pointer
                 i
                     display: none
             .delete-pop-show
@@ -80,6 +84,7 @@
                     display: block
                     color: white
             .delete-btn
+                cursor: pointer
                 padding: 4px
                 background-color: #000
                 opacity: .5
@@ -93,10 +98,40 @@
         .card-text
             .ant-card-meta-detail
                 padding: 4px 20px
+            .ant-card-meta-detail > div:not(:last-child)
+                margin: auto
+            .ant-card-meta-description
+                text-align: center
+                color: #f40
         .ant-card-body
             height: 80px
     .collect-header
         display: flex
+        .collect-header-product
+            min-width: 100px
+            text-align: center
+            background: #18202d
+            opacity: .5
+            cursor: pointer
+            color: white
+        .collect-header-product-no
+            min-width: 100px
+            text-align: center
+            cursor: pointer
+            color: white
+        .collect-header-shop
+            min-width: 100px
+            text-align: center
+            background: #18202d
+            opacity: .5
+            cursor: pointer
+            color: white
+        .collect-header-shop-no
+            min-width: 100px
+            text-align: center
+            cursor: pointer
+            color: white
+
     .ant-layout-header
         height: 100%
     .global-search-wrapper 

@@ -37,7 +37,6 @@ class CartPage extends Component {
 
     componentDidMount() {
         window.addEventListener('scroll', this.onScrollHandle.bind(this));
-        console.log("====");
     }
 
     componentWillUnmount() {
@@ -51,7 +50,6 @@ class CartPage extends Component {
         const isBottom = (clientHeight + scrollTop === scrollHeight)
         if (isBottom && this.state.showNum <= this.state.productList.length) {
             this.setState({ showNum: this.state.showNum + 2 })
-            console.log("aaaa")
         }
     }
 
@@ -125,12 +123,15 @@ class CartPage extends Component {
                         this.handleGetImg(resData);
                     }
                     productList.push(resData);
-
                     shopIdList.forEach(shop => {
+                        shop.disabled = false;
                         productList.forEach((product, index) => {
                             if (shop.shopId == product.shopInfo.shopId && !_.contains(shop.productList, product)) {
                                 product.checked = false;
                                 shop.productList.push(product);
+                                if (product.proNum == 0 || product.proStatus == 0) {
+                                    shop.disabled = true;
+                                }
                             }
                         });
                     });
@@ -327,7 +328,6 @@ class CartPage extends Component {
             }
             if (shop.checked == false) {
                 shopFlag = false;
-
             }
             shop.productList.forEach(product => {
                 if (shopId == product.shopInfo.shopId) {
@@ -363,7 +363,11 @@ class CartPage extends Component {
         let flag = true;
         let checkedAll = false;
         shopIdList.forEach(shop => {
-            shop.checked = e.target.checked;
+            if (shop.disabled) {  // 失效店铺不可以选中
+                shop.checked = null;
+            } else {
+                shop.checked = e.target.checked;
+            }
             if (shop.checked == false) {
                 flag = false;
             }
@@ -378,8 +382,8 @@ class CartPage extends Component {
         let totalCount = 0;
         if (flag == true) {
             checkedAll = true;
-            productList.forEach((product, index) => {
-                if (product.checked && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
+            productList.forEach((product, index) => { // 失效商品不选中
+                if (product.checked && product.proStatus != 0 && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
                     selectedCartIds.push(product.cartInfo.cartId);
                     totalCount += product.cartInfo.proNum * product.price;
                 } else if (_.contains(selectedCartIds, product.cartInfo.cartId) && product.checked == false) {
@@ -453,12 +457,19 @@ class CartPage extends Component {
                     <Layout>
                         <Header></Header>
                         <Content>
-                            <Checkbox
-                                onChange={this.handleCheckAll}
-                                checked={this.state.checkedAll}
-                            >
-                                全选
-                        </Checkbox>
+                            <div className="cart-title">
+                                <Checkbox
+                                    onChange={this.handleCheckAll}
+                                    checked={this.state.checkedAll}
+                                >
+                                    <div className="select-all">全选</div>
+                                </Checkbox>
+                                <div className="product-detail">商品信息</div>
+                                <div className="per-price">单价</div>
+                                <div className="pro-count">数量</div>
+                                <div className="total-price">金额</div>
+                                <div className="operation">操作</div>
+                            </div>
                             {productInfo.proId == null ? null : this.renderProduct()}
                         </Content>
                         <Footer>
@@ -483,13 +494,15 @@ class CartPage extends Component {
         let tempProductList = [];
         let plen = 0;
         shopIdList.forEach((shop, index) => {
-            console.log("showNum111,", showNum);
-            if (plen < showNum) {
-                console.log("aa");
+            if (plen < showNum) { // 懒加载
                 let cartItemDiv = [];
                 let titleDiv =
                     <div className="card-title">
-                        <Checkbox checked={shop.checked} onChange={this.handleCheckboxShop.bind(this, shop.shopId, shop.checked)}>
+                        <Checkbox
+                            checked={shop.checked}
+                            onChange={this.handleCheckboxShop.bind(this, shop.shopId, shop.checked)}
+                            disabled={shop.disabled ? true : false}
+                        >
                         </Checkbox>
                         <div className="card-title-text">
                             <div className="card-title-text">店铺：</div>
@@ -500,7 +513,6 @@ class CartPage extends Component {
                 tempProductList = shop.productList;
                 let flag = false;
                 shop.productList.forEach((product, index) => {
-                    console.log("showNum2222,", showNum);
                     if (plen < showNum) {
                         cartItemDiv = this.renderProductContent(product);
                         cartDiv.push(cartItemDiv)
@@ -542,7 +554,7 @@ class CartPage extends Component {
                     </div>
                     <div className="range-count">
                         {product.proNum == 0 || product.proStatus == 0 ?
-                            <div className="item-count">{product.cartInfo.proNum}</div>
+                            <div className="item-count-disabled">{product.cartInfo.proNum}</div>
                             :
                             <div className="item-count">
                                 <Button onClick={this.decreaseCount.bind(this, product.cartInfo.cartId, product)} disabled={product.cartInfo.proNum <= 1 ? true : false}>-</Button>

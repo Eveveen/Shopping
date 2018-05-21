@@ -133,15 +133,26 @@ class Collect extends Component {
         });
     }
 
+    handleGoToCollectShop = () => {
+        browserHistory.push(BASE_URL + "/collectShop");
+    }
+
+    handleGoToCollectTreasure = () => {
+        browserHistory.push(BASE_URL + "/collectTreasure");
+    }
+
     handleGoToShop = (shopId) => {
         browserHistory.push(BASE_URL + "/viewShop/" + shopId);
     }
 
-    handleShowDeletePop = () => {
+    handleShowDeletePop = (collectProduct) => {
+        collectProduct.showDeletePop = true;
         this.setState({ showDeletePop: true })
     }
 
-    handleHideDeletePop = () => {
+    handleHideDeletePop = (collectProduct) => {
+        collectProduct.showDeletePop = false;
+        console.log("cancel");
         this.setState({ showDeletePop: false })
     }
 
@@ -238,7 +249,6 @@ class Collect extends Component {
 
     render() {
         const { pageStatus, collectShopList } = this.state;
-        console.log(this.state.pathname);
         return (
             <div className="collect">
                 <Spin size="large" spinning={this.state.showLoading}>
@@ -255,38 +265,14 @@ class Collect extends Component {
     }
 
     renderCollectHeader() {
-        const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
+        const { pathname } = this.state;
         return (
             <div className="collect-header">
-                <Menu
-                    onClick={this.handleClick}
-                    selectedKeys={[this.state.current]}
-                    mode="horizontal"
-                    theme="dark"
-                >
-                    <Menu.Item key="treasure">
-                        <Icon type="mail" />收藏的宝贝
-                    </Menu.Item>
-                    <Menu.Item key="shop">
-                        <Icon type="appstore" />收藏的店铺
-                    </Menu.Item>
-                </Menu>
-                <div className="global-search-wrapper">
-                    <AutoComplete
-                        style={{ width: 200 }}
-                        dataSource={dataSource}
-                        placeholder="try to type `b`"
-                        className="global-search"
-                        filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                    >
-                        <Input
-                            suffix={(
-                                <Button className="search-btn" type="primary">
-                                    <Icon type="search" />
-                                </Button>
-                            )}
-                        />
-                    </AutoComplete>
+                <div className={pathname == "/collectTreasure" ? "collect-header-product" : "collect-header-product-no"} onClick={this.handleGoToCollectTreasure}>
+                    收藏的宝贝
+                </div>
+                <div className={pathname == "/collectShop" ? "collect-header-shop" : "collect-header-shop-no"} onClick={this.handleGoToCollectShop}>
+                    收藏的店铺
                 </div>
             </div>
         )
@@ -306,18 +292,18 @@ class Collect extends Component {
                             cover={<img alt={collectProduct.productInfo == null ? "img" : collectProduct.productInfo.proName} src={collectProduct.productInfo == null ? null : collectProduct.productInfo.imgCode} />}
                         >
                         </Card>
-                        {showDeletePop == false && collectProduct.shopInfo != null ?
+                        {collectProduct.shopInfo != null ?
                             <div>
                                 <div className="go-shop-btn" onClick={this.handleGoToShop.bind(this, collectProduct.shopInfo.shopId)}>
                                     <span>进入店铺</span>
                                 </div>
-                                <div className="delete-btn" onClick={this.handleShowDeletePop}>
+                                <div className="delete-btn" onClick={this.handleShowDeletePop.bind(this, collectProduct)}>
                                     <Icon type="delete" />
                                 </div>
 
                             </div>
                             : null}
-                        {showDeletePop == true ?
+                        {collectProduct.showDeletePop == true ?
                             <div className="delete-pop-show">
                                 <div className="delete-pop">
                                     <div className="del-pop-bg"></div>
@@ -325,7 +311,7 @@ class Collect extends Component {
                                         <div className="txt">确定删除？</div>
                                         <div className="btns">
                                             <Button type="primary" className="btn-ok" onClick={this.handleDeleteCollectProduct.bind(this, collectProduct.cpId)}>确定</Button>
-                                            <Button className="btn-close" onClick={this.handleHideDeletePop}>取消</Button>
+                                            <Button className="btn-close" onClick={this.handleHideDeletePop.bind(this, collectProduct)}>取消</Button>
                                         </div>
                                     </div>
                                 </div>
@@ -335,7 +321,7 @@ class Collect extends Component {
                         <div className="card-text">
                             {collectProduct.productInfo == null ? null : <Meta
                                 title={collectProduct.productInfo.proName}
-                                description={collectProduct.productInfo.price}
+                                description={<div>￥ {collectProduct.productInfo.price}</div>}
                             />}
                         </div>
                     </div>
@@ -344,7 +330,7 @@ class Collect extends Component {
         });
 
         return (
-            <div>{collectProductDiv}</div>
+            <div className="collect-product">{collectProductDiv}</div>
         )
     }
 

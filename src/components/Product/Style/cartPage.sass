@@ -1,6 +1,35 @@
 .cart-page
     margin: 0 13%
     max-width: 998px
+    background-color: #d2ddf9
+    .cart-title
+        display: flex
+        flex-direction: row
+        background: #e8e8e8
+        border: none
+        padding: 14px
+        border-radius: 2px 2px 0 0
+        zoom: 1
+        margin-bottom: -1px
+        min-height: 28px
+        .product-detail
+            flex: 4
+            margin-left: 50px
+        .per-price
+            flex: 1
+        .pro-count
+            flex: 2
+            text-align: center
+        .total-price
+            flex: 1
+        .operation
+            min-width: 60px
+            text-align: center
+        .ant-checkbox-wrapper
+            display: flex
+            flex: 1
+            .ant-checkbox
+                margin-top: 4px
     .cart-footer
         height: 65px
         width: 100%
@@ -24,22 +53,22 @@
         display: flex
         background: #fff
         border: 1px solid #e8e8e8
-        padding: 24px
-        border-radius: 2px 2px 0 0
+        padding: 20px 15px 10px
         zoom: 1
         margin-bottom: -1px
-        min-height: 48px
+        min-height: 38px
         .card-title-text
-            margin-right: 20px
             display: inline
             cursor: pointer
+            margin-left: 5px
     .cart-card
         padding: 24px
         zoom: 1
-        border: 1px solid #e8e8e8
+        border: 1px solid #bfbfbf
         background: #fff
         display: flex
         position: relative
+        margin-bottom: -1px
         .cart-disabled-bg
             background-color: #f0f0f0
             filter: alpha(opacity=50)
@@ -79,8 +108,9 @@
                 flex: 1
                 display: flex
                 flex-direction: column
-                .item-count
+                .item-count-disabled
                     flex: 1
+                    margin: auto
                 .range-tip
                     flex: 2
                     display: block;

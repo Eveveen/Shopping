@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, message } from 'antd';
+import { Menu, Form, Input, Checkbox, Button, Cascader, Select, message, Spin } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import './Style/editAddress.sass';
@@ -49,7 +49,8 @@ class EditAddress extends Component {
     state = {
         manageStatus: 1,
         submitLoading: false,
-        address: {}
+        address: {},
+        showLoading: true
     }
 
     componentWillMount() {
@@ -57,16 +58,15 @@ class EditAddress extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    console.log("addressData", resData);
                     this.setState({ showLoading: false, address: resData });
                 } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
+                    this.setState({ showLoading: false })
+                    message.error("获取地址失败");
                 }
             }).catch(error => {
                 console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
+                this.setState({ showLoading: false })
+                message.error("获取地址失败");
             });
     }
 
@@ -75,27 +75,22 @@ class EditAddress extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    console.log("--", resData);
-                    this.setState({ showLoading: false });
                 } else {
-                    // this.setState({ showLoading: false })
-                    // message.error(intl.get("editFailed"));
+                    message.error("更改默认地址失败");
                 }
             }).catch(error => {
                 console.log(error);
-                // message.error(intl.get("editFailed"));
-                // this.setState({ showLoading: false });
+                message.error("更改默认地址失败");
             });
     }
 
     handleSavePersonInfo = (e) => {
         e.preventDefault();
         const { address } = this.state;
-        console.log("---", address);
+        this.state.showLoading = true;
         this.props.form.validateFields((err, data) => {
             if (!err) {
                 data.addressId = this.props.params.id;
-                console.log(data);
                 if (data.addressStatus == true && address.addressStatus == 1) {
                     data.addressStatus = 1;
                 } else if (data.addressStatus == true && address.addressStatus != 1) {
@@ -108,17 +103,16 @@ class EditAddress extends Component {
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
-                            console.log("--", resData);
-                            this.setState({ showLoading: false, address: resData });
+                            this.setState({ showLoading: false });
                             message.success("保存成功");
                         } else {
-                            // this.setState({ showLoading: false })
-                            // message.error(intl.get("editFailed"));
+                            this.setState({ showLoading: false })
+                            message.error("保存失败");
                         }
                     }).catch(error => {
                         console.log(error);
-                        // message.error(intl.get("editFailed"));
-                        // this.setState({ showLoading: false });
+                        this.setState({ showLoading: false })
+                        message.error("保存失败");
                     });
             }
         });
@@ -130,16 +124,18 @@ class EditAddress extends Component {
 
     render() {
         return (
-            <div className="manage">
-                <div className="manage-menu">
-                    <AccountMenu
-                        keyMenu="user/address"
-                    />
-                </div>
-                <div className="manage-menu-content">
-                    {this.renderEditAddress()}
-                </div>
-            </div >
+            <Spin size="large" spinning={this.state.showLoading}>
+                <div className="manage">
+                    <div className="manage-menu">
+                        <AccountMenu
+                            keyMenu="user/address"
+                        />
+                    </div>
+                    <div className="manage-menu-content">
+                        {this.renderEditAddress()}
+                    </div>
+                </div >
+            </Spin>
         )
     }
 

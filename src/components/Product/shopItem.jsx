@@ -142,43 +142,39 @@ class ShopItem extends Component {
     }
 
     render() {
+        const { shopInfo } = this.state;
+        const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
         return (
             <div className="shop-item">
                 <Layout>
-                    <Header>{this.renderCollectHeader()}</Header>
+                    <Header>
+                        <div className="collect-header">
+                            店铺名称：{shopInfo.shopName}
+                        </div>
+                        <div className="global-search-wrapper">
+                            <AutoComplete
+                                style={{ width: 200 }}
+                                placeholder="输入要搜索的关键字"
+                                className="global-search"
+                                onChange={this.handleChangeSearchName}
+                                filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                            >
+                                <Input onKeyPress={this.handleEnter}
+                                    suffix={(
+                                        <Button className="search-btn" type="primary" onClick={this.handleSearchProduct}>
+                                            <Icon type="search" />
+                                        </Button>
+                                    )}
+                                />
+                            </AutoComplete>
+                        </div>
+                    </Header>
                     <Content>
                         {this.renderCollectTreasureContent()}
                     </Content>
                     <Footer>Footer</Footer>
                 </Layout>
             </div >
-        )
-    }
-
-    renderCollectHeader() {
-        const { shopInfo } = this.state;
-        const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
-        return (
-            <div className="collect-header">
-                店铺名称：{shopInfo.shopName}
-                <div className="global-search-wrapper">
-                    <AutoComplete
-                        style={{ width: 200 }}
-                        placeholder="输入要搜索的关键字"
-                        className="global-search"
-                        onChange={this.handleChangeSearchName}
-                        filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                    >
-                        <Input onKeyPress={this.handleEnter}
-                            suffix={(
-                                <Button className="search-btn" type="primary" onClick={this.handleSearchProduct}>
-                                    <Icon type="search" />
-                                </Button>
-                            )}
-                        />
-                    </AutoComplete>
-                </div>
-            </div>
         )
     }
 

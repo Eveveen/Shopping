@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, message, Popconfirm } from 'antd';
-const FormItem = Form.Item;
+import { Menu, Icon, Button, Select, Table, Divider, message, Popconfirm, Spin } from 'antd';
 import axios from 'axios';
 import intl from 'react-intl-universal';
-// import './Style/main.sass';
+import './Style/account.sass';
 import AccountMenu from '../Menu/accountMenu';
 import AddAddress from './addAddress';
 import EditAddress from './editAddress';
@@ -13,7 +12,8 @@ import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 class AddressList extends Component {
     state = {
         showAddAddress: false,
-        addressData: []
+        addressData: [],
+        showLoading: true
     }
 
     componentWillMount() {
@@ -21,11 +21,11 @@ class AddressList extends Component {
     }
 
     handleGetAllAddress = () => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getAllAddress")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    console.log("addressData", resData);
                     this.setState({ showLoading: false, addressData: resData });
                 } else {
                     this.setState({ showLoading: false })
@@ -43,6 +43,7 @@ class AddressList extends Component {
     }
 
     handleDeleteAddress = (id) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/deleteAddress/" + id)
             .then(response => {
                 const resData = response.data;
@@ -74,16 +75,18 @@ class AddressList extends Component {
 
     render() {
         return (
-            <div className="manage">
-                <div className="manage-menu">
-                    <AccountMenu
-                        keyMenu="user/address"
-                    />
-                </div>
-                <div className="manage-menu-content">
-                    {this.renderAddress()}
-                </div>
-            </div >
+            <Spin size="large" spinning={this.state.showLoading}>
+                <div className="manage">
+                    <div className="manage-menu">
+                        <AccountMenu
+                            keyMenu="user/address"
+                        />
+                    </div>
+                    <div className="manage-menu-content">
+                        {this.renderAddress()}
+                    </div>
+                </div >
+            </Spin>
         )
     }
 
@@ -125,7 +128,7 @@ class AddressList extends Component {
                     <Divider type="vertical" />
                     <Divider type="vertical" />
                     <a href="javascript:;" >
-                        <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteAddress.bind(this, data.addressId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                        <Popconfirm title="确认删除该收货地址吗?" onConfirm={this.handleDeleteAddress.bind(this, data.addressId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
                             <Icon type="delete" className="delete-icon" />
                         </Popconfirm>
                     </a>

@@ -1,18 +1,25 @@
 .manage
     display: flex
     margin: 0 10%
+    background-color: #d2ddf9
     .manage-menu
         display: inline-flex
         flex: 1
+        box-shadow: 2px 2px 5px #c3bebe, -1px 1px 20px #757575
+        .ant-menu-item-selected
+            box-shadow: 2px 2px 5px #c3bebe, -1px 1px 20px #757575
     .manage-menu-content
         display: inline-flex
-        border-right: 1px solid #333
         flex: 5
-        padding-top: 20px   
+        // padding-top: 10px   
         .address-list
             width: 100%
             display: flex
             flex-direction: column
+            // margin-top: -15px
+            box-shadow: 2px 2px 5px #cac3c3, 1px 1px 10px #6f6c6c
+            .ant-table-thead > tr > th, .ant-table-tbody > tr > td
+                padding: 10px 16px
             .add-icon
                 text-align: right
                 margin: 10px 20px 0px 0px
@@ -23,5 +30,17 @@
             height: 100%
             margin-left: -8%
             .personal-info-form
-                width: 60%
+                width: 90%
                 text-align: center
+                margin-top: 10px
+                .ant-upload
+                    position: relative
+                    padding: 0px
+                img
+                    width: 114px
+                    height: 114px
+                .anticon-close
+                    position: absolute
+                    top: 5px
+                    right: 5px
+                    color: #806868

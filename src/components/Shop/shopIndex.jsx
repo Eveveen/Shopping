@@ -3,7 +3,7 @@ import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/shopIndex.sass';
 import './Style/main.sass';
-import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message, Popconfirm } from 'antd';
+import { Card, Layout, AutoComplete, Input, Button, Icon, Menu, Avatar, message, Popconfirm, Spin } from 'antd';
 const { Meta } = Card;
 const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
@@ -19,7 +19,8 @@ class ShopIndex extends Component {
         imgCode: '',
         showAddModal: false,
         searchName: '',
-        current: "selling"
+        current: "selling",
+        showLoading: true
 
     }
 
@@ -28,6 +29,7 @@ class ShopIndex extends Component {
     }
 
     handleGetSellerShop = () => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getSellerShop")
             .then(response => {
                 const resData = response.data;
@@ -36,10 +38,10 @@ class ShopIndex extends Component {
                     this.setState({ showLoading: false, shopInfo: resData });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取信息失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取信息失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -67,6 +69,7 @@ class ShopIndex extends Component {
     // }
 
     handleGetImg = (product) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
             .then(response => {
                 const resData = response.data;
@@ -75,10 +78,10 @@ class ShopIndex extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取图片失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取图片失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -107,11 +110,11 @@ class ShopIndex extends Component {
                     this.handleGetSellerShop();
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("删除失败");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("删除失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -125,6 +128,7 @@ class ShopIndex extends Component {
         const { shopInfo, searchName } = this.state;
         data.proName = searchName;
         data.shopId = shopInfo.shopId;
+        this.state.showLoading = true;
         axios.post(SERVICE_URL + "/shop/searchShopProduct", { data })
             .then(response => {
                 const resData = response.data;
@@ -157,11 +161,11 @@ class ShopIndex extends Component {
 
     handleGetProductOrder = (product) => {
         let selledNum = 0;
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getOrderByProId/" + product.proId)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    console.log("red,", resData)
                     resData.forEach(order => {
                         selledNum += order.proNum;
                     });
@@ -169,10 +173,10 @@ class ShopIndex extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取订单失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取订单失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -186,6 +190,7 @@ class ShopIndex extends Component {
     handleGetProduct = (shopId, current) => {
         // const { shopInfo } = this.state;
         // let id = shopId == undefined ? shopInfo.shopId : shopId
+        this.state.showLoading = true;
         let proStatus = 1;
         if (current == "soldout") {
             proStatus = 0;
@@ -206,7 +211,7 @@ class ShopIndex extends Component {
                     message.error("获取商品失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取商品失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -214,23 +219,25 @@ class ShopIndex extends Component {
     render() {
         const { showAddModal } = this.state;
         return (
-            <div className="shop-index">
-                <Layout>
-                    <Header>{this.renderCollectHeader()}</Header>
-                    <Content>
-                        {this.renderShopMenu()}
-                        {this.renderCollectTreasureContent()}
-                        {showAddModal ?
-                            <AddProduct
-                                visible={this.state.showAddModal}
-                                handleCancel={this.handleCancelAddProduct}
-                                handleGetSellerShop={this.handleGetSellerShop}
-                                shopInfo={this.state.shopInfo}
-                            /> : null}
-                    </Content>
-                    <Footer>Footer</Footer>
-                </Layout>
-            </div >
+            <Spin size="large" spinning={this.state.showLoading}>
+                <div className="shop-index">
+                    <Layout>
+                        <Header>{this.renderCollectHeader()}</Header>
+                        <Content>
+                            {this.renderShopMenu()}
+                            {this.renderCollectTreasureContent()}
+                            {showAddModal ?
+                                <AddProduct
+                                    visible={this.state.showAddModal}
+                                    handleCancel={this.handleCancelAddProduct}
+                                    handleGetSellerShop={this.handleGetSellerShop}
+                                    shopInfo={this.state.shopInfo}
+                                /> : null}
+                        </Content>
+                        <Footer>Footer</Footer>
+                    </Layout>
+                </div >
+            </Spin>
         )
     }
 

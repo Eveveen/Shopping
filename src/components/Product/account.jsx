@@ -1,19 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Menu, Icon, Form, Input, Checkbox, Button, Cascader, Select, Table, Divider, Upload, message } from 'antd';
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
+import { Menu, Icon, Form, Input, Button, Cascader, Upload, message, Spin } from 'antd';
 import './Style/account.sass';
 const FormItem = Form.Item;
 import intl from 'react-intl-universal';
-import AddAddress from './addAddress';
-import EditAddress from './editAddress';
-import AddressList from './addressList';
 import { Link, browserHistory } from 'react-router';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import AccountMenu from '../Menu/accountMenu';
 // import UploadItem from './uploadItem';
-import { getBase64, contains, messageText, getCookie } from '../../data/tools';
+import { getBase64, getCookie } from '../../data/tools';
 
 const formItemLayout = {
     labelCol: {
@@ -60,6 +55,7 @@ class Account extends Component {
         imgId: "",
         imgCode: "",
         loading: false,
+        showLoading: true
     }
 
     componentWillMount() {
@@ -72,11 +68,11 @@ class Account extends Component {
                         this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
                     } else {
                         this.setState({ showLoading: false })
-                        message.error(intl.get("editFailed"));
+                        message.error("获取个人信息失败");
                     }
                 }).catch(error => {
                     console.log(error);
-                    message.error(intl.get("editFailed"));
+                    message.error("获取个人信息失败");
                     this.setState({ showLoading: false });
                 })
             :
@@ -88,11 +84,11 @@ class Account extends Component {
                         this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.avatar });
                     } else {
                         this.setState({ showLoading: false })
-                        message.error(intl.get("editFailed"));
+                        message.error("获取个人信息失败");
                     }
                 }).catch(error => {
                     console.log(error);
-                    message.error(intl.get("editFailed"));
+                    message.error("获取个人信息失败");
                     this.setState({ showLoading: false });
                 })
     }
@@ -101,6 +97,7 @@ class Account extends Component {
         e.preventDefault();
         const { userInfo, imgId } = this.state;
         const { role } = this.props.params;
+        this.state.showLoading = true;
         this.props.form.validateFields((err, data) => {
             data.userId = userInfo.userId;
             data.imgId = imgId;
@@ -114,13 +111,13 @@ class Account extends Component {
                             if (response.status == 200 && !resData.error) {
                                 message.success(intl.get("editSuccess"));
                             } else {
-                                message.error(messageText(resData.error.code, intl.get("editFailed")));
+                                message.error("编辑失败");
                             }
-                            this.setState({ editApplicationLoading: false });
+                            this.setState({ showLoading: false });
                         }).catch(error => {
                             console.log(error);
-                            message.error(intl.get("editFailed"));
-                            this.setState({ editApplicationLoading: false });
+                            message.error("编辑失败");
+                            this.setState({ showLoading: false });
                         })
                     :
                     axios.post(SERVICE_URL + "/shop/editSeller", { data })
@@ -129,13 +126,13 @@ class Account extends Component {
                             if (response.status == 200 && !resData.error) {
                                 message.success(intl.get("editSuccess"));
                             } else {
-                                message.error(messageText(resData.error.code, intl.get("editFailed")));
+                                message.error("编辑失败");
                             }
-                            this.setState({ editApplicationLoading: false });
+                            this.setState({ showLoading: false });
                         }).catch(error => {
                             console.log(error);
-                            message.error(intl.get("editFailed"));
-                            this.setState({ editApplicationLoading: false });
+                            message.error("编辑失败");
+                            this.setState({ showLoading: false });
                         });
             }
         });
@@ -172,19 +169,20 @@ class Account extends Component {
     }
 
     render() {
-        console.log("hello");
         const { manageStatus } = this.state;
         return (
-            <div className="manage">
-                <div className="manage-menu">
-                    <AccountMenu
-                        keyMenu="user/member"
-                    />
+            <Spin size="large" spinning={this.state.showLoading}>
+                <div className="manage">
+                    <div className="manage-menu">
+                        <AccountMenu
+                            keyMenu="user/member"
+                        />
+                    </div>
+                    <div className="manage-menu-content">
+                        {this.renderPersonalInfo()}
+                    </div>
                 </div>
-                <div className="manage-menu-content">
-                    {this.renderPersonalInfo()}
-                </div>
-            </div>
+            </Spin>
         )
     }
 
@@ -219,8 +217,8 @@ class Account extends Component {
                                 onChange={this.handleChange}
                                 disabled={submitLoading}
                             >
-                                {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
                                 {imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
+                                {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
                             </Upload>
                         )}
                     </FormItem>
