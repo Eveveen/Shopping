@@ -271,7 +271,7 @@ class ShopIndex extends Component {
                 <div className="collect-card">
                     <Card
                         style={{ width: 240 }}
-                        cover={<img alt="example" src={product.imgCode} />}
+                        cover={<img alt={product.proName} src={product.imgCode} />}
                         actions={[
                             <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />,
                             <Icon type="ellipsis" />,

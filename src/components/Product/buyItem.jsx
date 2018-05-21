@@ -365,7 +365,7 @@ class BuyItem extends Component {
             <div className="cart-card">
                 <div className="card-item-content">
                     <div className="left-img">
-                        <img alt="example" src={product.imgCode} />
+                        <img alt={product.proName} src={product.imgCode} />
                     </div>
                     <div className="item-info">
                         {product.proName} {product.description}

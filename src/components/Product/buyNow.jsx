@@ -238,7 +238,7 @@ class BuyNow extends Component {
             <div className="cart-card">
                 <div className="card-item-content">
                     <div className="left-img">
-                        <img alt="example" src={productInfo.imgCode} />
+                        <img alt={productInfo.proName} src={productInfo.imgCode} />
                     </div>
                     <div className="item-info">
                         {productInfo.proName} {productInfo.description}

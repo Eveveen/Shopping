@@ -411,7 +411,7 @@ class OrderItem extends Component {
                 <Card>
                     <div className="card-item-content">
                         <div className="left-img">
-                            <img alt="example" src={order.productInfo == null ? null : order.productInfo.imgCode} />
+                            <img alt={order.productInfo == null ? "img" : order.productInfo.proName} src={order.productInfo == null ? null : order.productInfo.imgCode} />
                         </div>
                         <div className="item-info">
                             {order.productInfo == null ? null : order.productInfo.proName} &nbsp;&nbsp;

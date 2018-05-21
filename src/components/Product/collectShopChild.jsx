@@ -66,7 +66,7 @@ class CollectShopChild extends Component {
                             <div className="right-treasure">
                                 <Card
                                     bordered={false}
-                                    cover={<img alt="example" src={collectShop.productList[index].imgCode} />}
+                                    cover={<img alt={collectShop.productList[index].proName} src={collectShop.productList[index].imgCode} />}
                                     onClick={this.handleShowProductDetail.bind(this, collectShop.productList[index].proId)}
                                 >
                                 </Card>

@@ -303,7 +303,7 @@ class Collect extends Component {
                             hoverable
                             onClick={this.handleShowProductDetail.bind(this, collectProduct.proId)}
                             style={{ width: 148 }}
-                            cover={<img alt="example" src={collectProduct.productInfo == null ? null : collectProduct.productInfo.imgCode} />}
+                            cover={<img alt={collectProduct.productInfo == null ? "img" : collectProduct.productInfo.proName} src={collectProduct.productInfo == null ? null : collectProduct.productInfo.imgCode} />}
                         >
                         </Card>
                         {showDeletePop == false && collectProduct.shopInfo != null ?

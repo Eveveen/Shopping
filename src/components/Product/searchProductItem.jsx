@@ -174,7 +174,7 @@ class SearchProductItem extends Component {
                 <div className="collect-card">
                     <Card
                         style={{ width: 300 }}
-                        cover={<img alt="example" src={product.imgCode} />}
+                        cover={<img alt={product.proName} src={product.imgCode} />}
                         onClick={this.handleShowProductDetail.bind(this, product.proId)}
                     >
                         <div className="card-text">

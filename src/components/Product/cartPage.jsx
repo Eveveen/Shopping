@@ -528,7 +528,7 @@ class CartPage extends Component {
                 </Checkbox>}
                 <div className="card-item-content">
                     <div className="left-img" onClick={this.handleShowProductDetail.bind(this, product.proId)}>
-                        <img alt="example" src={product.imgCode} />
+                        <img alt={product.proName} src={product.imgCode} />
                     </div>
                     <div className="item-info">
                         {product.proName} {product.description}

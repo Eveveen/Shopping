@@ -104,7 +104,7 @@ class Remark extends Component {
                     <Card title="评价宝贝" extra={<a href="#">More</a>}>
                         <div className="remark-content">
                             <div className="left-content">
-                                <img alt="example" src={order.productInfo.imgCode} />
+                                <img alt={order.productInfo.proName} src={order.productInfo.imgCode} />
                                 <div className="left-text">{order.productInfo.proName}&nbsp;&nbsp;{order.productInfo.description} </div>
                             </div>
                             <div className="right-content">
