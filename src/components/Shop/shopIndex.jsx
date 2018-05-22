@@ -20,12 +20,31 @@ class ShopIndex extends Component {
         showAddModal: false,
         searchName: '',
         current: "selling",
-        showLoading: true
-
+        showLoading: true,
+        showNum: 6
     }
 
     componentWillMount() {
         this.handleGetSellerShop();
+    }
+
+    componentDidMount() {
+        window.addEventListener('scroll', this.onScrollHandle.bind(this));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.onScrollHandle.bind(this));
+    }
+
+    onScrollHandle(event) {
+        const clientHeight = document.documentElement.clientHeight
+        const scrollTop = document.documentElement.scrollTop
+        const scrollHeight = document.documentElement.scrollHeight
+        const isBottom = (clientHeight + scrollTop === scrollHeight)
+        if (isBottom && this.state.showNum <= this.state.productList.length) {
+            this.setState({ showNum: this.state.showNum + 4 })
+            console.log("aaaa", this.state.showNum)
+        }
     }
 
     handleGetSellerShop = () => {
@@ -101,6 +120,7 @@ class ShopIndex extends Component {
     }
 
     handleDeleteProduct = (proId) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/deleteProduct/" + proId)
             .then(response => {
                 const resData = response.data;
@@ -217,12 +237,36 @@ class ShopIndex extends Component {
     }
 
     render() {
-        const { showAddModal } = this.state;
+        const { showAddModal, shopInfo } = this.state;
         return (
             <Spin size="large" spinning={this.state.showLoading}>
                 <div className="shop-index">
                     <Layout>
-                        <Header>{this.renderCollectHeader()}</Header>
+                        <Header>
+                            <div className="collect-header">
+                                店铺名称：{shopInfo.shopName}
+                            </div>
+                            <div className="global-search-wrapper">
+                                <AutoComplete
+                                    style={{ width: 200 }}
+                                    placeholder="请输入要查询的关键字"
+                                    className="global-search"
+                                    onChange={this.handleChangeSearchName}
+                                    filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                                >
+                                    <Input onKeyPress={this.handleEnter}
+                                        suffix={(
+                                            <Button className="search-btn" type="primary" onClick={this.handleSearchProduct} >
+                                                <Icon type="search" />
+                                            </Button>
+                                        )}
+                                    />
+                                </AutoComplete>
+                            </div>
+                            <div className="add-product" onClick={this.handleShowAddProduct}>
+                                <Icon type="appstore" />添加商品
+                            </div>
+                        </Header>
                         <Content>
                             {this.renderShopMenu()}
                             {this.renderCollectTreasureContent()}
@@ -241,66 +285,39 @@ class ShopIndex extends Component {
         )
     }
 
-    renderCollectHeader() {
-        const { shopInfo } = this.state;
-        return (
-            <div className="collect-header">
-                店铺名称：{shopInfo.shopName}
-                <div className="global-search-wrapper">
-                    <AutoComplete
-                        style={{ width: 200 }}
-                        placeholder="请输入要查询的关键字"
-                        className="global-search"
-                        onChange={this.handleChangeSearchName}
-                        filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                    >
-                        <Input onKeyPress={this.handleEnter}
-                            suffix={(
-                                <Button className="search-btn" type="primary" onClick={this.handleSearchProduct} >
-                                    <Icon type="search" />
-                                </Button>
-                            )}
-                        />
-                    </AutoComplete>
-                </div>
-                <div className="add-product" onClick={this.handleShowAddProduct}>
-                    <Icon type="appstore" />添加商品
-                </div>
-            </div>
-        )
-    }
-
     renderCollectTreasureContent() {
-        const { productList } = this.state;
+        const { productList, showNum } = this.state;
         let productDiv = [];
-        productList.forEach(product => {
-            productDiv.push(<div className="collect-treasure-content">
-                <div className="collect-card">
-                    <Card
-                        style={{ width: 240 }}
-                        cover={<img alt={product.proName} src={product.imgCode} />}
-                        actions={[
-                            <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />,
-                            <Icon type="ellipsis" />,
-                            <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteProduct.bind(this, product.proId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
-                                <a href="#">Delete</a>
-                            </Popconfirm>]}
-                    >
-                        <div className="card-text">
-                            <Meta
-                                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                title={<div>{product.proName}&nbsp;{product.description}</div>}
-                                description={
-                                    <div className="pro-description">
-                                        <div className="descprition-price">￥{product.price}</div>
-                                        <div className="selled-num">已售出：{product.selledNum == null ? null : product.selledNum}&nbsp;件</div>
-                                    </div>
-                                }
-                            />
-                        </div>
-                    </Card>
-                </div>
-            </div>);
+        productList.forEach((product, index) => {
+            if (index < showNum) {
+                productDiv.push(<div className="collect-treasure-content">
+                    <div className="collect-card">
+                        <Card
+                            style={{ width: 240 }}
+                            cover={<img alt={product.proName} src={product.imgCode} />}
+                            actions={[
+                                <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />,
+                                <Icon type="ellipsis" />,
+                                <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteProduct.bind(this, product.proId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                                    <a href="#">Delete</a>
+                                </Popconfirm>]}
+                        >
+                            <div className="card-text">
+                                <Meta
+                                    avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                    title={<div>{product.proName}&nbsp;{product.description}</div>}
+                                    description={
+                                        <div className="pro-description">
+                                            <div className="descprition-price">￥{product.price}</div>
+                                            <div className="selled-num">已售出：{product.selledNum == null ? null : product.selledNum}&nbsp;件</div>
+                                        </div>
+                                    }
+                                />
+                            </div>
+                        </Card>
+                    </div>
+                </div>);
+            }
         });
         return (
             <div>
