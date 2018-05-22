@@ -51,23 +51,34 @@ class EditProduct extends Component {
     }
 
     componentWillMount() {
-        const { proId } = this.props.params;
-        axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
+        axios.get(SERVICE_URL + "/checkIsSeller")
             .then(response => {
-                const resData = response.data;
-                console.log(resData);
-                if (response.status == 200 && !resData.error) {
-                    this.handleGetImg(resData);
-                    this.setState({ showLoading: false, productInfo: resData });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error("获取商品失败");
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        const { proId } = this.props.params;
+                        axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
+                            .then(response => {
+                                const resData = response.data;
+                                console.log(resData);
+                                if (response.status == 200 && !resData.error) {
+                                    this.handleGetImg(resData);
+                                    this.setState({ showLoading: false, productInfo: resData });
+                                } else {
+                                    this.setState({ showLoading: false })
+                                    message.error("获取商品失败");
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                message.error("获取商品失败");
+                                this.setState({ showLoading: false });
+                            })
+                    }
                 }
-            }).catch(error => {
-                console.log(error);
-                message.error("获取商品失败");
-                this.setState({ showLoading: false });
-            })
+            });
+
     }
 
     handleGetImg = (product) => {

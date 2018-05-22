@@ -21,11 +21,21 @@ class ShopIndex extends Component {
         searchName: '',
         current: "selling",
         showLoading: true,
-        showNum: 6
+        showNum: 8
     }
 
     componentWillMount() {
-        this.handleGetSellerShop();
+        axios.get(SERVICE_URL + "/checkIsSeller")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        this.handleGetSellerShop();
+                    }
+                }
+            });
     }
 
     componentDidMount() {

@@ -58,22 +58,32 @@ class ShopAccount extends Component {
     }
 
     componentWillMount() {
-        axios.get(SERVICE_URL + "/shop/getSellerInfo")
+        axios.get(SERVICE_URL + "/checkIsSeller")
             .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    // resData.imgId = resData.avatar;
-                    this.handleGetImg(resData);
-                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.imgCode, imgId: resData.avatar });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error("获取个人信息失败");
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        axios.get(SERVICE_URL + "/shop/getSellerInfo")
+                            .then(response => {
+                                const resData = response.data;
+                                if (response.status == 200 && !resData.error) {
+                                    // resData.imgId = resData.avatar;
+                                    this.handleGetImg(resData);
+                                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.imgCode, imgId: resData.avatar });
+                                } else {
+                                    this.setState({ showLoading: false })
+                                    message.error("获取个人信息失败");
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                message.error("获取个人信息失败");
+                                this.setState({ showLoading: false });
+                            })
+                    }
                 }
-            }).catch(error => {
-                console.log(error);
-                message.error("获取个人信息失败");
-                this.setState({ showLoading: false });
-            })
+            });
     }
 
     handleGetImg = (sellerInfo) => {

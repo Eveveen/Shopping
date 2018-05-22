@@ -16,7 +16,18 @@ class ShopMenu extends Component {
         this.setState({ current: e.key });
 
         if (e.key == "exitAccount") {
-            browserHistory.push(BASE_URL);
+            axios.get(SERVICE_URL + "/shop/logout")
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        message.error("退出失败");
+                    }
+                }).catch(error => {
+                    console.log(error);
+                    message.error("退出失败");
+                });
         } else {
             browserHistory.push(BASE_URL + '/' + e.key);
         }

@@ -21,64 +21,103 @@ router.post("/login", function (req, res) {
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })
+
+});
+
+/**
+ * 登出
+ */
+router.get("/logout", function (req, res) {
+    if (checkIsRole(req) == true) {
+        delete req.session.seller;
+        res.send(true);
+    } else {
+        logger.error('no permission to get "/logout"');
+        res.sendStatus(403);
+    }
 });
 
 /**
  * 获取卖家信息
  */
 router.get("/getSellerInfo", function (req, res) {
-    res.send(req.session.seller);
+    if (checkIsRole(req) == true) {
+        res.send(req.session.seller);
+    } else {
+        logger.error('no permission to get "/getSellerInfo"');
+        res.sendStatus(403);
+    }
 });
 
 /**
  * 编辑卖家信息
  */
 router.post("/editSeller", function (req, res) {
-    const path = utils.PROJECT + "/seller/editSeller";
-    const { data } = req.body;
-    data.sellerId = req.session.seller.sellerId;
-    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
+    if (checkIsRole(req) == true) {
+        const path = utils.PROJECT + "/seller/editSeller";
+        const { data } = req.body;
+        data.sellerId = req.session.seller.sellerId;
+        httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+            res.send(data);
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        logger.error('no permission to get "/editSeller"');
+        res.sendStatus(403);
+    }
 });
 
 /**
  * 获取卖家的店铺
  */
 router.get("/getSellerShop", function (req, res) {
-    const path = utils.PROJECT + "/getSellerShop";
-    httpAgent.httpRequest({ sellerId: req.session.seller.sellerId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
+    if (checkIsRole(req) == true) {
+        const path = utils.PROJECT + "/getSellerShop";
+        httpAgent.httpRequest({ sellerId: req.session.seller.sellerId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+            res.send(data);
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        logger.error('no permission to get "/getSellerShop"');
+        res.sendStatus(403);
+    }
 });
 
 /**
  * 获取该店铺的所有订单
  */
 router.get("/getShopOrder/:shopId", function (req, res) {
-    const path = utils.PROJECT + "/getShopOrder";
-    httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
+    if (checkIsRole(req) == true) {
+        const path = utils.PROJECT + "/getShopOrder";
+        httpAgent.httpRequest({ shopId: req.params.shopId }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+            res.send(data);
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        logger.error('no permission to get "/getShopOrder"');
+        res.sendStatus(403);
+    }
 });
 
 /**
  * 根据评价状态查询该店铺的订单
  */
 router.post("/getOrderByShopIdAndStatus", function (req, res) {
-    const path = utils.PROJECT + "/getOrderByShopIdAndStatus";
-    const { data } = req.body;
-    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
+    if (checkIsRole(req) == true) {
+        const path = utils.PROJECT + "/getOrderByShopIdAndStatus";
+        const { data } = req.body;
+        httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+            res.send(data);
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        logger.error('no permission to get "/getOrderByShopIdAndStatus"');
+        res.sendStatus(403);
+    }
 });
 
 /**
@@ -97,23 +136,25 @@ router.get("/getImg/:id", function (req, res) {
  * 搜索店铺内商品
  */
 router.post("/searchShopProduct", function (req, res) {
-    const { data } = req.body;
-    const path = utils.PROJECT + "/searchShopProduct";
-    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
-        res.send(resData);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
+    if (checkIsRole(req) == true) {
+        const { data } = req.body;
+        const path = utils.PROJECT + "/searchShopProduct";
+        httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (resData) {
+            res.send(resData);
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        logger.error('no permission to get "/searchShopProduct"');
+        res.sendStatus(403);
+    }
 });
 
 function checkIsRole(req) {
-    const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
-    for (var i = 0; i < roles.length; i++) {
-        if (roles[i] == 'admin') {
-            break;
-        }
+    let flag = false;
+    if ((req.session.seller && req.session.seller.sellerId != null) || (req.session.admin && req.session.admin.name != null)) {
+        flag = true;
     }
-    let flag = i < roles.length ? true : false;
     return flag;
 }
 

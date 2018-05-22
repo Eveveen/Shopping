@@ -1,7 +1,7 @@
 {
-    "name": "usercenter",
+    "name": "shopping",
     "version": "1.0.0",
-    "description": "usercenter",
+    "description": "Shopping",
     "main": "./src/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -47,7 +47,6 @@
         "react-intl-universal": "^1.4.3",
         "react-router": "^2.7.0",
         "react-table": "^6.7.4",
-        "request": "^2.85.0",
         "reqwest": "^2.0.5",
         "sass-loader": "^4.0.2",
         "serve-favicon": "^2.4.5",
@@ -58,7 +57,9 @@
         "url-loader": "^0.5.6",
         "webpack": "^1.15.0",
         "webpack-cleanup-plugin": "^0.5.1",
-        "webpack-dev-server": "^1.14.1"
+        "webpack-dev-server": "^1.14.1",
+        "request": "^2.83.0",
+        "moment": "^2.22.1"
     },
     "dependencies": {
         "@alicloud/sms-sdk": "^1.0.8",

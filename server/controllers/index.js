@@ -21,4 +21,12 @@ router.get('/checkIsAdmin', function (req, res) {
     res.send(flag);
 });
 
+router.get('/checkIsSeller', function (req, res) {
+    let flag = false;
+    if (req.session.seller && req.session.seller.sellerId != null) {
+        flag = true;
+    }
+    res.send(flag);
+});
+
 module.exports = router;
