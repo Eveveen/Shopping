@@ -54,20 +54,31 @@ class EditAddress extends Component {
     }
 
     componentWillMount() {
-        axios.get(SERVICE_URL + "/product/getAddress/" + this.props.params.id)
+        axios.get(SERVICE_URL + "/checkIsUser")
             .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, address: resData });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error("获取地址失败");
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        axios.get(SERVICE_URL + "/product/getAddress/" + this.props.params.id)
+                            .then(response => {
+                                const resData = response.data;
+                                if (response.status == 200 && !resData.error) {
+                                    this.setState({ showLoading: false, address: resData });
+                                } else {
+                                    this.setState({ showLoading: false })
+                                    message.error("获取地址失败");
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                this.setState({ showLoading: false })
+                                message.error("获取地址失败");
+                            });
+                    }
                 }
-            }).catch(error => {
-                console.log(error);
-                this.setState({ showLoading: false })
-                message.error("获取地址失败");
             });
+
     }
 
     handleChageAddressStatus = () => {

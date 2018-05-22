@@ -59,21 +59,32 @@ class Account extends Component {
     }
 
     componentWillMount() {
-        const { role } = this.props.params;
-        axios.get(SERVICE_URL + "/user/getUserInfo")
+        axios.get(SERVICE_URL + "/checkIsUser")
             .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
-                } else {
-                    this.setState({ showLoading: false })
-                    message.error("获取个人信息失败");
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        const { role } = this.props.params;
+                        axios.get(SERVICE_URL + "/user/getUserInfo")
+                            .then(response => {
+                                const resData = response.data;
+                                if (response.status == 200 && !resData.error) {
+                                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
+                                } else {
+                                    this.setState({ showLoading: false })
+                                    message.error("获取个人信息失败");
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                message.error("获取个人信息失败");
+                                this.setState({ showLoading: false });
+                            })
+                    }
                 }
-            }).catch(error => {
-                console.log(error);
-                message.error("获取个人信息失败");
-                this.setState({ showLoading: false });
-            })
+            });
+
     }
 
     handleSavePersonInfo = (e) => {

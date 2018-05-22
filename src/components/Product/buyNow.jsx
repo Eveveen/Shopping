@@ -23,9 +23,20 @@ class BuyNow extends Component {
     }
 
     componentWillMount() {
-        const { productInfo } = this.props.location.state;
-        this.handleGetAllAddress();
-        this.setState({ productInfo: productInfo })
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        const { productInfo } = this.props.location.state;
+                        this.handleGetAllAddress();
+                        this.setState({ productInfo: productInfo })
+                    }
+                }
+            });
+
     }
 
     changeCount = (cartId, product, e) => {

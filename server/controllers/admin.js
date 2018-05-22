@@ -57,17 +57,12 @@ router.get("/getAllSeller", function (req, res) {
  * 根据卖家编号获取卖家信息
  */
 router.get("/getSeller/:id", function (req, res) {
-    if (checkIsRole(req) == true) {
-        const path = utils.PROJECT + "/seller/getSeller";
-        httpAgent.httpRequest({ sellerId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-            res.send(data);
-        }, function (statusCode, msg) {
-            res.send({ error: { code: -1, msg: msg } });
-        })
-    } else {
-        logger.error('no permission to get "/getSeller"');
-        res.sendStatus(403);
-    }
+    const path = utils.PROJECT + "/seller/getSeller";
+    httpAgent.httpRequest({ sellerId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
 });
 
 /**

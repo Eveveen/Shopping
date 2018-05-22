@@ -18,9 +18,19 @@ class Remark extends Component {
     }
 
     componentWillMount() {
-        const { order } = this.props.location.state;
-        this.handleGetImg(order.productInfo);
-        this.setState({ order: order });
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        const { order } = this.props.location.state;
+                        this.handleGetImg(order.productInfo);
+                        this.setState({ order: order });
+                    }
+                }
+            });
     }
 
     handleGetImg = (product) => {

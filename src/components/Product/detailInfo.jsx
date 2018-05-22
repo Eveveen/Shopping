@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Select, Upload, Modal, message, Icon, Form, Card, Avatar, Tabs } from 'antd';
-const FormItem = Form.Item;
+import { Button, Input, message, Card, Avatar, Tabs, Spin } from 'antd';
 import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/main.sass';
@@ -15,22 +14,37 @@ class DetailInfo extends Component {
     state = {
         count: 1,
         productInfo: {},
-        showLoading: false,
+        showLoading: true,
         commentList: [],
         defaultAddress: {},
-        overRange: false
+        overRange: false,
+        isLogin: false
     }
 
     componentWillMount() {
+        this.handleIsLogin();
         const { proId } = this.props.params;
         this.handleChageProductScanNum();
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getProductByProId/" + proId)
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
                     this.handleGetShopInfo(resData);
                     this.handleGetImg(resData);
-                    this.handleGetDefaultAddress();
+                    axios.get(SERVICE_URL + "/checkIsUser")
+                        .then(response => {
+                            const data = response.data;
+                            if (!data.error) {
+                                if (data == false) {
+                                    let defaultAddress = { area: "江苏", addressName: "南通" };
+                                    this.setState({ defaultAddress: defaultAddress })
+                                } else {
+                                    this.handleGetDefaultAddress();
+                                }
+                            }
+                        });
+
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
                     message.error("获取商品失败");
@@ -42,8 +56,19 @@ class DetailInfo extends Component {
             })
     }
 
+    handleIsLogin = () => {
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    this.setState({ isLogin: data })
+                }
+            });
+    }
+
     handleChageProductScanNum = () => {
         const { proId } = this.props.params;
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/updateProductScanNum/" + proId)
             .then(response => {
                 const resData = response.data;
@@ -60,6 +85,7 @@ class DetailInfo extends Component {
     }
 
     handleGetShopInfo = (product) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getShop/" + product.shopId)
             .then(response => {
                 const resData = response.data;
@@ -77,6 +103,7 @@ class DetailInfo extends Component {
     }
 
     handleGetImg = (product) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
             .then(response => {
                 const resData = response.data;
@@ -95,6 +122,7 @@ class DetailInfo extends Component {
     }
 
     handleGetDefaultAddress = () => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getDefaultAddress")
             .then(response => {
                 const resData = response.data;
@@ -105,13 +133,14 @@ class DetailInfo extends Component {
                     message.error("获取默认地址失败");
                 }
             }).catch(error => {
-                // console.log(error);
-                // message.error("获取默认地址失败");
+                console.log(error);
+                message.error("获取默认地址失败");
                 this.setState({ showLoading: false });
             });
     }
 
     handleGetComment = (proId) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/getAllComment/" + proId)
             .then(response => {
                 const resData = response.data;
@@ -131,6 +160,7 @@ class DetailInfo extends Component {
     }
 
     handleGetUser = (comment) => {
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/user/getUser/" + comment.userId)
             .then(response => {
                 const resData = response.data;
@@ -172,39 +202,46 @@ class DetailInfo extends Component {
     }
 
     handleBuyNow = () => {
-        const { productInfo } = this.state;
-        productInfo.count = this.state.count;
+        if (this.state.isLogin) {
+            const { productInfo } = this.state;
+            productInfo.count = this.state.count;
 
-        browserHistory.push({ pathname: BASE_URL + "/buyNow/" + productInfo.proId, state: { productInfo: productInfo } });
+            browserHistory.push({ pathname: BASE_URL + "/buyNow/" + productInfo.proId, state: { productInfo: productInfo } });
+        } else {
+            browserHistory.push(BASE_URL + "/login")
+        }
     }
 
     handleIsCartExist = () => {
-        const { productInfo, count } = this.state;
-        let data = {};
-        data.proId = productInfo.proId;
-        axios.post(SERVICE_URL + "/product/isCartExist", { data })
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false });
-                    if (resData.cartId != null) {
-                        if (resData.proNum + count > productInfo.proNum) {
-                            this.setState({ overRange: true })
+        if (this.state.isLogin) {
+            const { productInfo, count } = this.state;
+            let data = {};
+            data.proId = productInfo.proId;
+            axios.post(SERVICE_URL + "/product/isCartExist", { data })
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        this.setState({ showLoading: false });
+                        if (resData.cartId != null) {
+                            if (resData.proNum + count > productInfo.proNum) {
+                                this.setState({ overRange: true })
+                            } else {
+                                this.setState({ overRange: false })
+                                this.handleChageProNum(resData);
+                            }
                         } else {
-                            this.setState({ overRange: false })
-                            this.handleChageProNum(resData);
+                            this.handleAddCart();
                         }
                     } else {
-                        this.handleAddCart();
+                        message.error("判断商品失败存在失败");
                     }
-                } else {
-                    this.setState({ showLoading: false })
+                }).catch(error => {
                     message.error("判断商品失败存在失败");
-                }
-            }).catch(error => {
-                message.error("判断商品失败存在失败");
-                this.setState({ showLoading: false });
-            });
+                    this.setState({ showLoading: false });
+                });
+        } else {
+            browserHistory.push(BASE_URL + "/login")
+        }
     }
 
     handleAddCart = () => {
@@ -213,7 +250,6 @@ class DetailInfo extends Component {
         data.shopId = productInfo.shopId;
         data.proId = productInfo.proId;
         data.proNum = count;
-
         axios.post(SERVICE_URL + "/product/addCart", { data })
             .then(response => {
                 const resData = response.data;
@@ -274,51 +310,61 @@ class DetailInfo extends Component {
     }
 
     handleIsCollectProductExist = () => {
-        const { productInfo } = this.state;
-        axios.get(SERVICE_URL + "/product/isCollectProductExist/" + productInfo.proId)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    if (resData == true) {
-                        message.warning("商品已收藏");
+        if (this.state.isLogin) {
+            const { productInfo } = this.state;
+            axios.get(SERVICE_URL + "/product/isCollectProductExist/" + productInfo.proId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        if (resData == true) {
+                            message.warning("商品已收藏");
+                        } else {
+                            this.handleAddCollectProduct();
+                        }
+                        this.setState({ showLoading: false });
                     } else {
-                        this.handleAddCollectProduct();
+                        this.setState({ showLoading: false })
+                        message.error("判断商品收藏失败");
                     }
-                    this.setState({ showLoading: false });
-                } else {
-                    this.setState({ showLoading: false })
+                }).catch(error => {
                     message.error("判断商品收藏失败");
-                }
-            }).catch(error => {
-                message.error("判断商品收藏失败");
-                this.setState({ showLoading: false });
-            })
+                    this.setState({ showLoading: false });
+                })
+        } else {
+            browserHistory.push(BASE_URL + "/login")
+        }
     }
 
     handleIsCollectShopExist = () => {
-        const { productInfo } = this.state;
-        axios.get(SERVICE_URL + "/product/isCollectShopExist/" + productInfo.shopInfo.shopId)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    if (resData == true) {
-                        message.warning("店铺已收藏");
+        if (this.state.isLogin) {
+            const { productInfo } = this.state;
+            this.state.showLoading = true;
+            axios.get(SERVICE_URL + "/product/isCollectShopExist/" + productInfo.shopInfo.shopId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        if (resData == true) {
+                            message.warning("店铺已收藏");
+                        } else {
+                            this.handleAddCollectShop();
+                        }
+                        this.setState({ showLoading: false });
                     } else {
-                        this.handleAddCollectShop();
+                        this.setState({ showLoading: false })
+                        message.error("判断商品收藏失败");
                     }
-                    this.setState({ showLoading: false });
-                } else {
-                    this.setState({ showLoading: false })
+                }).catch(error => {
                     message.error("判断商品收藏失败");
-                }
-            }).catch(error => {
-                message.error("判断商品收藏失败");
-                this.setState({ showLoading: false });
-            })
+                    this.setState({ showLoading: false });
+                })
+        } else {
+            browserHistory.push(BASE_URL + "/login")
+        }
     }
 
     handleAddCollectShop = () => {
         const { productInfo } = this.state;
+        this.state.showLoading = true;
         axios.get(SERVICE_URL + "/product/addCollectShop/" + productInfo.shopInfo.shopId)
             .then(response => {
                 const resData = response.data;
@@ -339,79 +385,81 @@ class DetailInfo extends Component {
     render() {
         const { count, productInfo, defaultAddress, overRange } = this.state;
         return (
-            <div className="detail">
-                <div className="summary-info">
-                    <div className="card-info">
-                        <Card
-                            style={{ width: 400, height: 400 }}
-                            cover={<img alt="example" src={productInfo.imgCode} />}
-                        >
-                            <div className="detail-info-img">
-                                <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
+            <Spin size="large" spinning={this.state.showLoading}>
+                <div className="detail">
+                    <div className="summary-info">
+                        <div className="card-info">
+                            <Card
+                                style={{ width: 400, height: 400 }}
+                                cover={<img alt="example" src={productInfo.imgCode} />}
+                            >
+                                <div className="detail-info-img">
+                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
+                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
+                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
+                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
+                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
+                                </div>
+                            </Card>
+                        </div>
+                        <div className="text-info">
+                            <div className="text-title">
+                                {productInfo.proName}
                             </div>
-                        </Card>
-                    </div>
-                    <div className="text-info">
-                        <div className="text-title">
-                            {productInfo.proName}
-                        </div>
-                        <div className="text-detail text-price">
-                            <div className="left-text">价格</div>
-                            <div className="right-text">￥{productInfo.price}</div>
-                        </div>
-                        <div className="text-detail">
-                            <div className="left-text">配送</div>
-                            <div className="right-text">
-                                {productInfo.shopInfo == null ? null : productInfo.shopInfo.addressArea}
-                                &nbsp;至&nbsp;
+                            <div className="text-detail text-price">
+                                <div className="left-text">价格</div>
+                                <div className="right-text">￥{productInfo.price}</div>
+                            </div>
+                            <div className="text-detail">
+                                <div className="left-text">配送</div>
+                                <div className="right-text">
+                                    {productInfo.shopInfo == null ? null : productInfo.shopInfo.addressArea}
+                                    &nbsp;至&nbsp;
                                 {defaultAddress.area} {defaultAddress.addressName}
+                                </div>
+                            </div>
+                            <div className="text-detail">
+                                <div className="left-text">数量</div>
+                                <div className="right-text">
+                                    <Button onClick={this.decreaseCount}>-</Button>
+                                    <Input value={count} onChange={this.changeCount} />
+                                    <Button onClick={this.increaseCount}>+</Button>
+                                </div>
+                                <div className="pro-text">库存：{productInfo.proNum}</div>
+                            </div>
+                            {count > productInfo.proNum ?
+                                <div className="text-detail range-tip">您所填写的商品数量超过库存！</div> : null}
+                            {overRange ? <div className="text-detail range-tip" style={{ width: "265px" }}>商品加购件数(含已加购件数)已超过库存</div> : null}
+                            <div className="text-detail">
+                                <div className={count > productInfo.proNum ? "left-btn-disabled" : "left-btn"}>
+                                    <Button onClick={this.handleBuyNow} disabled={count > productInfo.proNum ? true : false}>立即购买</Button>
+                                </div>
+                                <div className={count > productInfo.proNum ? "right-btn-disabled" : "right-btn"}>
+                                    <Button onClick={this.handleIsCartExist} disabled={count > productInfo.proNum ? true : false}>加入购物车</Button>
+                                </div>
+                            </div>
+                            <div>
+                                <Button onClick={this.handleIsCollectProductExist}>收藏宝贝</Button>
                             </div>
                         </div>
-                        <div className="text-detail">
-                            <div className="left-text">数量</div>
-                            <div className="right-text">
-                                <Button onClick={this.decreaseCount}>-</Button>
-                                <Input value={count} onChange={this.changeCount} />
-                                <Button onClick={this.increaseCount}>+</Button>
-                            </div>
-                            <div className="pro-text">库存：{productInfo.proNum}</div>
+                        <div className="shop-info">
+                            <div className="shop-name">{productInfo.shopInfo == null ? null : productInfo.shopInfo.shopName}</div>
+                            <div className="shop-btn"><Button onClick={productInfo.shopInfo == null ? null : this.handleViewShop.bind(this, productInfo.shopInfo.shopId)}>进入店铺</Button></div>
+                            <div className="shop-btn"><Button onClick={this.handleIsCollectShopExist}>收藏店铺</Button></div>
                         </div>
-                        {count > productInfo.proNum ?
-                            <div className="text-detail range-tip">您所填写的商品数量超过库存！</div> : null}
-                        {overRange ? <div className="text-detail range-tip" style={{ width: "265px" }}>商品加购件数(含已加购件数)已超过库存</div> : null}
-                        <div className="text-detail">
-                            <div className={count > productInfo.proNum ? "left-btn-disabled" : "left-btn"}>
-                                <Button onClick={this.handleBuyNow} disabled={count > productInfo.proNum ? true : false}>立即购买</Button>
-                            </div>
-                            <div className={count > productInfo.proNum ? "right-btn-disabled" : "right-btn"}>
-                                <Button onClick={this.handleIsCartExist} disabled={count > productInfo.proNum ? true : false}>加入购物车</Button>
-                            </div>
-                        </div>
-                        <div>
-                            <Button onClick={this.handleIsCollectProductExist}>收藏宝贝</Button>
-                        </div>
+                    </div >
+                    <div className="detailed-info">
+                        <Tabs onChange={this.callback} type="card">
+                            <TabPane tab="宝贝详情" key="basic">
+                                <div className="detailed-header">商品基本信息</div>
+                            </TabPane>
+                            <TabPane tab="累计评论" key="comment">
+                                {this.renderComment()}
+                            </TabPane>
+                        </Tabs>
                     </div>
-                    <div className="shop-info">
-                        <div className="shop-name">{productInfo.shopInfo == null ? null : productInfo.shopInfo.shopName}</div>
-                        <div className="shop-btn"><Button onClick={productInfo.shopInfo == null ? null : this.handleViewShop.bind(this, productInfo.shopInfo.shopId)}>进入店铺</Button></div>
-                        <div className="shop-btn"><Button onClick={this.handleIsCollectShopExist}>收藏店铺</Button></div>
-                    </div>
-                </div >
-                <div className="detailed-info">
-                    <Tabs onChange={this.callback} type="card">
-                        <TabPane tab="宝贝详情" key="basic">
-                            <div className="detailed-header">商品基本信息</div>
-                        </TabPane>
-                        <TabPane tab="累计评论" key="comment">
-                            {this.renderComment()}
-                        </TabPane>
-                    </Tabs>
                 </div>
-            </div>
+            </Spin>
         )
     }
 

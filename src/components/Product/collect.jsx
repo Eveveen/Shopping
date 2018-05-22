@@ -27,11 +27,21 @@ class Collect extends Component {
     }
 
     componentWillMount() {
-        this.handleGetCollectProduct();
-        if (this.props.location.pathname == "/collectShop") {
-            this.handleGetCollectShop();
-        }
-        this.setState({ pathname: this.props.location.pathname })
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        this.handleGetCollectProduct();
+                        if (this.props.location.pathname == "/collectShop") {
+                            this.handleGetCollectShop();
+                        }
+                        this.setState({ pathname: this.props.location.pathname })
+                    }
+                }
+            });
     }
 
     componentWillReceiveProps(props) {

@@ -23,10 +23,20 @@ class BuyItem extends Component {
     }
 
     componentWillMount() {
-        let cartIds = this.props.params.id.split(",");
-        const { cartList, shopList } = this.props.location.state;
-        this.handleGetAllAddress();
-        this.setState({ cartIds: cartIds, buyList: cartList, shopList: shopList })
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        let cartIds = this.props.params.id.split(",");
+                        const { cartList, shopList } = this.props.location.state;
+                        this.handleGetAllAddress();
+                        this.setState({ cartIds: cartIds, buyList: cartList, shopList: shopList })
+                    }
+                }
+            });
     }
 
     handleGetAllAddress = () => {

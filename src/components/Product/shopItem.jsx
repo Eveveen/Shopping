@@ -18,7 +18,7 @@ class ShopItem extends Component {
         imgCode: '',
         searchName: '',
         showLoading: true,
-        showNum: 6
+        showNum: 8
     }
 
     componentWillMount() {

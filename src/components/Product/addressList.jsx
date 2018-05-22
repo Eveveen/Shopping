@@ -17,7 +17,17 @@ class AddressList extends Component {
     }
 
     componentWillMount() {
-        this.handleGetAllAddress();
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        this.handleGetAllAddress();
+                    }
+                }
+            });
     }
 
     handleGetAllAddress = () => {

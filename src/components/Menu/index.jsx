@@ -9,15 +9,44 @@ import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 class MenuIndex extends Component {
     state = {
         current: 'mail',
-        pageStatus: "index"
+        pageStatus: "index",
+        isLogin: false
+    }
+    componentWillMount() {
+        this.handleIsLogin();
+    }
+
+    handleIsLogin = () => {
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    this.setState({ isLogin: data })
+                }
+            });
     }
 
     handleClick = (e) => {
         this.setState({ current: e.key });
         if (e.key == "exitAccount") {
-            browserHistory.push(BASE_URL);
+            axios.get(SERVICE_URL + "/user/logout")
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        message.error("退出失败");
+                    }
+                }).catch(error => {
+                    console.log(error);
+                    message.error("退出失败");
+                });
         } else {
-            browserHistory.push(BASE_URL + '/' + e.key);
+            if (this.state.isLogin) {
+                browserHistory.push(BASE_URL + '/' + e.key);
+            } else {
+                browserHistory.push(BASE_URL + "/login")
+            }
         }
         // this.props.handleChangePageStatus(e);
     }

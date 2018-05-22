@@ -607,13 +607,10 @@ router.get("/updateProductScanNum/:proId", function (req, res) {
 });
 
 function checkIsRole(req) {
-    const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
-    for (var i = 0; i < roles.length; i++) {
-        if (roles[i] == 'admin') {
-            break;
-        }
+    let flag = false;
+    if (req.session.user && req.session.user.userName != null) {
+        flag = true;
     }
-    let flag = i < roles.length ? true : false;
     return flag;
 }
 

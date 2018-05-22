@@ -28,7 +28,17 @@ class OrderItem extends Component {
     }
 
     componentWillMount() {
-        this.handleGetAllOrder();
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        this.handleGetAllOrder();
+                    }
+                }
+            });
     }
 
     componentDidMount() {

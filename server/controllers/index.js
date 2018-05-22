@@ -29,4 +29,12 @@ router.get('/checkIsSeller', function (req, res) {
     res.send(flag);
 });
 
+router.get('/checkIsUser', function (req, res) {
+    let flag = false;
+    if (req.session.user && req.session.user.userName != null) {
+        flag = true;
+    }
+    res.send(flag);
+});
+
 module.exports = router;

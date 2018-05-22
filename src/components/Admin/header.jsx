@@ -25,7 +25,7 @@ class AdminHeader extends Component {
                 .then(response => {
                     const resData = response.data;
                     if (response.status == 200 && !resData.error) {
-                        browserHistory.push(BASE_URL);
+                        browserHistory.push(BASE_URL + "/login");
                     } else {
                         message.error("退出失败");
                     }

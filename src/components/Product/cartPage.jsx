@@ -32,7 +32,17 @@ class CartPage extends Component {
     };
 
     componentWillMount() {
-        this.handleGetAllCart();
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        this.handleGetAllCart();
+                    }
+                }
+            });
     }
 
     componentDidMount() {

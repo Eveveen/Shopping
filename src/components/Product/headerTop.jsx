@@ -13,11 +13,22 @@ class HeaderTop extends Component {
     }
 
     handleClick = (e) => {
-        browserHistory.push(BASE_URL + '/' + e.key);
-        // this.props.handleChangePageStatus(e);
-        // this.setState({
-        //     current: e.key,
-        // });
+        if (e.key == "exitAccount") {
+            axios.get(SERVICE_URL + "/user/logout")
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        browserHistory.push(BASE_URL + "/login");
+                    } else {
+                        message.error("退出失败");
+                    }
+                }).catch(error => {
+                    console.log(error);
+                    message.error("退出失败");
+                });
+        } else {
+            browserHistory.push(BASE_URL + '/' + e.key);
+        }
     }
 
     render() {

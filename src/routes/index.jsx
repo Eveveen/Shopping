@@ -16,12 +16,11 @@ const baseUrl = BASE_URL.substring(1);
 const routes = (
     <Router history={browserHistory}>
         <Route path={"/"} component={App} >
-            <IndexRoute component={Login} />
             <Route path={"/upload"} component={UploadItem} />
-
+            <Route path={"/login"} component={Login} />
             <Route path={baseUrl} component={MenuIndex}>
-                <Route path={"/register"} component={Register} />
                 <IndexRoute component={HomePage} />
+                <Route path={"/register"} component={Register} />
                 <Route path={"/home"} component={HomePage} />
                 <Route path={"/buy/:id"} component={BuyItem} />
                 <Route path={"/buyNow/:id"} component={BuyNow} />
