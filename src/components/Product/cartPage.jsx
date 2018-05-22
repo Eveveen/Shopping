@@ -433,10 +433,10 @@ class CartPage extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取图片失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取图片失败");
                 this.setState({ showLoading: false });
             });
     }

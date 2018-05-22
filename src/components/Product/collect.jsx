@@ -214,10 +214,10 @@ class Collect extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取店铺商品失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取店铺商品失败");
                 this.setState({ showLoading: false });
             });
     }

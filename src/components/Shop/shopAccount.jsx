@@ -45,9 +45,8 @@ const residences = [{
     }],
 }];
 
-class Account extends Component {
+class ShopAccount extends Component {
     state = {
-        manageStatus: "member",
         submitLoading: false,
         showAddAddress: false,
         addressAction: "list",
@@ -59,12 +58,13 @@ class Account extends Component {
     }
 
     componentWillMount() {
-        const { role } = this.props.params;
-        axios.get(SERVICE_URL + "/user/getUserInfo")
+        axios.get(SERVICE_URL + "/shop/getSellerInfo")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.avatar, imgId: resData.imgId });
+                    // resData.imgId = resData.avatar;
+                    this.handleGetImg(resData);
+                    this.setState({ showLoading: false, userInfo: resData, imgCode: resData.imgCode, imgId: resData.avatar });
                 } else {
                     this.setState({ showLoading: false })
                     message.error("获取个人信息失败");
@@ -76,18 +76,37 @@ class Account extends Component {
             })
     }
 
+    handleGetImg = (sellerInfo) => {
+        // this.state.showLoading = true;
+        axios.get(SERVICE_URL + "/shop/getImg/" + sellerInfo.avatar)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    sellerInfo.imgCode = resData.imgCode;
+                    this.setState({ showLoading: false });
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取图片失败");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("获取图片失败");
+                this.setState({ showLoading: false });
+            });
+    }
+
     handleSavePersonInfo = (e) => {
         e.preventDefault();
-        const { userInfo, imgId } = this.state;
+        const { userInfo } = this.state;
         const { role } = this.props.params;
         this.state.showLoading = true;
         this.props.form.validateFields((err, data) => {
             data.userId = userInfo.userId;
-            data.imgId = imgId;
-            data.avatar = '';
+            data.imgId = userInfo.avatar;
+            data.avatar = userInfo.avatar;
             data.role = 1;
             if (!err) {
-                axios.post(SERVICE_URL + "/user/updateUser", { data })
+                axios.post(SERVICE_URL + "/shop/editSeller", { data })
                     .then(response => {
                         const resData = response.data;
                         if (response.status == 200 && !resData.error) {
@@ -100,7 +119,7 @@ class Account extends Component {
                         console.log(error);
                         message.error("编辑失败");
                         this.setState({ showLoading: false });
-                    })
+                    });
             }
         });
     }
@@ -112,10 +131,9 @@ class Account extends Component {
     handleIconDelete = (e) => {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        this.setState({
-            imgId: null,
-            imgCode: null
-        });
+        this.state.userInfo.imgCode = null;
+        this.state.userInfo.avatar = null;
+        this.setState({})
     }
 
     handleChange = (info) => {
@@ -130,19 +148,20 @@ class Account extends Component {
                 loading: false,
             }));
             if (!info.file.response.error) {
-                this.setState({ imgId: info.file.response.imgId });
+                this.state.userInfo.avatar = info.file.response.imgId;
+                this.handleGetImg(this.state.userInfo);
             }
         }
     }
 
     render() {
-        const { manageStatus } = this.state;
         return (
             <Spin size="large" spinning={this.state.showLoading}>
                 <div className="manage">
                     <div className="manage-menu">
                         <AccountMenu
                             keyMenu="user/member"
+                            pathname="shop"
                         />
                     </div>
                     <div className="manage-menu-content">
@@ -157,10 +176,11 @@ class Account extends Component {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading, imgCode, loading, userInfo } = this.state;
         const { role } = this.props.params;
+        console.log("userInfo,", userInfo);
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
-                <div className="ant-upload-text">upload</div>
+                <div className="ant-upload-text">上传</div>
             </div>
         );
         return (
@@ -172,7 +192,7 @@ class Account extends Component {
                     >
                         {getFieldDecorator('avatar', {
                             rules: [],
-                            initialValue: userInfo.avatar
+                            // initialValue: userInfo == {} ? null : userInfo.imgCode
                         })(
                             <Upload
                                 listType="picture-card"
@@ -184,8 +204,8 @@ class Account extends Component {
                                 onChange={this.handleChange}
                                 disabled={submitLoading}
                             >
-                                {imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
-                                {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
+                                {userInfo.imgCode ? <img src={userInfo.imgCode} alt="" /> : uploadButton}
+                                {userInfo.imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
                             </Upload>
                         )}
                     </FormItem>
@@ -202,14 +222,14 @@ class Account extends Component {
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label={"用户名"}
+                        label={"昵称"}
                         required="true"
                     >
                         {getFieldDecorator(role == "user" ? 'userName' : 'sellerName', {
                             rules: [{
                                 required: true, message: "用户名不能为空"
                             }, {
-                                eq: 11, message: "用户名长度过长"
+                                eq: 50, message: "用户名长度过长"
                             }],
                             initialValue: role == "user" ? userInfo.userName : userInfo.sellerName
                         })(
@@ -223,9 +243,9 @@ class Account extends Component {
                     >
                         {getFieldDecorator('password', {
                             rules: [{
-                                required: true, message: "密码"
+                                required: true, message: "密码不能为空"
                             }, {
-                                eq: 11, message: "密码长度过长"
+                                eq: 50, message: "密码长度过长"
                             }],
                             initialValue: userInfo.password
                         })(
@@ -242,12 +262,12 @@ class Account extends Component {
                                 required: true, message: "邮箱不能为空"
                             }, {
                                 type: 'email', message: "邮箱格式不正确"
-                            }, {
+                            }, , {
                                 eq: 50, message: "邮箱长度过长"
                             }],
                             initialValue: userInfo.email
                         })(
-                            <Input placeholder={"邮箱"} disabled={submitLoading} />
+                            <Input placeholder={"email"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
@@ -273,4 +293,4 @@ class Account extends Component {
 
 }
 
-export default Form.create()(Account);
+export default Form.create()(ShopAccount);

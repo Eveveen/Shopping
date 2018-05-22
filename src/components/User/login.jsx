@@ -29,17 +29,24 @@ class Login extends Component {
 
     handleLogin = (e) => {
         const { role } = this.state;
+        this.setState({ submitLoading: true });
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, data) => {
             console.log(data);
             if (!err) {
-                this.setState({ submitLoading: true });
                 if (role == "user") {
                     this.handleUserLogin(data);
+                    this.setState({ submitLoading: false })
                     return;
                 }
                 if (role == "seller") {
                     this.handleSellerLogin(data);
+                    this.setState({ submitLoading: false })
+                    return;
+                }
+                if (role == "admin") {
+                    this.handleAdminLogin(data);
+                    this.setState({ submitLoading: false })
                     return;
                 }
             }
@@ -48,60 +55,51 @@ class Login extends Component {
 
     handleUserLogin = (data) => {
         httpRequestPost(SERVICE_URL + "/user/login", { data }, (resData) => {
-            this.setState({ showLoading: false });
             if (resData) {
-                // axios.get(SERVICE_URL + "/user/getUserInfo")
-                //     .then(response => {
-                //         const resData = response.data;
-                //         if (response.status == 200 && !resData.error) {
-                //             this.setState({ showLoading: false, userInfo: resData });
-                //         } else {
-                //             this.setState({ showLoading: false })
-                //             message.error(intl.get("editFailed"));
-                //         }
-                //     }).catch(error => {
-                //         console.log(error);
-                //         message.error(intl.get("editFailed"));
-                //         this.setState({ showLoading: false });
-                //     });
                 browserHistory.push(BASE_URL + "/home");
+                this.setState({ submitLoading: false });
             } else {
-                message.error(intl.get("editFailed"));
+                message.error("用户登录失败");
+                this.setState({ submitLoading: false });
             }
         }, (errorData) => {
-            this.setState({ showLoading: false })
-            message.error(intl.get("editFailed"));
+            message.error("用户登录失败");
+            this.setState({ submitLoading: false })
         })
     }
 
     handleSellerLogin = (data) => {
         httpRequestPost(SERVICE_URL + "/shop/login", { data }, (resData) => {
-            this.setState({ showLoading: false });
+            this.setState({ submitLoading: false });
             if (resData) {
-                // axios.get(SERVICE_URL + "/shop/getShopInfo")
-                //     .then(response => {
-                //         const resData = response.data;
-                //         if (response.status == 200 && !resData.error) {
-                //             this.setState({ showLoading: false, userInfo: resData });
-                //         } else {
-                //             this.setState({ showLoading: false })
-                //             message.error(intl.get("editFailed"));
-                //         }
-                //     }).catch(error => {
-                //         console.log(error);
-                //         message.error(intl.get("editFailed"));
-                //         this.setState({ showLoading: false });
-                //     });
                 browserHistory.push(BASE_URL + "/shop");
             } else {
-                message.error(intl.get("editFailed"));
+                message.error("卖家登录失败");
+                this.setState({ submitLoading: false });
             }
         }, (errorData) => {
             console.log(errorData);
-            this.setState({ showLoading: false })
-            message.error(intl.get("editFailed"));
+            this.setState({ submitLoading: false })
+            message.error("卖家登录失败");
         })
     }
+
+    handleAdminLogin = (data) => {
+        httpRequestPost(SERVICE_URL + "/admin/login", { data }, (resData) => {
+            this.setState({ submitLoading: false });
+            if (resData) {
+                browserHistory.push(BASE_URL + "/admin");
+            } else {
+                message.error("管理员登录失败");
+                this.setState({ submitLoading: false });
+            }
+        }, (errorData) => {
+            console.log(errorData);
+            this.setState({ submitLoading: false })
+            message.error("管理员登录失败");
+        })
+    }
+
     callback = (key) => {
         this.setState({ role: key })
     }
@@ -143,36 +141,36 @@ class Login extends Component {
                 <Form>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("username")}
+                        label={"用户名"}
                         required="true"
                     >
-                        {getFieldDecorator(role == "user" ? 'userName' : 'sellerName', {
+                        {getFieldDecorator(role == "user" ? 'userName' : role == "seller" ? 'sellerName' : "name", {
                             rules: [{
-                                required: true, message: intl.get("usernameNotnull")
+                                required: true, message: "用户名不能为空"
                             }, {
-                                max: 50, message: intl.get("usernameLength")
+                                max: 50, message: "用户名过长"
                             }],
                         })(
-                            <Input placeholder={intl.get("username")} disabled={submitLoading} />
+                            <Input placeholder={"用户名"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("password")}
+                        label={"密码"}
                         required="true"
                     >
                         {getFieldDecorator('password', {
                             rules: [{
-                                required: true, message: intl.get("passwordNotnull")
+                                required: true, message: "密码不能为空"
                             }, {
-                                max: 50, message: intl.get("passwordLength")
+                                max: 50, message: "密码过长"
                             }],
                         })(
-                            <Input type="password" placeholder={intl.get("password")} disabled={submitLoading} />
+                            <Input type="password" placeholder={"密码"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem>
-                        <Button type="primary" onClick={this.handleLogin} loading={submitLoading}>{intl.get("login")}</Button>
+                        <Button type="primary" onClick={this.handleLogin} loading={submitLoading}>{"登录"}</Button>
                     </FormItem>
                 </Form>
                 <hr />

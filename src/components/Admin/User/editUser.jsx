@@ -54,15 +54,14 @@ class EditUser extends Component {
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    console.log("--", resData);
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("更改默认地址失败");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("更改默认地址失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -81,11 +80,11 @@ class EditUser extends Component {
                             this.setState({ showLoading: false });
                         } else {
                             this.setState({ showLoading: false })
-                            message.error(intl.get("editFailed"));
+                            message.error("编辑失败");
                         }
                     }).catch(error => {
                         console.log(error);
-                        message.error(intl.get("editFailed"));
+                        message.error("编辑失败");
                         this.setState({ showLoading: false });
                     });
             }
@@ -104,7 +103,7 @@ class EditUser extends Component {
         const form = this.props.form;
         var password = form.getFieldValue('password')
         if (value != password) {
-            callback(intl.get("samepassword"));
+            callback("确认密码不一致");
         } else {
             callback();
         }
@@ -185,11 +184,11 @@ class EditUser extends Component {
                         >
                             {getFieldDecorator('email', {
                                 rules: [{
-                                    required: true, message: intl.get("requireemail"),
+                                    required: true, message: "邮箱不能为空",
                                 }, {
-                                    type: 'email', message: intl.get("formatemail")
+                                    type: 'email', message: "邮箱格式不正确"
                                 }, {
-                                    max: 50, message: intl.get("emailmax")
+                                    max: 50, message: "邮箱长度过长"
                                 }],
                                 initialValue: userInfo.email
                             })(
@@ -198,8 +197,8 @@ class EditUser extends Component {
                         </FormItem>
                         <FormItem>
                             <div className="edit-user-footer">
-                                <Button type="primary" onClick={this.handleEditUser} loading={submitLoading}>{intl.get("save")}</Button>
-                                <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                                <Button type="primary" onClick={this.handleEditUser} loading={submitLoading}>保存</Button>
+                                <Button onClick={this.handleCancel} disabled={submitLoading} >取消</Button>
                             </div>
                         </FormItem>
                     </Form>

@@ -160,13 +160,13 @@ class EditAddress extends Component {
                     >
                         {getFieldDecorator('consignee', {
                             rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
+                                required: true, message: "收货人姓名不能为空"
                             }, {
-                                eq: 11, message: intl.get("telphoneLength")
+                                eq: 50, message: "收货人姓名过长"
                             }],
                             initialValue: address.consignee
                         })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                            <Input placeholder={"收货人姓名"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
@@ -174,7 +174,7 @@ class EditAddress extends Component {
                         label="手机号码"
                     >
                         {getFieldDecorator('telphone', {
-                            rules: [{ required: true, message: 'Please input your phone number!' }],
+                            rules: [{ required: true, message: "手机号不能为空" }],
                             initialValue: address.telphone
                         })(
                             <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
@@ -187,27 +187,15 @@ class EditAddress extends Component {
                     >
                         {getFieldDecorator('area', {
                             rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
+                                required: true, message: "所在地区不能为空"
                             }, {
-                                eq: 11, message: intl.get("telphoneLength")
+                                eq: 50, message: "所在地区长度过长"
                             }],
                             initialValue: address.area
                         })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                            <Input placeholder={"所在地区"} disabled={submitLoading} />
                         )}
                     </FormItem>
-                    {/* <FormItem
-                        {...formItemLayout}
-                        label="所在地区"
-                    >
-                        {getFieldDecorator('area', {
-                            initialValue: ['zhejiang', 'hangzhou', 'xihu'],
-                            rules: [{ type: 'array', required: true, message: 'Please select your habitual residence!' }],
-                            // initialValue: address.area
-                        })(
-                            <Cascader options={residences} />
-                        )}
-                    </FormItem> */}
                     <FormItem
                         {...formItemLayout}
                         label={"详细地址"}
@@ -215,13 +203,13 @@ class EditAddress extends Component {
                     >
                         {getFieldDecorator('addressName', {
                             rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
+                                required: true, message: "详细地址不能为空"
                             }, {
-                                eq: 11, message: intl.get("telphoneLength")
+                                eq: 50, message: "详细地址长度过长"
                             }],
                             initialValue: address.addressName
                         })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                            <Input placeholder={"详细地址"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
@@ -230,12 +218,10 @@ class EditAddress extends Component {
                         required="true"
                     >
                         {getFieldDecorator('zipCode', {
-                            rules: [{
-                                required: true, message: intl.get("telphoneNotnull")
-                            }],
+                            rules: [],
                             initialValue: address.zipCode
                         })(
-                            <Input placeholder={"nickname"} disabled={submitLoading} />
+                            <Input placeholder={"邮政编码"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <div className="footer-checkbox">

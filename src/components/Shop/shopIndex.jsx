@@ -298,7 +298,7 @@ class ShopIndex extends Component {
                             actions={[
                                 <Icon type="edit" onClick={this.handleEditProduct.bind(this, product.proId)} />,
                                 <Icon type="ellipsis" />,
-                                <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteProduct.bind(this, product.proId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                                <Popconfirm title="确定删除该商品？" onConfirm={this.handleDeleteProduct.bind(this, product.proId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
                                     <a href="#">Delete</a>
                                 </Popconfirm>]}
                         >

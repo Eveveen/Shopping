@@ -126,6 +126,7 @@ class EditProduct extends Component {
         e.nativeEvent.stopImmediatePropagation();
         this.state.productInfo.imgCode = null;
         this.state.productInfo.imgId = null;
+        this.setState({})
     }
 
     handleChange = (info) => {

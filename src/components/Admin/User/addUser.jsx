@@ -164,7 +164,7 @@ class AddUser extends Component {
                                     }, {
                                         type: 'email', message: "邮箱格式不正确"
                                     }, {
-                                        max: 50, message: intl.get("emailmax")
+                                        max: 50, message: "邮箱长度过长"
                                     }],
                                 })(
                                     <Input />

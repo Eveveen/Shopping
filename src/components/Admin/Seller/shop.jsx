@@ -116,7 +116,7 @@ class SellerShop extends Component {
         const form = this.props.form;
         var password = form.getFieldValue('password')
         if (value != password) {
-            callback(intl.get("samepassword"));
+            callback("确认密码不一致");
         } else {
             callback();
         }
@@ -198,8 +198,8 @@ class SellerShop extends Component {
                         </FormItem>
                         <FormItem>
                             <div className="edit-shop-footer">
-                                <Button type="primary" onClick={shopId == "undefined" ? this.handleAddShop : this.handleEditShop} loading={submitLoading}>{intl.get("save")}</Button>
-                                <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                                <Button type="primary" onClick={shopId == "undefined" ? this.handleAddShop : this.handleEditShop} loading={submitLoading}>保存</Button>
+                                <Button onClick={this.handleCancel} disabled={submitLoading} >取消</Button>
                             </div>
                         </FormItem>
                     </Form>

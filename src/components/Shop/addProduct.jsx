@@ -60,10 +60,10 @@ class AddProduct extends Component {
                     this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("获取图片失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("获取图片失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -83,12 +83,12 @@ class AddProduct extends Component {
                             this.handleCancel();
                             this.props.handleGetSellerShop();
                         } else {
-                            message.error(messageText(resData.error.code, intl.get("editFailed")));
+                            message.error("添加商品失败");
                         }
                         this.setState({ submitLoading: false });
                     }).catch(error => {
                         console.log(error);
-                        message.error(intl.get("editFailed"));
+                        message.error("添加商品失败");
                         this.setState({ submitLoading: false });
                     });
             }
@@ -150,7 +150,7 @@ class AddProduct extends Component {
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
-                <div className="ant-upload-text">{intl.get("upload")}</div>
+                <div className="ant-upload-text">upload</div>
             </div>
         );
         return (

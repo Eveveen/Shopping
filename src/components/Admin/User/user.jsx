@@ -60,11 +60,11 @@ class User extends Component {
                     this.handleGetAllUser();
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("删除失败");
                 }
             }).catch(error => {
                 console.log(error);
-                message.error(intl.get("editFailed"));
+                message.error("删除失败");
                 this.setState({ showLoading: false });
             });
     }
@@ -99,7 +99,7 @@ class User extends Component {
                     <a href="javascript:;" className="ant-dropdown-link">
                         <Icon type="edit" onClick={this.handleEditUser.bind(this, user)} />
                     </a>
-                    <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteUser.bind(this, user.userId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                    <Popconfirm title="确定删除该用户？" onConfirm={this.handleDeleteUser.bind(this, user.userId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
                         <Icon type="delete" className="delete-icon" />
                     </Popconfirm>
                 </span >
@@ -112,7 +112,16 @@ class User extends Component {
                 <div className="add-icon" onClick={this.handleShowAddUser}>
                     <Icon type="plus-circle" style={{ fontSize: 24 }} />
                 </div>
-                <Table columns={columns} dataSource={userList} />
+                <Table
+                    columns={columns}
+                    dataSource={userList}
+                    pagination={{
+                        defaultPageSize: 5,
+                        total: userList.length,
+                        showQuickJumper: true,
+                        showSizeChanger: true
+                    }}
+                />
                 {showAddUser ?
                     <AddUser
                         visible={this.state.showAddUser}

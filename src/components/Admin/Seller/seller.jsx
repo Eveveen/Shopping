@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Input, Select, Upload, Modal, message, Icon, Form, Menu, Table, Divider, Popconfirm } from 'antd';
-const FormItem = Form.Item;
+import { message, Icon, Table, Popconfirm, Pagination } from 'antd';
 import axios from 'axios';
 import intl from 'react-intl-universal';
 import './Style/seller.sass';
 import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
-const SubMenu = Menu.SubMenu;
 import { Link, browserHistory } from 'react-router';
 import AddSeller from './addSeller';
 
@@ -203,14 +201,14 @@ class Seller extends Component {
             dataIndex: 'shopStatus',
             key: 'shopStatus',
         }, {
-            title: 'Action',
+            title: '操作',
             key: 'action',
             render: (text, seller) => (
                 <span>
                     <a href="javascript:;" className="ant-dropdown-link">
                         <Icon type="edit" onClick={this.handleEditSeller.bind(this, seller)} />
                     </a>
-                    <Popconfirm title="Are you sure delete this task?" onConfirm={this.handleDeleteSeller.bind(this, seller.sellerId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
+                    <Popconfirm title="确定删除该卖家？" onConfirm={this.handleDeleteSeller.bind(this, seller.sellerId)} onCancel={this.handleCancelDelete} okText="Yes" cancelText="No">
                         <Icon type="delete" className="delete-icon" />
                     </Popconfirm>
                 </span >
@@ -222,7 +220,16 @@ class Seller extends Component {
                     <Icon type="plus-circle" style={{ fontSize: 24 }} />
                 </div>
                 <div>
-                    <Table columns={columns} dataSource={sellerList} />
+                    <Table
+                        columns={columns}
+                        dataSource={sellerList}
+                        pagination={{
+                            defaultPageSize: 5,
+                            total: sellerList.length,
+                            showQuickJumper: true,
+                            showSizeChanger: true
+                        }}
+                    />
                 </div>
                 {showAddSeller ?
                     <AddSeller

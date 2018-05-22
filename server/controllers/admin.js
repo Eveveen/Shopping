@@ -10,6 +10,21 @@ const multer = require('multer')
 const paramsMulter = multer({ dest: 'upload/' });
 
 /**
+ * 管理员登录
+ */
+router.post("/login", function (req, res) {
+    const path = utils.PROJECT + "/admin/login";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        req.session.admin = data;
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+
+/**
  * 获取所有的卖家
  */
 router.get("/getAllSeller", function (req, res) {

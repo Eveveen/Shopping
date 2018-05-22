@@ -199,10 +199,10 @@ class DetailInfo extends Component {
                     }
                 } else {
                     this.setState({ showLoading: false })
-                    message.error(intl.get("editFailed"));
+                    message.error("判断商品失败存在失败");
                 }
             }).catch(error => {
-                message.error(intl.get("editFailed"));
+                message.error("判断商品失败存在失败");
                 this.setState({ showLoading: false });
             });
     }

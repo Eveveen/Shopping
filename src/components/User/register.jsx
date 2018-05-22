@@ -72,17 +72,15 @@ class Register extends Component {
                 console.log('Received values of form: ', data);
                 data.telphone = telphone;
                 httpRequestPost(SERVICE_URL + "/user/addUser", { data }, (resData) => {
-                    // this.setState({ showLoading: false });
-                    console.log("addU", resData)
+                    this.setState({ showLoading: false });
                     if (resData == true) {
-                        console.log("true");
                         this.next();
                     } else {
-                        message.error(intl.get("createApplicationFailed"));
+                        message.error("注册失败");
                     }
                 }, (errorData) => {
-                    // this.setState({ showLoading: false })
-                    message.error(intl.get("createApplicationFailed"));
+                    this.setState({ showLoading: false })
+                    message.error("注册失败");
                 })
                 // this.next();
             }
@@ -185,47 +183,45 @@ class Register extends Component {
                 <Form onSubmit={this.handleSubmitSecond}>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("loginName")}
+                        label={"用户名"}
                         required="true"
                     >
                         {getFieldDecorator('userName', {
                             rules: [{
-                                required: true, message: intl.get("loginNameNotnull")
+                                required: true, message: "用户名不能为空"
                             }, {
-                                eq: 11, message: intl.get("loginNameLength")
+                                eq: 50, message: "用户名长度过长"
                             }],
                         })(
-                            <Input placeholder={intl.get("loginName")} disabled={submitLoading} />
+                            <Input placeholder={"用户名"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("password")}
+                        label={"密码"}
                         required="true"
                     >
                         {getFieldDecorator('password', {
                             rules: [{
-                                required: true, message: intl.get("passwordNotnull")
+                                required: true, message: "密码不能为空"
                             }, {
-                                eq: 11, message: intl.get("passwordLength")
+                                eq: 11, message: "密码长度过长"
                             }],
                         })(
-                            <Input placeholder={intl.get("password")} disabled={submitLoading} />
+                            <Input placeholder={"密码"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label={intl.get("repassword")}
+                        label={"确认密码"}
                         required="true"
                     >
                         {getFieldDecorator('repassword', {
                             rules: [{
-                                required: true, message: intl.get("repasswordNotnull")
-                            }, {
-                                eq: 11, message: intl.get("repasswordLength")
+                                required: true, message: "确认密码不能为空"
                             }],
                         })(
-                            <Input placeholder={intl.get("repassword")} disabled={submitLoading} />
+                            <Input placeholder={"确认密码"} disabled={submitLoading} />
                         )}
                     </FormItem>
                     <FormItem>

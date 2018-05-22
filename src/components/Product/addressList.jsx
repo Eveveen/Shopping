@@ -143,7 +143,16 @@ class AddressList extends Component {
                     <Icon type="plus-circle" style={{ fontSize: 24 }} onClick={this.handleShowAddAddress} />
                 </div>
                 <div className="address-table">
-                    <Table columns={columns} dataSource={this.state.addressData} />
+                    <Table
+                        columns={columns}
+                        dataSource={this.state.addressData}
+                        pagination={{
+                            defaultPageSize: 5,
+                            total: this.state.addressData.length,
+                            showQuickJumper: true,
+                            showSizeChanger: true
+                        }}
+                    />
                 </div>
                 <AddAddress
                     visible={this.state.showAddAddress}

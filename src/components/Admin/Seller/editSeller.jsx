@@ -89,7 +89,7 @@ class EditSeller extends Component {
         const form = this.props.form;
         var password = form.getFieldValue('password')
         if (value != password) {
-            callback(intl.get("samepassword"));
+            callback("密码不一致");
         } else {
             callback();
         }
@@ -185,11 +185,11 @@ class EditSeller extends Component {
                         >
                             {getFieldDecorator('email', {
                                 rules: [{
-                                    required: true, message: intl.get("requireemail"),
+                                    required: true, message: "邮箱不能为空",
                                 }, {
-                                    type: 'email', message: intl.get("formatemail")
+                                    type: 'email', message: "邮箱格式不正确"
                                 }, {
-                                    max: 50, message: intl.get("emailmax")
+                                    max: 50, message: "邮箱长度过长"
                                 }],
                                 initialValue: sellerInfo.email
                             })(
@@ -198,8 +198,8 @@ class EditSeller extends Component {
                         </FormItem>
                         <FormItem>
                             <div className="edit-seller-footer">
-                                <Button type="primary" onClick={this.handlEditSeller} loading={submitLoading}>{intl.get("save")}</Button>
-                                <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                                <Button type="primary" onClick={this.handlEditSeller} loading={submitLoading}>保存</Button>
+                                <Button onClick={this.handleCancel} disabled={submitLoading} >取消</Button>
                             </div>
                         </FormItem>
                     </Form>

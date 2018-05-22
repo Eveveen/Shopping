@@ -50,7 +50,7 @@ class UploadItem extends Component {
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
-                <div className="ant-upload-text">{intl.get("upload")}</div>
+                <div className="ant-upload-text">upload</div>
             </div>
         );
         return (

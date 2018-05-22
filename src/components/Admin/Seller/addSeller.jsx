@@ -50,7 +50,6 @@ class AddSeller extends Component {
                         }
                     }).catch(error => {
                         console.log(error);
-                        message.error(intl.get("editFailed"));
                         message.error("添加卖家失败");
                     });
             }
@@ -97,8 +96,8 @@ class AddSeller extends Component {
                     destroyOnClose={true}
                     maskClosable={false}
                     footer={<div>
-                        <Button type="primary" onClick={this.handleAddSeller} loading={submitLoading}>{intl.get("save")}</Button>
-                        <Button onClick={this.handleCancel} disabled={submitLoading} >{intl.get("cancel")}</Button>
+                        <Button type="primary" onClick={this.handleAddSeller} loading={submitLoading}>{"保存"}</Button>
+                        <Button onClick={this.handleCancel} disabled={submitLoading} >{"取消"}</Button>
                     </div>}
                 >
                     <div className="personal-info">
@@ -160,11 +159,11 @@ class AddSeller extends Component {
                             >
                                 {getFieldDecorator('email', {
                                     rules: [{
-                                        required: true, message: intl.get("requireemail"),
+                                        required: true, message: "邮箱不能为空",
                                     }, {
-                                        type: 'email', message: intl.get("formatemail")
+                                        type: 'email', message: "邮箱格式不正确"
                                     }, {
-                                        max: 50, message: intl.get("emailmax")
+                                        max: 50, message: "邮箱长度过长"
                                     }],
                                 })(
                                     <Input />

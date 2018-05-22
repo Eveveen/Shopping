@@ -33,7 +33,7 @@ class ShopMenu extends Component {
                         mode="horizontal"
                     >
                         <SubMenu title={<span><Icon type="setting" />用户名</span>}>
-                            <Menu.Item key="account/seller">账号管理</Menu.Item>
+                            <Menu.Item key="shop/account">账号管理</Menu.Item>
                             <Menu.Item key="exitAccount">退出</Menu.Item>
                         </SubMenu>
                         <Menu.Item key="shop">

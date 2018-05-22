@@ -16,9 +16,11 @@ class AccountMenu extends Component {
 
     handleClick = (e) => {
         console.log('click ', e);
-        // this.setState({ current: e.key })
-        browserHistory.push(BASE_URL + "/account/" + e.key);
-        // browserHistory.push(BASE_URL + "/" + e.key);
+        if (this.props.pathname == "shop") {
+            browserHistory.push(BASE_URL + "/shop/" + e.key);
+        } else {
+            browserHistory.push(BASE_URL + "/account/" + e.key);
+        }
 
     }
 
@@ -37,7 +39,7 @@ class AccountMenu extends Component {
                     >
                         <SubMenu key="sub1" title={<span><Icon type="mail" /><span>帐号管理</span></span>}>
                             <Menu.Item key="user/member">个人资料</Menu.Item>
-                            <Menu.Item key="user/address">收货地址</Menu.Item>
+                            {this.props.pathname == "shop" ? null : <Menu.Item key="user/address">收货地址</Menu.Item>}
                         </SubMenu>
                     </Menu>
                 </div>

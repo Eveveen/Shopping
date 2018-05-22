@@ -21,6 +21,7 @@ export OrderItem from './Product/orderItem';
 export Pay from './Product/pay';
 export ProductIndex from './Product';
 export SellerShop from "./Admin/Seller/shop";
+export ShopAccount from "./Shop/shopAccount";
 export ShopItem from "./Product/shopItem";
 export ShopMenu from "./Menu/shopMenu";
 export ShopOrder from "./Shop/shopOrder";
