@@ -28,25 +28,34 @@ class SellerShop extends Component {
     }
 
     componentWillMount() {
-        console.log(this.props);
-        const { shopId } = this.props;
-        console.log(shopId);
-        if (shopId != "undefined") {
-            axios.get(SERVICE_URL + "/admin/getSellerShop/" + shopId)
-                .then(response => {
-                    const resData = response.data;
-                    if (response.status == 200 && !resData.error) {
-                        this.setState({ showLoading: false, shopInfo: resData });
+        axios.get(SERVICE_URL + "/checkIsAdmin")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
                     } else {
-                        message.error("获取店铺失败");
-                        this.setState({ showLoading: false })
+                        const { shopId } = this.props;
+                        if (shopId != "undefined") {
+                            axios.get(SERVICE_URL + "/admin/getSellerShop/" + shopId)
+                                .then(response => {
+                                    const resData = response.data;
+                                    if (response.status == 200 && !resData.error) {
+                                        this.setState({ showLoading: false, shopInfo: resData });
+                                    } else {
+                                        message.error("获取店铺失败");
+                                        this.setState({ showLoading: false })
+                                    }
+                                }).catch(error => {
+                                    console.log(error);
+                                    this.setState({ showLoading: false })
+                                    message.error("获取店铺失败");
+                                });
+                        }
                     }
-                }).catch(error => {
-                    console.log(error);
-                    this.setState({ showLoading: false })
-                    message.error("获取店铺失败");
-                });
-        }
+                }
+            });
+
     }
 
     handleCancel = () => {

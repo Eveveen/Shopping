@@ -18,7 +18,17 @@ class User extends Component {
     }
 
     componentWillMount() {
-        this.handleGetAllUser();
+        axios.get(SERVICE_URL + "/checkIsAdmin")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        this.handleGetAllUser();
+                    }
+                }
+            });
     }
 
     handleGetAllUser = () => {
@@ -44,10 +54,7 @@ class User extends Component {
     }
 
     handleClick = (e) => {
-        console.log('click ', e);
         browserHistory.push(BASE_URL + "/admin/" + e.key);
-        // browserHistory.push(BASE_URL + "/" + e.key);
-
     }
 
     handleDeleteUser = (userId) => {

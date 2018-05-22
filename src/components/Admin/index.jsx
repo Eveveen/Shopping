@@ -9,33 +9,9 @@ const SubMenu = Menu.SubMenu;
 import { Link, browserHistory } from 'react-router';
 
 class AdminIndex extends Component {
-
-    state = {
-        current: 'seller',
-    }
-
-    handleClick = (e) => {
-        console.log('click ', e);
-        browserHistory.push(BASE_URL + "/admin/" + e.key);
-        // browserHistory.push(BASE_URL + "/" + e.key);
-
-    }
-
     render() {
         return (
             <div>
-                {/* <Menu
-                    onClick={this.handleClick}
-                    selectedKeys={[this.state.current]}
-                    mode="horizontal"
-                >
-                    <Menu.Item key="seller">
-                        <Icon type="appstore" />卖家
-                </Menu.Item>
-                    <Menu.Item key="user">
-                        <Icon type="appstore" />普通用户
-                </Menu.Item>
-                </Menu> */}
                 {this.props.children}
             </div>
         )

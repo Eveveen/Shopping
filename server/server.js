@@ -90,6 +90,8 @@ app.use('/static', express.static(path.resolve(__dirname + '/static')));
 app.use('/', require("./controllers/index.js"));
 app.use('/user', require("./controllers/user.js"));
 app.use('/product', require("./controllers/product.js"));
+app.use('/shop', require("./controllers/shop.js"));
+app.use('/admin', require("./controllers/admin.js"));
 
 app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname + '/../dist/index.html'));

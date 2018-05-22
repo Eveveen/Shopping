@@ -20,7 +20,6 @@ class ShopMenu extends Component {
         } else {
             browserHistory.push(BASE_URL + '/' + e.key);
         }
-        // this.props.handleChangePageStatus(e);
     }
 
     render() {

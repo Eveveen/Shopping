@@ -23,17 +23,31 @@ router.post("/login", function (req, res) {
     })
 });
 
+router.get("/logout", function (req, res) {
+    if (checkIsRole(req) == true) {
+        delete req.session.admin;
+        res.send(true);
+    } else {
+        logger.error('no permission to get "/logout"');
+        res.sendStatus(403);
+    }
+});
 
 /**
  * 获取所有的卖家
  */
 router.get("/getAllSeller", function (req, res) {
-    const path = utils.PROJECT + "/seller/getAllSeller";
-    httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
-    }, function (statusCode, msg) {
-        res.send({ error: { code: -1, msg: msg } });
-    })
+    if (checkIsRole(req) == true) {
+        const path = utils.PROJECT + "/seller/getAllSeller";
+        httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+            res.send(data);
+        }, function (statusCode, msg) {
+            res.send({ error: { code: -1, msg: msg } });
+        })
+    } else {
+        logger.error('no permission to get "/getAllSeller"');
+        res.sendStatus(403);
+    }
 });
 
 /**
@@ -226,13 +240,10 @@ router.get("/deleteUser/:id", function (req, res) {
 });
 
 function checkIsRole(req) {
-    const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
-    for (var i = 0; i < roles.length; i++) {
-        if (roles[i] == 'admin') {
-            break;
-        }
+    let flag = false;
+    if (req.session.admin && req.session.admin.name != null) {
+        flag = true;
     }
-    let flag = i < roles.length ? true : false;
     return flag;
 }
 

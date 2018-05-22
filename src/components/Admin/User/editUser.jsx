@@ -28,20 +28,30 @@ class EditUser extends Component {
     }
 
     componentWillMount() {
-        const { id } = this.props.params;
-        axios.get(SERVICE_URL + "/admin/getUser/" + id)
+        axios.get(SERVICE_URL + "/checkIsAdmin")
             .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, userInfo: resData });
-                } else {
-                    message.error("获取用户失败");
-                    this.setState({ showLoading: false })
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        const { id } = this.props.params;
+                        axios.get(SERVICE_URL + "/admin/getUser/" + id)
+                            .then(response => {
+                                const resData = response.data;
+                                if (response.status == 200 && !resData.error) {
+                                    this.setState({ showLoading: false, userInfo: resData });
+                                } else {
+                                    message.error("获取用户失败");
+                                    this.setState({ showLoading: false })
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                this.setState({ showLoading: false })
+                                message.error("获取用户失败");
+                            });
+                    }
                 }
-            }).catch(error => {
-                console.log(error);
-                this.setState({ showLoading: false })
-                message.error("获取用户失败");
             });
     }
 

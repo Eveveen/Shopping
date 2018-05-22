@@ -16,12 +16,22 @@ class Seller extends Component {
     }
 
     componentWillMount() {
-        if (this.props.location.pathname == "/admin/shopApply") {
-            this.handleGetApplyShop();
-        } else {
-            this.handleGetAllSeller(this.props.location.pathname);
-        }
-        this.setState({})
+        axios.get(SERVICE_URL + "/checkIsAdmin")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    if (data == false) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        if (this.props.location.pathname == "/admin/shopApply") {
+                            this.handleGetApplyShop();
+                        } else {
+                            this.handleGetAllSeller(this.props.location.pathname);
+                        }
+                        this.setState({})
+                    }
+                }
+            });
     }
 
     componentWillReceiveProps(props) {

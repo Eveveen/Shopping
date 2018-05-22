@@ -15,16 +15,27 @@ class AdminHeader extends Component {
     }
     componentWillMount() {
         let current = this.props.location.pathname.split("/");
-        console.log(current);
         this.setState({ current: current[2] })
     }
 
     handleClick = (e) => {
-        console.log('click ', e);
         this.setState({ current: e.key })
-        browserHistory.push(BASE_URL + "/admin/" + e.key);
-        // browserHistory.push(BASE_URL + "/" + e.key);
-
+        if (e.key == "exitAccount") {
+            axios.get(SERVICE_URL + "/admin/logout")
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        browserHistory.push(BASE_URL);
+                    } else {
+                        message.error("退出失败");
+                    }
+                }).catch(error => {
+                    console.log(error);
+                    message.error("退出失败");
+                });
+        } else {
+            browserHistory.push(BASE_URL + "/admin/" + e.key);
+        }
     }
 
     render() {
@@ -43,6 +54,9 @@ class AdminHeader extends Component {
                     </Menu.Item>
                     <Menu.Item key="user">
                         <Icon type="appstore" />普通用户
+                    </Menu.Item>
+                    <Menu.Item key="exitAccount">
+                        <Icon type="appstore" />退出登录
                     </Menu.Item>
                 </Menu>
                 {this.props.children}
