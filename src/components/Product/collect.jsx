@@ -281,7 +281,7 @@ class Collect extends Component {
                         <Content>{this.state.pathname == "/collectTreasure" ?
                             this.renderCollectTreasureContent() :
                             this.state.pathname == "/collectShop" ? <CollectShopChild collectShopList={collectShopList} /> : null}</Content>
-                        <Footer>&nbsp;&nbsp;</Footer>
+                        <Footer>@2018-eshop</Footer>
                     </Layout>
                 </Spin>
             </div>

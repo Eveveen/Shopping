@@ -22,7 +22,7 @@ class Category extends Component {
                         <Sider>Sider</Sider>
                         <Content>{this.renderThemeMarket()}</Content>
                     </Layout>
-                    <Footer></Footer>
+                    <Footer>@2018-eshop</Footer>
                 </Layout>
             </div >
         )

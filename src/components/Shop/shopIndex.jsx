@@ -327,7 +327,7 @@ class ShopIndex extends Component {
                                     shopInfo={this.state.shopInfo}
                                 /> : null}
                         </Content>
-                        <Footer>&nbsp;&nbsp;</Footer>
+                        <Footer>@2018-eshop</Footer>
                     </Layout>
                 </div >
             </Spin>

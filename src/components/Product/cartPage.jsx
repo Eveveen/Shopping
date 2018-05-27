@@ -489,7 +489,7 @@ class CartPage extends Component {
                             </div>
                             {productInfo.proId == null ? null : this.renderProduct()}
                         </Content>
-                        <Footer>
+                        <Footer>@2018-eshop
                         </Footer>
                         <div className="cart-footer">
                             <CartFooter

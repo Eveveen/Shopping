@@ -258,7 +258,7 @@ class ShopItem extends Component {
                         <Content>
                             {this.renderCollectTreasureContent()}
                         </Content>
-                        <Footer></Footer>
+                        <Footer>@2018-eshop</Footer>
                     </Layout>
                 </div >
             </Spin>
