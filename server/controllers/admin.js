@@ -69,18 +69,18 @@ router.get("/getSeller/:id", function (req, res) {
  * 添加卖家
  */
 router.post("/addSeller", function (req, res) {
-    if (checkIsRole(req) == true) {
-        const path = utils.PROJECT + "/seller/addSeller";
-        const { data } = req.body;
-        httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-            res.send(data);
-        }, function (statusCode, msg) {
-            res.send({ error: { code: -1, msg: msg } });
-        })
-    } else {
-        logger.error('no permission to get "/addSeller"');
-        res.sendStatus(403);
-    }
+    // if (checkIsRole(req) == true) {
+    const path = utils.PROJECT + "/seller/addSeller";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+    // } else {
+    //     logger.error('no permission to get "/addSeller"');
+    //     res.sendStatus(403);
+    // }
 });
 
 
@@ -174,18 +174,18 @@ router.get("/getShopByShopStatus/:shopStatus", function (req, res) {
  * 添加店铺，一个卖家只能有一个店铺
  */
 router.post("/addShop", function (req, res) {
-    if (checkIsRole(req) == true) {
-        const path = utils.PROJECT + "/addShop";
-        const { data } = req.body;
-        httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-            res.send(data);
-        }, function (statusCode, msg) {
-            res.send({ error: { code: -1, msg: msg } });
-        })
-    } else {
-        logger.error('no permission to get "/addShop"');
-        res.sendStatus(403);
-    }
+    // if (checkIsRole(req) == true) {
+    const path = utils.PROJECT + "/addShop";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+    // } else {
+    //     logger.error('no permission to get "/addShop"');
+    //     res.sendStatus(403);
+    // }
 });
 
 /**

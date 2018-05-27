@@ -188,7 +188,7 @@ class SellerShop extends Component {
                             label="店铺状态"
                         >
                             {getFieldDecorator('shopStatus', {
-                                rules: [{ required: true, message: 'Please input your phone number!' }],
+                                rules: [{ required: true, message: '请输入店铺描述' }],
                                 initialValue: shopInfo.shopStatus
                             })(
                                 <Input placeholder={"店铺状态"} disabled={submitLoading} />

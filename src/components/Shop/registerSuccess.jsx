@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Button } from 'antd';
 import intl from 'react-intl-universal';
-import './success.sass';
+import './Style/registerSuccess.sass';
 import { Link, browserHistory } from 'react-router';
-import { SERVICE_URL, BASE_URL } from '../../../../conf/config';
+import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 
-class Success extends Component {
+class RegisterSuccess extends Component {
 
     handleReturnToIndex = () => {
         browserHistory.push(BASE_URL + "/home");
@@ -13,11 +13,10 @@ class Success extends Component {
     render() {
         return (
             <div className="success-page">
-                <div>SUCCESS！</div>
-                <Button type="primary" onClick={this.handleReturnToIndex}>点击返回首页</Button>
+                <div>注册成功！等待管理员认证</div>
             </div >
         )
     }
 }
 
-export default Success;
+export default RegisterSuccess;

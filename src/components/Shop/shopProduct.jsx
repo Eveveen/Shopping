@@ -27,7 +27,7 @@ class ShopProduct extends Component {
                 <Layout>
                     <Header>{this.renderShopHeader()}</Header>
                     <Content>{this.renderShopContent()}</Content>
-                    <Footer>Footer</Footer>
+                    <Footer></Footer>
                 </Layout>
             </div >
         )

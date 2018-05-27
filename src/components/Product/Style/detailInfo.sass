@@ -1,11 +1,16 @@
 .detail
-    margin: 10px 13%
+    padding: 10px 13%
     display: flex
     flex-direction: column
     .summary-info
         display: flex
+        background: #fff
+        margin-top: -12px;
+        padding-top: 20px
         .card-info
             flex: 2
+            .ant-card-bordered
+                border: none
             .ant-card-cover
                 img
                     width: 400px
@@ -75,7 +80,7 @@
                     .ant-btn
                         background-color: lightgrey
                 .pro-text
-                    flex: 2
+                    flex: 4
             .range-tip
                 padding: 3px 10px 3px 5px;
                 border: 1px solid #efefef;
@@ -83,23 +88,55 @@
                 margin: -1px
                 width: 215px
                 color: #666
+    .detailed-info
+        margin: 2% 0%
+        display: flex
+        flex-direction: row
         .shop-info
-            flex: 1
+            // flex: 1
             border: 1px solid black
             max-height: 200px
             min-width: 200px
             margin-top: 50px
-            margin-left: 20px
+            margin-right: 20px
+            box-shadow: 2px 2px 5px #b7b3b3, -1px 1px 20px #8f9494
             .shop-name
                 margin: 20px 30px
                 font-size: 20px
                 font-weight: 800
             .shop-btn
                 margin: 20px 30px
-    .detailed-info
-        margin: 2% 0%
+        .ant-tabs
+            width: 100%
+        .ant-tabs-bar
+            margin-bottom: 0px
+        .detailed-content
+            text-align: center
+            padding-top: 20px
+            .product-content
+                border: 1px solid #aaa
+                .line
+                    display: flex
+                    padding: 10px
+                    .left-line
+                        flex: 1
+                        display: flex
+                    .right-line
+                        flex: 1
+                        display: flex
+                // .left-text
+                //     padding: 10px
+            .product-img
+                height: 600px
+                width: 600px
+                margin-top: 10px
+                img 
+                    width: 100%
+                    height: 100%
         .remark
             display: flex
+            padding-left: 20px
+            padding-top: 20px
             .remark-info
                 margin-left: 50px
                 display: flex

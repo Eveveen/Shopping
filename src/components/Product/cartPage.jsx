@@ -345,13 +345,16 @@ class CartPage extends Component {
                 }
             });
         });
+        let tPrice = 0;
+        let f = false;
         productList.forEach((product, index) => {
             if (product.shopInfo.shopId == shopId) {
                 if (product.checked && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
                     selectedCartIds.push(product.cartInfo.cartId);
                     totalCount += product.cartInfo.proNum * product.price;
                 } else if (_.contains(selectedCartIds, product.cartInfo.cartId) && product.checked == false) {
-                    totalCount -= product.cartInfo.proNum * product.price;
+                    f = true;
+                    tPrice = tPrice + product.cartInfo.proNum * product.price;
                     selectedCartIds.forEach((id, idIndex) => {
                         if (id == product.cartInfo.cartId) {
                             selectedCartIds.splice(idIndex, 1);
@@ -360,6 +363,9 @@ class CartPage extends Component {
                 }
             }
         });
+        if (f) {
+            totalCount = totalCount - tPrice;
+        }
         if (shopFlag) {
             this.state.checkedAll = true;
         } else {
@@ -393,7 +399,8 @@ class CartPage extends Component {
         if (flag == true) {
             checkedAll = true;
             productList.forEach((product, index) => { // 失效商品不选中
-                if (product.checked && product.proStatus != 0 && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
+                // if (product.checked && product.proStatus != 0 && !_.contains(selectedCartIds, product.cartInfo.cartId)) {
+                if (product.checked && product.proStatus != 0) {
                     selectedCartIds.push(product.cartInfo.cartId);
                     totalCount += product.cartInfo.proNum * product.price;
                 } else if (_.contains(selectedCartIds, product.cartInfo.cartId) && product.checked == false) {

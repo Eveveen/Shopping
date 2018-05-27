@@ -16,12 +16,20 @@ class DetailInfo extends Component {
         productInfo: {},
         showLoading: true,
         commentList: [],
-        defaultAddress: {},
         overRange: false,
-        isLogin: false
+        isLogin: false,
+        defaultAddress: { area: "江苏", addressName: "南通" },
+        getCurrentPositionResult: null
     }
 
+
     componentWillMount() {
+        // var point = new BMap.Point(116.331398, 39.897445);
+        // map.centerAndZoom(point, 12);
+        var map = new BMap.Map("allmap");
+        var geolocation = new BMap.Geolocation();
+        var defaultAddress = { area: "", addressName: "" }
+
         this.handleIsLogin();
         const { proId } = this.props.params;
         this.handleChageProductScanNum();
@@ -37,14 +45,17 @@ class DetailInfo extends Component {
                             const data = response.data;
                             if (!data.error) {
                                 if (data == false) {
-                                    let defaultAddress = { area: "江苏", addressName: "南通" };
-                                    this.setState({ defaultAddress: defaultAddress })
+                                    geolocation.getCurrentPosition((r) => {
+                                        defaultAddress.area = r.address.province;
+                                        defaultAddress.addressName = r.address.city;
+                                        this.setState({ defaultAddress: defaultAddress })
+                                    }, { enableHighAccuracy: true })
+                                    //this.setState({ defaultAddress: defaultAddress })
                                 } else {
                                     this.handleGetDefaultAddress();
                                 }
                             }
                         });
-
                     this.setState({ showLoading: false, productInfo: resData });
                 } else {
                     message.error("获取商品失败");
@@ -54,6 +65,8 @@ class DetailInfo extends Component {
                 message.error("获取商品失败");
                 this.setState({ showLoading: false });
             })
+
+
     }
 
     handleIsLogin = () => {
@@ -123,11 +136,23 @@ class DetailInfo extends Component {
 
     handleGetDefaultAddress = () => {
         this.state.showLoading = true;
+        var map = new BMap.Map("allmap");
+        var geolocation = new BMap.Geolocation();
+        var defaultAddress = { area: "", addressName: "" }
         axios.get(SERVICE_URL + "/product/getDefaultAddress")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    this.setState({ showLoading: false, defaultAddress: resData });
+                    if (resData != "") {
+                        this.setState({ defaultAddress: resData })
+                    } else {
+                        geolocation.getCurrentPosition((r) => {
+                            defaultAddress.area = r.address.province;
+                            defaultAddress.addressName = r.address.city;
+                            this.setState({ defaultAddress: defaultAddress })
+                        }, { enableHighAccuracy: true })
+                    }
+                    this.setState({ showLoading: false });
                 } else {
                     this.setState({ showLoading: false })
                     message.error("获取默认地址失败");
@@ -393,13 +418,13 @@ class DetailInfo extends Component {
                                 style={{ width: 400, height: 400 }}
                                 cover={<img alt="example" src={productInfo.imgCode} />}
                             >
-                                <div className="detail-info-img">
+                                {/* <div className="detail-info-img">
                                     <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
                                     <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
                                     <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
                                     <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
                                     <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                </div>
+                                </div> */}
                             </Card>
                         </div>
                         <div className="text-info">
@@ -425,7 +450,7 @@ class DetailInfo extends Component {
                                     <Input value={count} onChange={this.changeCount} />
                                     <Button onClick={this.increaseCount}>+</Button>
                                 </div>
-                                <div className="pro-text">库存：{productInfo.proNum}</div>
+                                <div className="pro-text">库存：{productInfo.proNum}件</div>
                             </div>
                             {count > productInfo.proNum ?
                                 <div className="text-detail range-tip">您所填写的商品数量超过库存！</div> : null}
@@ -442,16 +467,44 @@ class DetailInfo extends Component {
                                 <Button onClick={this.handleIsCollectProductExist}>收藏宝贝</Button>
                             </div>
                         </div>
+
+                    </div >
+                    <div className="detailed-info">
                         <div className="shop-info">
                             <div className="shop-name">{productInfo.shopInfo == null ? null : productInfo.shopInfo.shopName}</div>
                             <div className="shop-btn"><Button onClick={productInfo.shopInfo == null ? null : this.handleViewShop.bind(this, productInfo.shopInfo.shopId)}>进入店铺</Button></div>
                             <div className="shop-btn"><Button onClick={this.handleIsCollectShopExist}>收藏店铺</Button></div>
                         </div>
-                    </div >
-                    <div className="detailed-info">
                         <Tabs onChange={this.callback} type="card">
                             <TabPane tab="宝贝详情" key="basic">
-                                <div className="detailed-header">商品基本信息</div>
+                                <div className="detailed-content">
+                                    <div className="product-content">
+                                        <div className="line">产品参数：</div>
+                                        <div className="line">
+                                            <div className="left-line">
+                                                <div className="left-text">产品名称：</div>
+                                                <div className="right-text">{productInfo.proName}</div>
+                                            </div>
+                                            <div className="right-line">
+                                                <div className="left-text">产品描述：</div>
+                                                <div className="right-text">{productInfo.description}</div>
+                                            </div>
+                                        </div>
+                                        <div className="line">
+                                            <div className="left-line">
+                                                <div className="left-text">定价：</div>
+                                                <div className="right-text">{productInfo.price}元</div>
+                                            </div>
+                                            <div className="right-line">
+                                                <div className="left-text">库存：</div>
+                                                <div className="right-text">{productInfo.proNum} 件</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="product-img">
+                                        <img alt="img" src={productInfo.imgCode} />
+                                    </div>
+                                </div>
                             </TabPane>
                             <TabPane tab="累计评论" key="comment">
                                 {this.renderComment()}

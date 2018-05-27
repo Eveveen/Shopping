@@ -5,7 +5,7 @@ import {
     OrderItem, MenuIndex, CartPage, Account, Collect, BuyItem, AddressList, AccountMenu,
     EditAddress, EditProduct, UploadItem, AdminHeader, User, Seller, ShopProduct, ShopIndex,
     ShopMenu, BuyNow, EditUser, EditSeller, SellerShop, ShopItem, SearchProductItem, Pay,
-    ShopOrder, CollectShopChild, ShopAccount
+    ShopOrder, CollectShopChild, ShopAccount, RegisterSeller, RegisterShop, RegisterSuccess
 } from '../components';
 import { BASE_URL } from '../../conf/config';
 import { adminOperationTypeEnum } from '../data/enum';
@@ -17,10 +17,12 @@ const routes = (
     <Router history={browserHistory}>
         <Route path={"/"} component={App} >
             <Route path={"/upload"} component={UploadItem} />
+            <Route path={"/aa"} component={ProductIndex} />
             <Route path={"/login"} component={Login} />
+            <Route path={"/register"} component={Register} />
+            <Route path={"/registerSeller"} component={RegisterSeller} />
             <Route path={baseUrl} component={MenuIndex}>
                 <IndexRoute component={HomePage} />
-                <Route path={"/register"} component={Register} />
                 <Route path={"/home"} component={HomePage} />
                 <Route path={"/buy/:id"} component={BuyItem} />
                 <Route path={"/buyNow/:id"} component={BuyNow} />
@@ -48,6 +50,8 @@ const routes = (
 
             <Route path={"/shop"} component={ShopMenu}>
                 <IndexRoute component={ShopIndex} />
+                <Route path={"registerShop/:sellerId"} component={RegisterShop} />
+                <Route path={"registerSuccess"} component={RegisterSuccess} />
                 <Route path="account" component={ShopAccount} />
                 <Route path="user/member" component={ShopAccount} />
                 <Route path="order" component={ShopOrder} />

@@ -20,8 +20,8 @@ class AddressItem extends Component {
         })
     }
 
-    handleEditAddress = () => {
-        browserHistory.push(BASE_URL + "/account/user/editAddress");
+    handleEditAddress = (addressId) => {
+        browserHistory.push(BASE_URL + "/account/user/editAddress/" + addressId);
     }
 
     handleChageAddress = (e) => {
@@ -54,13 +54,18 @@ class AddressItem extends Component {
             tempAddressDiv.push(
                 <div className="address-radio">
                     <Radio value={address.addressId}>
-                        {address.area} {address.addressName} （{address.consignee} 收） {address.telphone}
-                        <div className="adddress-operation">
-                            <div className="address-status">
-                                默认地址
-                            </div>
-                            <div className="address-edit" onClick={this.handleEditAddress}>
-                                修改本地址
+                        <div className="radio-text">
+                            <div className="address-radio-text">{address.area}</div>
+                            <div className="address-radio-text">{address.addressName} </div>
+                            <div className="address-radio-text">（{address.consignee} 收） </div>
+                            <div className="address-radio-text">{address.telphone}</div>
+                            <div className="adddress-operation">
+                                <div className="address-edit" onClick={this.handleEditAddress.bind(this, address.addressId)}>
+                                    修改本地址
+                                </div>
+                                <div className="address-status">
+                                    {address.addressStatus == 1 ? "默认地址" : ""}
+                                </div>
                             </div>
                         </div>
                     </Radio>

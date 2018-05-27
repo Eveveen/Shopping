@@ -38,6 +38,57 @@ router.get("/logout", function (req, res) {
 });
 
 /**
+ * 获取验证码
+ */
+router.post("/getCode", function (req, res) {
+    var code = parseInt(Math.random() * 100000)
+    const { telphone } = req.body;
+    var sendCode = `` + code.toString().slice(0, 4) + ``;
+    const path = utils.PROJECT + "/seller/saveCode/" + sendCode + "/" + telphone;
+    //num.substring(0,s.indexOf(".")+3);
+    console.log(sendCode)
+    console.log(telphone)
+    var sendData = {
+        PhoneNumbers: telphone,
+        SignName: '孙梦娟',
+        TemplateCode: 'SMS_130840278',
+        TemplateParam: '{"code":' + '"' + sendCode + '"' + '}'
+    }
+    // res.send(sendCode)
+    let data = { telphone: telphone, validateCode: sendCode };
+    httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (resData) {
+        res.send(resData);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+    // smsClient.sendSMS(sendData).then(function (data) {
+    //     let { Code } = data
+    //     if (Code === 'OK') {
+    //         //处理返回参数
+    //         console.log(data)
+    //         // res.send(data)
+    //     }
+    // }, function (err) {
+    //     res.send({ error: { code: -1, msg: err } });
+    // })
+});
+
+/**
+ * 验证验证码
+ */
+router.post("/verifyCode", function (req, res) {
+    const path = utils.PROJECT + "/seller/verifyCode";
+    const { data } = req.body;
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+    // logger.error('no permission to get "/getChannel"');
+    // res.sendStatus(403);
+});
+
+/**
  * 获取卖家信息
  */
 router.get("/getSellerInfo", function (req, res) {

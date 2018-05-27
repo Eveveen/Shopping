@@ -188,10 +188,9 @@ class HomePage extends Component {
                     <Layout>
                         <Header>{this.renderHeader()}</Header>
                         <Layout>
-                            {/* <Sider> {this.renderLeftMenu()}</Sider> */}
                             <Content>{this.renderContent()}</Content>
                         </Layout>
-                        <Footer>Footer</Footer>
+                        <Footer>@2018-eshop</Footer>
                     </Layout>
                 </div>
             </div>
@@ -220,51 +219,6 @@ class HomePage extends Component {
                         )}
                     />
                 </AutoComplete>
-            </div>
-        )
-    }
-
-    renderLeftMenu() {
-        return (
-            <div className="home-left-menu">
-                <Menu>
-                    <SubMenu key="sub4" title={<span><Icon type="setting" /><span>Navigation four&nbsp;&nbsp;</span></span>}>
-                        <Menu.Item key="9">Option 9</Menu.Item>
-                        <Menu.Item key="10">Option 10</Menu.Item>
-                        <Menu.Item key="11">Option 11</Menu.Item>
-                        <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="sub3" title={<span><Icon type="setting" /><span>Navigation two</span></span>}>
-                        <Menu.Item key="9">Option 9</Menu.Item>
-                        <Menu.Item key="10">Option 10</Menu.Item>
-                        <Menu.Item key="11">Option 11</Menu.Item>
-                        <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="sub2" title={<span><Icon type="setting" /><span>Navigation one</span></span>}>
-                        <Menu.Item key="9">Option 9</Menu.Item>
-                        <Menu.Item key="10">Option 10</Menu.Item>
-                        <Menu.Item key="11">Option 11</Menu.Item>
-                        <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="sub1" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-                        <Menu.Item key="9">Option 9</Menu.Item>
-                        <Menu.Item key="10">Option 10</Menu.Item>
-                        <Menu.Item key="11">Option 11</Menu.Item>
-                        <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="sub0" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-                        <Menu.Item key="9">Option 9</Menu.Item>
-                        <Menu.Item key="10">Option 10</Menu.Item>
-                        <Menu.Item key="11">Option 11</Menu.Item>
-                        <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="sub11" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-                        <Menu.Item key="9">Option 9</Menu.Item>
-                        <Menu.Item key="10">Option 10</Menu.Item>
-                        <Menu.Item key="11">Option 11</Menu.Item>
-                        <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                </Menu>
             </div>
         )
     }
@@ -299,7 +253,7 @@ class HomePage extends Component {
             if (index < 3) {
                 arrangeProDiv1.push(
                     <div className="arrange-item">
-                        <Card.Grid>
+                        <Card.Grid onClick={this.handleShowDetail.bind(this, img.proId)}>
                             <img src={img.imgCode} />
                             <div className="item-title">{img.productInfo == null ? null : img.productInfo.proName}</div>
                             <div className="item-price">￥ {img.productInfo == null ? null : img.productInfo.price}</div>
@@ -309,7 +263,7 @@ class HomePage extends Component {
             } else {
                 arrangeProDiv2.push(
                     <div className="arrange-item">
-                        <Card.Grid>
+                        <Card.Grid onClick={this.handleShowDetail.bind(this, img.proId)}>
                             <img src={img.imgCode} />
                             <div className="item-title">{img.productInfo == null ? null : img.productInfo.proName}</div>
                             <div className="item-price">￥ {img.productInfo == null ? null : img.productInfo.price}</div>

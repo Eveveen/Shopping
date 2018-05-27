@@ -196,7 +196,7 @@ class BuyNow extends Component {
         return (
             <div className="buy-item">
                 <Layout>
-                    <Header>Header</Header>
+                    <Header>&nbsp;&nbsp;</Header>
                     <Content>
                         {addressData.length == 0 ? null : <AddressItem
                             handleChageAddress={this.handleChageAddress}
@@ -227,7 +227,7 @@ class BuyNow extends Component {
                             </div>
                         </div>
                     </Content>
-                    <Footer>Footer</Footer>
+                    <Footer>@2018-eshop</Footer>
                 </Layout>
 
             </div >

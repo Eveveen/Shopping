@@ -104,7 +104,7 @@ class SearchProductItem extends Component {
                     <Content>
                         {this.renderCollectTreasureContent()}
                     </Content>
-                    <Footer>Footer</Footer>
+                    <Footer></Footer>
                 </Layout>
             </div >
         )

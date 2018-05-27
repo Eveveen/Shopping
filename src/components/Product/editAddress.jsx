@@ -106,7 +106,7 @@ class EditAddress extends Component {
                     data.addressStatus = 1;
                 } else if (data.addressStatus == true && address.addressStatus != 1) {
                     data.addressStatus = 1;
-                    this.handleChageAddressStatus();
+                    this.handleChageAddressStatus(); // 修改默认地址
                 } else {
                     data.addressStatus = 0;
                 }

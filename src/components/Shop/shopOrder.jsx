@@ -345,7 +345,7 @@ class ShopOrder extends Component {
                             {this.renderOrderMenu()}
                             {this.renderOrderItem()}
                         </Content>
-                        <Footer>Footer</Footer>
+                        <Footer></Footer>
                     </Layout>
                 </div >
             </Spin>

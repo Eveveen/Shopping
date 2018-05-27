@@ -99,7 +99,7 @@ class User extends Component {
             dataIndex: 'email',
             key: 'email',
         }, {
-            title: 'Action',
+            title: '操作',
             key: 'action',
             render: (text, user) => (
                 <span>

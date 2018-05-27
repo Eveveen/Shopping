@@ -104,6 +104,16 @@ class Login extends Component {
         this.setState({ role: key })
     }
 
+    handleToRegister = () => {
+        const { role } = this.state;
+        if (role == "user") {
+            browserHistory.push(BASE_URL + "/register");
+        } else if (role == "seller") {
+            browserHistory.push(BASE_URL + "/registerSeller");
+        }
+
+    }
+
     render() {
         const { getFieldDecorator } = this.props.form;
         const { submitLoading } = this.state;
@@ -174,7 +184,9 @@ class Login extends Component {
                     </FormItem>
                 </Form>
                 <hr />
-                <Link to="register">点击注册</Link>
+                <div className="register-btn">
+                    {role == "admin" ? null : <a onClick={this.handleToRegister}>点击注册</a>}
+                </div>
             </div>
         )
     }

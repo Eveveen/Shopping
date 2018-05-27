@@ -111,11 +111,14 @@ class Remark extends Component {
         return (
             <div className="remark">
                 <div className="remark-card">
-                    <Card title="评价宝贝" extra={<a href="#">More</a>}>
+                    <Card title="评价宝贝">
                         <div className="remark-content">
                             <div className="left-content">
-                                <img alt={order.productInfo.proName} src={order.productInfo.imgCode} />
-                                <div className="left-text">{order.productInfo.proName}&nbsp;&nbsp;{order.productInfo.description} </div>
+                                <img alt={order.productInfo == null ? null : order.productInfo.proName} src={order.productInfo == null ? null : order.productInfo.imgCode} />
+                                <div className="left-text">
+                                    {order.productInfo == null ? null : order.productInfo.proName}&nbsp;&nbsp;
+                                {order.productInfo == null ? null : order.productInfo.description}
+                                </div>
                             </div>
                             <div className="right-content">
                                 <div className="remark-rate">

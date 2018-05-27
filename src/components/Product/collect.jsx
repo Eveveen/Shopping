@@ -26,6 +26,20 @@ class Collect extends Component {
         pathname: this.props.pageStatus
     }
 
+    getInitialState() {
+        return {
+            mapconfig: {
+                center: { lat: 42.872, lng: 3.644 },
+                zoom: 3
+            }
+        }
+    }
+    componentDidMount() {
+        new window.google.maps.Map(
+            this.refs.map,
+            this.state.mapconfig);
+    }
+
     componentWillMount() {
         axios.get(SERVICE_URL + "/checkIsUser")
             .then(response => {
@@ -267,10 +281,10 @@ class Collect extends Component {
                         <Content>{this.state.pathname == "/collectTreasure" ?
                             this.renderCollectTreasureContent() :
                             this.state.pathname == "/collectShop" ? <CollectShopChild collectShopList={collectShopList} /> : null}</Content>
-                        <Footer>Footer</Footer>
+                        <Footer>&nbsp;&nbsp;</Footer>
                     </Layout>
                 </Spin>
-            </div >
+            </div>
         )
     }
 

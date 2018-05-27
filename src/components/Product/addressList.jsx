@@ -127,7 +127,7 @@ class AddressList extends Component {
             dataIndex: 'addressStatus',
             key: 'addressStatus',
         }, {
-            title: 'Action',
+            title: '操作',
             key: 'addressId',
             render: (data, record) => (
                 <span>

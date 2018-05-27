@@ -41,6 +41,8 @@ class MenuIndex extends Component {
                     console.log(error);
                     message.error("退出失败");
                 });
+        } else if (e.key == "home") {
+            browserHistory.push(BASE_URL + '/' + e.key);
         } else {
             if (this.state.isLogin) {
                 browserHistory.push(BASE_URL + '/' + e.key);

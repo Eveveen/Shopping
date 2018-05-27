@@ -107,18 +107,11 @@ class AddAddress extends Component {
         const { visible } = this.props;
         const { iconImg, loading, submitLoading } = this.state;
         const { getFieldDecorator } = this.props.form;
-        const prefixSelector = getFieldDecorator('prefix', {
-            initialValue: '86',
-        })(
-            <Select style={{ width: 70 }}>
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-            </Select>
-        );
+
         return (
             <div className="add-address">
                 <Modal
-                    title={"Add Address"}
+                    title={"添加地址"}
                     visible={visible}
                     onCancel={this.handleCancel}
                     width={850}
@@ -154,7 +147,7 @@ class AddAddress extends Component {
                                     {getFieldDecorator('telphone', {
                                         rules: [{ required: true, message: '请输入手机号码' }],
                                     })(
-                                        <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                        <Input placeholder="手机号码" style={{ width: '100%' }} />
                                     )}
                                 </FormItem>
                                 <FormItem

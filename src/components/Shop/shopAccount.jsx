@@ -280,7 +280,7 @@ class ShopAccount extends Component {
                             <Input placeholder={"email"} disabled={submitLoading} />
                         )}
                     </FormItem>
-                    <FormItem
+                    {/* <FormItem
                         {...formItemLayout}
                         label="居住地"
                     >
@@ -290,7 +290,7 @@ class ShopAccount extends Component {
                         })(
                             <Cascader options={residences} />
                         )}
-                    </FormItem>
+                    </FormItem> */}
                     <FormItem>
                         <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
                             保存

@@ -320,7 +320,7 @@ class OrderItem extends Component {
                             {this.renderOrderMenu()}
                             {this.renderOrderItem()}
                         </Content>
-                        <Footer>Footer</Footer>
+                        <Footer></Footer>
                     </Layout>
                 </Spin>
             </div >

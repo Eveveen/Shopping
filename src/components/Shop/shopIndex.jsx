@@ -57,13 +57,51 @@ class ShopIndex extends Component {
         }
     }
 
+    handleGetSellerInfo = () => {
+        axios.get(SERVICE_URL + "/shop/getSellerInfo")
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                } else {
+                    this.setState({ showLoading: false })
+                    message.error("获取个人信息失败");
+                }
+            }).catch(error => {
+                console.log(error);
+                message.error("获取个人信息失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
     handleGetSellerShop = () => {
         this.state.showLoading = true;
         axios.get(SERVICE_URL + "/shop/getSellerShop")
             .then(response => {
                 const resData = response.data;
                 if (response.status == 200 && !resData.error) {
-                    this.handleGetProduct(resData.shopId);
+                    console.log(resData);
+                    if (resData == "") {
+                        axios.get(SERVICE_URL + "/shop/getSellerInfo")
+                            .then(response => {
+                                const res = response.data;
+                                if (response.status == 200 && !res.error) {
+                                    browserHistory.push(BASE_URL + "shop/registerShop/" + res.sellerId);
+                                } else {
+                                    this.setState({ showLoading: false })
+                                    message.error("获取个人信息失败");
+                                }
+                            }).catch(error => {
+                                console.log(error);
+                                message.error("获取个人信息失败");
+                                this.setState({ showLoading: false });
+                            })
+                    } else {
+                        if (resData.shopStatus == 0 || resData.shopStatus == null) {
+                            browserHistory.push(BASE_URL + "shop/registerSuccess");
+                        } else {
+                            this.handleGetProduct(resData.shopId);
+                        }
+                    }
                     this.setState({ showLoading: false, shopInfo: resData });
                 } else {
                     this.setState({ showLoading: false })
@@ -110,6 +148,7 @@ class ShopIndex extends Component {
                     message.error("获取图片失败");
                 }
             }).catch(error => {
+                console.log(error)
                 message.error("获取图片失败");
                 this.setState({ showLoading: false });
             });
@@ -288,7 +327,7 @@ class ShopIndex extends Component {
                                     shopInfo={this.state.shopInfo}
                                 /> : null}
                         </Content>
-                        <Footer>Footer</Footer>
+                        <Footer>&nbsp;&nbsp;</Footer>
                     </Layout>
                 </div >
             </Spin>

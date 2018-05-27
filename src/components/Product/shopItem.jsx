@@ -18,11 +18,13 @@ class ShopItem extends Component {
         imgCode: '',
         searchName: '',
         showLoading: true,
-        showNum: 8
+        showNum: 8,
+        isLogin: false
     }
 
     componentWillMount() {
         this.handleGetSellerShop();
+        this.handleIsLogin();
     }
 
     componentDidMount() {
@@ -31,6 +33,16 @@ class ShopItem extends Component {
 
     componentWillUnmount() {
         window.removeEventListener('scroll', this.onScrollHandle.bind(this));
+    }
+
+    handleIsLogin = () => {
+        axios.get(SERVICE_URL + "/checkIsUser")
+            .then(response => {
+                const data = response.data;
+                if (!data.error) {
+                    this.setState({ isLogin: data })
+                }
+            });
     }
 
     onScrollHandle(event) {
@@ -165,6 +177,54 @@ class ShopItem extends Component {
         }
     }
 
+    handleIsCollectShopExist = () => {
+        console.log(this.state.isLogin);
+        if (this.state.isLogin) {
+            const { shopInfo } = this.state;
+            this.state.showLoading = true;
+            axios.get(SERVICE_URL + "/product/isCollectShopExist/" + shopInfo.shopId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        if (resData == true) {
+                            message.warning("店铺已收藏");
+                        } else {
+                            this.handleAddCollectShop();
+                        }
+                        this.setState({ showLoading: false });
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error("判断商品收藏失败");
+                    }
+                }).catch(error => {
+                    message.error("判断商品收藏失败");
+                    this.setState({ showLoading: false });
+                })
+        } else {
+            browserHistory.push(BASE_URL + "/login")
+        }
+    }
+
+    handleAddCollectShop = () => {
+        const { shopInfo } = this.state;
+        this.state.showLoading = true;
+        axios.get(SERVICE_URL + "/product/addCollectShop/" + shopInfo.shopId)
+            .then(response => {
+                const resData = response.data;
+                if (response.status == 200 && !resData.error) {
+                    message.success("收藏成功");
+                    this.setState({ showLoading: false });
+                } else {
+                    console.log(error)
+                    this.setState({ showLoading: false })
+                    message.error("收藏店铺失败");
+                }
+            }).catch(error => {
+                message.error("收藏商品失败");
+                this.setState({ showLoading: false });
+            })
+    }
+
     render() {
         const { shopInfo } = this.state;
         const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
@@ -193,11 +253,12 @@ class ShopItem extends Component {
                                     />
                                 </AutoComplete>
                             </div>
+                            <div className="collect-shop" onClick={this.handleIsCollectShopExist}>收藏店铺</div>
                         </Header>
                         <Content>
                             {this.renderCollectTreasureContent()}
                         </Content>
-                        <Footer>Footer</Footer>
+                        <Footer></Footer>
                     </Layout>
                 </div >
             </Spin>
