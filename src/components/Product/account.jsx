@@ -261,7 +261,7 @@ class Account extends Component {
                             <Input placeholder={"邮箱"} disabled={submitLoading} />
                         )}
                     </FormItem>
-                    <FormItem
+                    {/* <FormItem
                         {...formItemLayout}
                         label="居住地"
                     >
@@ -271,7 +271,7 @@ class Account extends Component {
                         })(
                             <Cascader options={residences} />
                         )}
-                    </FormItem>
+                    </FormItem> */}
                     <FormItem>
                         <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.handleSavePersonInfo}>
                             保存

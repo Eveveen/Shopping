@@ -88,9 +88,9 @@ class ShopMenu extends Component {
                         <Menu.Item key="shop">
                             <Icon type="appstore" />首页
                         </Menu.Item>
-                        <Menu.Item key="message">
+                        {/* <Menu.Item key="message">
                             <Icon type="appstore" />消息
-                        </Menu.Item>
+                        </Menu.Item> */}
                         <Menu.Item key="shop/order">
                             <Icon type="appstore" />我的订单
                         </Menu.Item>

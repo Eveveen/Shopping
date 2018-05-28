@@ -44,12 +44,12 @@ class HeaderTop extends Component {
                             <Menu.Item key="accountSetting">账号管理</Menu.Item>
                             <Menu.Item key="exitAccount">退出</Menu.Item>
                         </SubMenu>
-                        <Menu.Item key="message">
+                        {/* <Menu.Item key="message">
                             <Icon type="appstore" />消息
-                    </Menu.Item>
+                        </Menu.Item> */}
                         <Menu.Item key="cart">
                             <Icon type="appstore" />购物车
-                    </Menu.Item>
+                        </Menu.Item>
                         <SubMenu title={<span><Icon type="setting" />收藏夹</span>}>
                             <Menu.Item key="collectTreasure">收藏的宝贝</Menu.Item>
                             <Menu.Item key="collectShop">收藏的店铺</Menu.Item>
