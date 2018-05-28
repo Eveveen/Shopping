@@ -19,7 +19,8 @@ class BuyNow extends Component {
         totalCount: 0,
         productInfo: {},
         orderAddressId: '',
-        addressData: []
+        addressData: [],
+        defaultAddress: {}
     }
 
     componentWillMount() {
@@ -171,6 +172,7 @@ class BuyNow extends Component {
                     resData.forEach(address => {
                         if (address.addressStatus == 1) {
                             this.state.orderAddressId = address.addressId;
+                            this.state.defaultAddress = address;
                         }
                     });
                     this.state.addressData = resData;
@@ -186,13 +188,15 @@ class BuyNow extends Component {
     }
 
     handleChageAddress = (e) => {
+        const { addressData } = this.state;
+        addressData.find((address) => { address.addressId == e.target.value ? this.state.defaultAddress = address : null });
         this.setState({
             orderAddressId: e.target.value
         })
     }
 
     render() {
-        const { shopList, totalCount, buyList, productInfo, orderAddressId, addressData } = this.state;
+        const { shopList, totalCount, buyList, productInfo, orderAddressId, addressData, defaultAddress } = this.state;
         return (
             <div className="buy-item">
                 <Layout>
@@ -214,11 +218,11 @@ class BuyNow extends Component {
                                     </div>
                                     <div className="pay-info-content">
                                         <span className="real-pay-title">寄送至：</span>
-                                        <span className="real-pay-text">江苏省南通市崇川区狼山镇街道啬园路9号南通大学主校区</span>
+                                        <span className="real-pay-text">{defaultAddress.area}{defaultAddress.addressName}</span>
                                     </div>
                                     <div>
                                         <span className="real-pay-title">收货人：</span>
-                                        <span className="real-pay-text">张三12345678909</span>
+                                        <span className="real-pay-text">{defaultAddress.consignee} &nbsp;&nbsp; {defaultAddress.telphone}</span>
                                     </div>
                                 </div>
                             </div>
