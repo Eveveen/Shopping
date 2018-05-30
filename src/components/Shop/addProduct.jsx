@@ -7,6 +7,7 @@ import './Style/editProduct.sass';
 import { getBase64, contains, messageText, getCookie } from '../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { Link, browserHistory } from 'react-router';
+import { _ } from 'underscore';
 
 const formItemLayout = {
     labelCol: {
@@ -48,7 +49,19 @@ class AddProduct extends Component {
         submitLoading: false,
         loading: false,
         imgId: '',
-        imgCode: ''
+        imgCode: '',
+        previewVisible: false,
+        previewImage: '',
+        fileList: [],
+        imgIdList: []
+    }
+
+    handleCancelViewImg = () => this.setState({ previewVisible: false });
+    handlePreview = (file) => {
+        this.setState({
+            previewImage: file.url || file.thumbUrl,
+            previewVisible: true,
+        });
     }
 
     handleGetImg = (product) => {
@@ -70,12 +83,13 @@ class AddProduct extends Component {
 
     handleAddProduct = (e) => {
         e.preventDefault();
-        const { imgId } = this.state;
+        const { imgId, imgIdList } = this.state;
         const { shopInfo } = this.props;
         this.props.form.validateFields((err, data) => {
             if (!err) {
                 data.imgId = imgId;
                 data.shopId = shopInfo.shopId;
+                data.imgIdList = imgIdList;
                 axios.post(SERVICE_URL + '/product/addProduct', { data })
                     .then(response => {
                         const resData = response.data;
@@ -109,6 +123,25 @@ class AddProduct extends Component {
         })
     }
 
+    // handleChangeImgList = (fileList) => {
+    //     console.log(fileList);
+    //     this.setState({ fileList })
+    // }
+    handleChangeImgList = ({ fileList }) => {
+        let imgIdList = this.state.imgIdList;
+        if (fileList.length != 0) {
+            fileList.forEach(file => {
+                console.log(file);
+                if (file.response) {
+                    if (!_.contains(imgIdList, file.response.imgId)) {
+                        imgIdList.push(file.response.imgId);
+                    }
+                    this.setState({ imgId: file.response.imgId });
+                }
+            });
+        }
+        this.setState({ fileList: fileList, imgIdList: imgIdList })
+    }
     handleChange = (info) => {
         if (info.file.status === 'uploading') {
             this.setState({ loading: true });
@@ -146,13 +179,14 @@ class AddProduct extends Component {
     renderAddProduct() {
         const { visible } = this.props;
         const { getFieldDecorator } = this.props.form;
-        const { loading, submitLoading, imgCode } = this.state;
+        const { loading, submitLoading, imgCode, previewVisible, previewImage, fileList } = this.state;
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
                 <div className="ant-upload-text">upload</div>
             </div>
         );
+        console.log("fileList", fileList);
         return (
             <Modal
                 title={"添加商品"}
@@ -242,19 +276,33 @@ class AddProduct extends Component {
                             {getFieldDecorator('imgCodes', {
                                 rules: [],
                             })(
-                                <Upload
-                                    listType="picture-card"
-                                    showUploadList={false}
-                                    withCredentials={true}
-                                    headers={{ 'X-XSRF-TOKEN': getCookie("XSRF-TOKEN") }}
-                                    action={SERVICE_URL + "/user/uploadImg"}
-                                    beforeUpload={this.beforeUpload}
-                                    onChange={this.handleChange}
-                                    disabled={submitLoading}
-                                >
-                                    {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
-                                    {imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
-                                </Upload>
+                                <div className="clearfix">
+                                    <Upload
+                                        action={SERVICE_URL + "/user/uploadImg"}
+                                        listType="picture-card"
+                                        fileList={fileList}
+                                        onPreview={this.handlePreview}
+                                        onChange={this.handleChangeImgList}
+                                    >
+                                        {fileList.length >= 3 ? null : uploadButton}
+                                    </Upload>
+                                    <Modal visible={previewVisible} footer={null} onCancel={this.handleCancelViewImg}>
+                                        <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                                    </Modal>
+                                </div>
+                                // <Upload
+                                //     listType="picture-card"
+                                //     showUploadList={false}
+                                //     withCredentials={true}
+                                //     headers={{ 'X-XSRF-TOKEN': getCookie("XSRF-TOKEN") }}
+                                //     action={SERVICE_URL + "/user/uploadImg"}
+                                //     beforeUpload={this.beforeUpload}
+                                //     onChange={this.handleChange}
+                                //     disabled={submitLoading}
+                                // >
+                                //     {imgCode ? <img src={imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
+                                //     {imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
+                                // </Upload>
                             )}
                         </FormItem>
                     </Form>

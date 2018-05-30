@@ -563,8 +563,8 @@ class CartPage extends Component {
                         {product.proName} {product.description}
                     </div>
                     <div className="item-status">
-                        颜色分类：白色<br />
-                        尺码：均码
+                        &nbsp;&nbsp;<br />
+                        &nbsp;&nbsp;
                         </div>
                     <div className="item-price">
                         {product.price}
@@ -582,7 +582,7 @@ class CartPage extends Component {
                         {product.overRange ? <div className="range-tip">最多只能购买{product.proNum}件</div> : null}
                     </div>
                     <div className="item-total-price">
-                        ￥{product.price * product.cartInfo.proNum}
+                        ￥{(product.price * product.cartInfo.proNum).toFixed(2)}
                     </div>
                     <div className="item-operation">
                         <div className="delete-op" onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</div>
@@ -610,7 +610,7 @@ class CartPage extends Component {
                 <div className="footer-operation">清除失效宝贝</div>
                 <div className="footer-operation"> 移入收藏夹</div>
                 <div className="footer-operation"> 已选商品{selectedCartIds.length}件</div>
-                <div className="footer-operation">合计（不含运费）： ￥{totalCount}</div>
+                <div className="footer-operation">合计（不含运费）： ￥{totalCount.toFixed(2)}</div>
             </div>
         )
     }

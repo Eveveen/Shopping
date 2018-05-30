@@ -19,7 +19,9 @@ class DetailInfo extends Component {
         overRange: false,
         isLogin: false,
         defaultAddress: { area: "江苏", addressName: "南通" },
-        getCurrentPositionResult: null
+        getCurrentPositionResult: null,
+        imgList: [],
+        showImg: {}
     }
 
 
@@ -117,21 +119,27 @@ class DetailInfo extends Component {
 
     handleGetImg = (product) => {
         this.state.showLoading = true;
-        axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    product.imgCode = resData.imgCode;
-                    this.setState({ showLoading: false });
-                } else {
-                    this.setState({ showLoading: false })
+        product.imgIdList.forEach((imgId, index) => {
+            axios.get(SERVICE_URL + "/shop/getImg/" + imgId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        product.imgCode = resData.imgCode;
+                        if (index == 0) {
+                            this.state.showImg = { imgId: imgId, imgCode: resData.imgCode };
+                        }
+                        this.state.imgList.push({ imgId: imgId, imgCode: resData.imgCode })
+                        this.setState({ showLoading: false });
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error("获取图片失败");
+                    }
+                }).catch(error => {
+                    console.log(error);
                     message.error("获取图片失败");
-                }
-            }).catch(error => {
-                console.log(error);
-                message.error("获取图片失败");
-                this.setState({ showLoading: false });
-            });
+                    this.setState({ showLoading: false });
+                });
+        })
     }
 
     handleGetDefaultAddress = () => {
@@ -203,8 +211,9 @@ class DetailInfo extends Component {
     }
 
 
-    handleImgFocus = () => {
+    handleImgFocus = (img) => {
         console.log("focus");
+        this.setState({ showImg: img })
     }
 
     changeCount = (e) => {
@@ -230,7 +239,7 @@ class DetailInfo extends Component {
         if (this.state.isLogin) {
             const { productInfo } = this.state;
             productInfo.count = this.state.count;
-
+            console.log("----");
             browserHistory.push({ pathname: BASE_URL + "/buyNow/" + productInfo.proId, state: { productInfo: productInfo } });
         } else {
             browserHistory.push(BASE_URL + "/login")
@@ -408,7 +417,14 @@ class DetailInfo extends Component {
     }
 
     render() {
-        const { count, productInfo, defaultAddress, overRange } = this.state;
+        const { count, productInfo, defaultAddress, overRange, imgList, showImg } = this.state;
+        let moreImgDiv = [];
+        let imgsDiv = [];
+        console.log(imgList);
+        imgList.length == 0 ? null : imgList.forEach(img => {
+            moreImgDiv.push(<img alt="image" src={img.imgCode} onClick={this.handleImgFocus.bind(this, img)} />)
+            imgsDiv.push(<img alt="img" src={img.imgCode} />);
+        });
         return (
             <Spin size="large" spinning={this.state.showLoading}>
                 <div className="detail">
@@ -416,15 +432,8 @@ class DetailInfo extends Component {
                         <div className="card-info">
                             <Card
                                 style={{ width: 400, height: 400 }}
-                                cover={<img alt="example" src={productInfo.imgCode} />}
+                                cover={<img alt="example" src={showImg.imgCode} />}
                             >
-                                {/* <div className="detail-info-img">
-                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                    <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" onClick={this.handleImgFocus} />
-                                </div> */}
                             </Card>
                         </div>
                         <div className="text-info">
@@ -463,8 +472,16 @@ class DetailInfo extends Component {
                                     <Button onClick={this.handleIsCartExist} disabled={count > productInfo.proNum ? true : false}>加入购物车</Button>
                                 </div>
                             </div>
-                            <div>
+                            {/* <div className="collect-btn">
                                 <Button onClick={this.handleIsCollectProductExist}>收藏宝贝</Button>
+                            </div> */}
+                            <div className="right-text-foot">
+                                <div className="detail-info-img">
+                                    {moreImgDiv}
+                                </div>
+                                <div className="collect-btn">
+                                    <Button onClick={this.handleIsCollectProductExist}>收藏宝贝</Button>
+                                </div>
                             </div>
                         </div>
 
@@ -502,7 +519,8 @@ class DetailInfo extends Component {
                                         </div>
                                     </div>
                                     <div className="product-img">
-                                        <img alt="img" src={productInfo.imgCode} />
+                                        {imgsDiv}
+                                        {/* <img alt="img" src={showImg.imgCode} /> */}
                                     </div>
                                 </div>
                             </TabPane>

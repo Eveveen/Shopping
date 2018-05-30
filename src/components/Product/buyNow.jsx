@@ -214,7 +214,7 @@ class BuyNow extends Component {
                                 <div className="pay-info">
                                     <div className="pay-info-content">
                                         <span className="real-pay-title">实付款：</span>
-                                        <span className="real-pay-price">￥{productInfo.price * productInfo.count}</span>
+                                        <span className="real-pay-price">￥{(productInfo.price * productInfo.count).toFixed(2)}</span>
                                     </div>
                                     <div className="pay-info-content">
                                         <span className="real-pay-title">寄送至：</span>
@@ -259,8 +259,8 @@ class BuyNow extends Component {
                         {productInfo.proName} {productInfo.description}
                     </div>
                     <div className="item-status">
-                        颜色分类：白色<br />
-                        尺码：均码
+                        &nbsp;&nbsp;<br />
+                        &nbsp;&nbsp;
                         </div>
                     <div className="item-price">
                         {productInfo.price}
@@ -272,7 +272,7 @@ class BuyNow extends Component {
                         {/* <Button onClick={this.increaseCount.bind(this, productInfo.cartInfo.cartId, productInfo)}>+</Button> */}
                     </div>
                     <div className="item-total-price">
-                        ￥{productInfo.price * productInfo.count}
+                        ￥{(productInfo.price * productInfo.count).toFixed(2)}
                     </div>
                     <div className="item-operation">
                         {/* <span onClick={this.handleDeleteItem.bind(this, product.cartInfo.cartId)}>删除</span> */}

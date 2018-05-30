@@ -35,9 +35,10 @@ class SellerShop extends Component {
                     if (data == false) {
                         browserHistory.push(BASE_URL);
                     } else {
-                        const { shopId } = this.props;
-                        if (shopId != "undefined") {
-                            axios.get(SERVICE_URL + "/admin/getSellerShop/" + shopId)
+                        console.log(this.props);
+                        const { sellerId } = this.props;
+                        if (sellerId != "undefined") {
+                            axios.get(SERVICE_URL + "/admin/getSellerShop/" + sellerId)
                                 .then(response => {
                                     const resData = response.data;
                                     if (response.status == 200 && !resData.error) {

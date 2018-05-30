@@ -7,6 +7,7 @@ import './Style/editProduct.sass';
 import { getBase64, contains, messageText, getCookie } from '../../data/tools';
 import { SERVICE_URL, BASE_URL } from '../../../conf/config';
 import { Link, browserHistory } from 'react-router';
+import { _ } from 'underscore';
 
 const formItemLayout = {
     labelCol: {
@@ -47,10 +48,17 @@ class EditProduct extends Component {
     state = {
         submitLoading: false,
         loading: false,
-        productInfo: {}
+        productInfo: {},
+        previewVisible: false,
+        previewImage: '',
+        fileList: [],
+        imgIdList: [],
+        deleteImgIdList: [],
+        tempIdList: []
     }
 
     componentWillMount() {
+        let tempIdList = [];
         axios.get(SERVICE_URL + "/checkIsSeller")
             .then(response => {
                 const data = response.data;
@@ -65,46 +73,71 @@ class EditProduct extends Component {
                                 console.log(resData);
                                 if (response.status == 200 && !resData.error) {
                                     this.handleGetImg(resData);
-                                    this.setState({ showLoading: false, productInfo: resData });
+                                    this.state.imgIdList = resData.imgIdList;
+                                    resData.imgIdList.forEach(id => {
+                                        tempIdList.push(id)
+                                    });
+                                    console.log("this.state.fileList.,", this.state.fileList);
+                                    this.setState({ showLoading: false, productInfo: resData, tempIdList: tempIdList });
                                 } else {
                                     this.setState({ showLoading: false })
                                     message.error("获取商品失败");
                                 }
                             }).catch(error => {
-                                console.log(error);
                                 message.error("获取商品失败");
                                 this.setState({ showLoading: false });
                             })
                     }
                 }
             });
+    }
 
+    handleCancelViewImg = () => this.setState({ previewVisible: false });
+    handlePreview = (file) => {
+        this.setState({
+            previewImage: file.url || file.thumbUrl,
+            previewVisible: true,
+        });
     }
 
     handleGetImg = (product) => {
-        axios.get(SERVICE_URL + "/shop/getImg/" + product.imgId)
-            .then(response => {
-                const resData = response.data;
-                if (response.status == 200 && !resData.error) {
-                    product.imgCode = resData.imgCode;
-                    this.setState({ showLoading: false });
-                } else {
-                    this.setState({ showLoading: false })
+        product.imgIdList.forEach(imgId => {
+            axios.get(SERVICE_URL + "/shop/getImg/" + imgId)
+                .then(response => {
+                    const resData = response.data;
+                    if (response.status == 200 && !resData.error) {
+                        product.imgCode = resData.imgCode;
+                        this.state.fileList.push({ url: resData.imgCode, uid: imgId });
+                        this.setState({ showLoading: false });
+                    } else {
+                        this.setState({ showLoading: false })
+                        message.error("获取图片失败");
+                    }
+                }).catch(error => {
                     message.error("获取图片失败");
-                }
-            }).catch(error => {
-                message.error("获取图片失败");
-                this.setState({ showLoading: false });
-            });
+                    this.setState({ showLoading: false });
+                });
+        });
     }
 
     handleEditProduct = (e) => {
         e.preventDefault();
-        const { productInfo } = this.state;
+        const { productInfo, imgIdList, deleteImgIdList, tempIdList } = this.state;
+        let tList = [];
+        tempIdList.forEach(id => {
+            tList.push(id);
+        });
+        tList.forEach((id, index) => {
+            if (_.contains(imgIdList, id)) {
+                tList = _.without(tList, id);
+            }
+        });
         this.props.form.validateFields((err, data) => {
             if (!err) {
                 data.proId = productInfo.proId;
                 data.imgId = productInfo.imgId;
+                data.deleteImgIdList = tList;
+                data.imgIdList = imgIdList;
                 axios.post(SERVICE_URL + '/product/editProduct', { data })
                     .then(response => {
                         const resData = response.data;
@@ -115,7 +148,6 @@ class EditProduct extends Component {
                         }
                         this.setState({ submitLoading: false });
                     }).catch(error => {
-                        console.log(error);
                         message.error("编辑失败");
                         this.setState({ submitLoading: false });
                     });
@@ -138,6 +170,23 @@ class EditProduct extends Component {
         this.state.productInfo.imgCode = null;
         this.state.productInfo.imgId = null;
         this.setState({})
+    }
+
+    handleChangeImgList = ({ fileList }) => {
+        let imgIdList = this.state.imgIdList;
+        if (fileList.length != 0) {
+            fileList.forEach(file => {
+                console.log("file,", file);
+                if (file.response) {
+                    imgIdList.push(file.response.imgId);
+                    this.state.productInfo.imgId = file.response.imgId;
+                    // this.handleGetImg(this.state.productInfo);
+                    this.setState({ imgId: file.response.imgId });
+                }
+            });
+        }
+        console.log(imgIdList);
+        this.setState({ fileList: fileList, imgIdList: imgIdList })
     }
 
     handleChange = (info) => {
@@ -168,7 +217,7 @@ class EditProduct extends Component {
 
     renderEditProduct() {
         const { getFieldDecorator } = this.props.form;
-        const { loading, submitLoading, productInfo } = this.state;
+        const { loading, submitLoading, productInfo, previewVisible, previewImage, fileList } = this.state;
         const uploadButton = (
             <div>
                 <Icon type={loading ? 'loading' : 'plus'} />
@@ -255,19 +304,33 @@ class EditProduct extends Component {
                         {getFieldDecorator('imgCodes', {
                             rules: [],
                         })(
-                            <Upload
-                                listType="picture-card"
-                                showUploadList={false}
-                                withCredentials={true}
-                                headers={{ 'X-XSRF-TOKEN': getCookie("XSRF-TOKEN") }}
-                                action={SERVICE_URL + "/user/uploadImg"}
-                                beforeUpload={this.beforeUpload}
-                                onChange={this.handleChange}
-                                disabled={submitLoading}
-                            >
-                                {productInfo.imgCode ? <img src={productInfo.imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
-                                {productInfo.imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
-                            </Upload>
+                            <div className="clearfix">
+                                <Upload
+                                    action={SERVICE_URL + "/user/uploadImg"}
+                                    listType="picture-card"
+                                    fileList={fileList}
+                                    onPreview={this.handlePreview}
+                                    onChange={this.handleChangeImgList}
+                                >
+                                    {fileList.length >= 4 ? null : uploadButton}
+                                </Upload>
+                                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancelViewImg}>
+                                    <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                                </Modal>
+                            </div>
+                            // <Upload
+                            //     listType="picture-card"
+                            //     showUploadList={false}
+                            //     withCredentials={true}
+                            //     headers={{ 'X-XSRF-TOKEN': getCookie("XSRF-TOKEN") }}
+                            //     action={SERVICE_URL + "/user/uploadImg"}
+                            //     beforeUpload={this.beforeUpload}
+                            //     onChange={this.handleChange}
+                            //     disabled={submitLoading}
+                            // >
+                            //     {productInfo.imgCode ? <img src={productInfo.imgCode} alt="" style={{ maxWidth: 383 }} /> : uploadButton}
+                            //     {productInfo.imgCode && <Icon style={{ fontSize: 16 }} type="close" onClick={this.handleIconDelete} />}
+                            // </Upload>
                         )}
                     </FormItem>
                     <FormItem>

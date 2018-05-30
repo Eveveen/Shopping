@@ -356,7 +356,7 @@ class ShopOrder extends Component {
         const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
         return (
             <div className="global-search-wrapper">
-                <AutoComplete
+                {/* <AutoComplete
                     style={{ width: 200 }}
                     // dataSource={dataSource}
                     onChange={this.handleChangeSearchName}
@@ -371,7 +371,7 @@ class ShopOrder extends Component {
                             </Button>
                         )}
                     />
-                </AutoComplete>
+                </AutoComplete> */}
             </div>
         )
     }
