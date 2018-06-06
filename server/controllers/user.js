@@ -8,12 +8,12 @@ const logger = log4js.getLogger();
 const fs = require('fs');
 const multer = require('multer')
 const paramsMulter = multer({ dest: 'upload/' });
-// const SMSClient = require('@alicloud/sms-sdk')
+const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'xx'
-const secretAccessKey = 'xx'
+const accessKeyId = 'LTAI4U9l91SizWvG'
+const secretAccessKey = 'x9Bp7LYdvUCOPHOTqU3otr0itlJJtn'
 //初始化sms_client
-// let smsClient = new SMSClient({ accessKeyId, secretAccessKey })
+let smsClient = new SMSClient({ accessKeyId, secretAccessKey })
 
 /**
  * 登录
@@ -22,7 +22,7 @@ router.post("/login", function (req, res) {
     const path = utils.PROJECT + "/login";
     const { data } = req.body;
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        req.session.user = req.body.data;
+        req.session.user = data;
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
@@ -37,32 +37,34 @@ router.post("/login", function (req, res) {
 router.post("/getCode", function (req, res) {
     var code = parseInt(Math.random() * 100000)
     const { telphone } = req.body;
-    const path = utils.PROJECT + "/saveCode";
-    //num.substring(0,s.indexOf(".")+3);
     var sendCode = `` + code.toString().slice(0, 4) + ``;
+    const path = utils.PROJECT + "/saveCode/" + sendCode + "/" + telphone;
+    //num.substring(0,s.indexOf(".")+3);
     console.log(sendCode)
+    console.log(telphone)
     var sendData = {
         PhoneNumbers: telphone,
-        SignName: 'xx',
+        SignName: '孙梦娟',
         TemplateCode: 'SMS_130840278',
         TemplateParam: '{"code":' + '"' + sendCode + '"' + '}'
     }
     // res.send(sendCode)
-    httpAgent.httpRequest({ telphone: telphone, validateCode: sendCode }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        res.send(data);
+    let data = { telphone: telphone, validateCode: sendCode };
+    httpAgent.httpRequest({}, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (resData) {
+        res.send(resData);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })
-    // smsClient.sendSMS(sendData).then(function (data) {
-    //     let { Code } = data
-    //     if (Code === 'OK') {
-    //         //处理返回参数
-    //         console.log(data)
-    //         res.send(data)
-    //     }
-    // }, function (err) {
-    //     res.send({ error: { code: -1, msg: err } });
-    // })
+    smsClient.sendSMS(sendData).then(function (data) {
+        let { Code } = data
+        if (Code === 'OK') {
+            //处理返回参数
+            console.log(data)
+            // res.send(data)
+        }
+    }, function (err) {
+        res.send({ error: { code: -1, msg: err } });
+    })
 });
 
 /**
@@ -71,7 +73,7 @@ router.post("/getCode", function (req, res) {
 router.post("/verifyCode", function (req, res) {
     const path = utils.PROJECT + "/verifyCode";
     const { data } = req.body;
-    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+    httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (data) {
         res.send(data);
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
@@ -94,6 +96,14 @@ router.post("/addUser", function (req, res) {
 });
 
 /**
+ * 登出
+ */
+router.get("/logout", function (req, res) {
+    delete req.session.user;
+    res.send(true);
+});
+
+/**
  * 根据用户姓名获取用户信息
  */
 router.get("/getUserInfo", function (req, res) {
@@ -107,28 +117,25 @@ router.get("/getUserInfo", function (req, res) {
 });
 
 /**
+ * 根据买家编号获取买家信息
+ */
+router.get("/getUser/:id", function (req, res) {
+    const path = utils.PROJECT + "/getUser";
+    httpAgent.httpRequest({ userId: req.params.id }, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
+        res.send(data);
+    }, function (statusCode, msg) {
+        res.send({ error: { code: -1, msg: msg } });
+    })
+});
+
+/**
  * 更新用户信息
  */
-// router.post("/updateUser", function (req, res) {
-//     const path = utils.PROJECT + "/updateUser";
-//     const { data } = req.body;
-//     console.log("ddd----", data);
-//     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (data) {
-//         res.send(data);
-//     }, function (statusCode, msg) {
-//         res.send({ error: { code: -1, msg: msg } });
-//     })
-// });
-
 router.post("/updateUser", function (req, res) {
     const { data } = req.body;
-    console.log("111,,,", data)
     const path = utils.PROJECT + "/updateUser";
     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "get", function (data) {
-        // res.send(data);
-        console.log(data)
         res.send(data);
-        // res.status(200).send(data)
     }, function (statusCode, msg) {
         res.send({ error: { code: -1, msg: msg } });
     })
@@ -158,43 +165,6 @@ router.post("/uploadImg", paramsMulter.any(), function (req, res) {
     }
 });
 
-// router.post("/createChannel", function (req, res) {
-//     const { channelName, rules } = req.body;
-//     const path = utils.PROJECT + "/channel";
-//     const data = {
-//         "createBy": req.session.cas.user,
-//         "channelName": channelName,
-//         "rules": rules
-//     }
-//     httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "post", function (data) {
-//         res.send(data);
-//     }, function (statusCode, msg) {
-//         res.send({ error: { code: -1, msg: msg } });
-//     })
-//     // logger.error('no permission to get "/createChannel"');
-//     // res.sendStatus(403);
-// });
-
-// router.post("/editChannel/:id", function (req, res) {
-//     if (checkIsRole(req) == true) {
-//         const { channelName, rules } = req.body;
-//         const path = utils.BASE_URL_V2 + "/channel/" + req.params.id;
-//         const data = {
-//             "createBy": req.session.cas.user,
-//             "channelName": channelName,
-//             "rules": rules
-//         }
-//         httpAgent.httpRequest(data, "json", config.BACKEND_API.TYPE, config.BACKEND_API.HOST, config.BACKEND_API.PORT, path, "put", function (data) {
-//             res.send(data);
-//         }, function (statusCode, msg) {
-//             res.send({ error: { code: -1, msg: msg } });
-//         })
-//     } else {
-//         logger.error('no permission to get "/editChannel"');
-//         res.sendStatus(403);
-//     }
-// });
-
 router.post("/deleteChannel/:id", function (req, res) {
     if (checkIsRole(req) == true) {
         const path = utils.BASE_URL_V2 + "/channel/" + req.params.id;
@@ -211,15 +181,11 @@ router.post("/deleteChannel/:id", function (req, res) {
 });
 
 
-
 function checkIsRole(req) {
-    const roles = req.session.principal && req.session.principal.roles ? req.session.principal.roles : [];
-    for (var i = 0; i < roles.length; i++) {
-        if (roles[i] == 'admin') {
-            break;
-        }
+    let flag = false;
+    if (req.session.user && req.session.user.userName != null) {
+        flag = true;
     }
-    let flag = i < roles.length ? true : false;
     return flag;
 }
 

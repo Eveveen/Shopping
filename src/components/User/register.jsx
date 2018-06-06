@@ -100,6 +100,12 @@ class Register extends Component {
                             this.setState({ showLoading: false })
                             message.error("注册失败");
                         })
+                    } else if (resData == "tel") {
+                        message.error("手机号码已存在");
+                    } else if (resData == "user") {
+                        message.error("用户名已存在")
+                    } else {
+                        message.error("验证码错误")
                     }
                 }, (errorData) => {
                     console.log(errorData);
