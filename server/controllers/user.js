@@ -10,8 +10,8 @@ const multer = require('multer')
 const paramsMulter = multer({ dest: 'upload/' });
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAI4U9l91SizWvG'
-const secretAccessKey = 'x9Bp7LYdvUCOPHOTqU3otr0itlJJtn'
+const accessKeyId = 'xx'
+const secretAccessKey = 'xx'
 //初始化sms_client
 let smsClient = new SMSClient({ accessKeyId, secretAccessKey })
 
