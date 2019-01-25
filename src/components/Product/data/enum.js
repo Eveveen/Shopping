@@ -1,0 +1,1 @@
+exports.commentTypeEnum = { WAITCOMMENT: 0, COMMENTED: 1, WAITPAY: 2, WAITSEND: 3, WAITCONFIRM: 4 }

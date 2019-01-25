@@ -1,0 +1,2 @@
+exports.adminOperationTypeEnum = { USER: "user", APPLICATION: "application", TENANT: "tenant", PERSONA: "persona" }
+exports.tenantOperationTypeEnum = { BASIC: "basic", APPLICATION: "application", USER: "user", EXTENSION: "extension", SECRETKEY: "secretkey" }

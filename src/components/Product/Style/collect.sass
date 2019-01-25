@@ -1,0 +1,139 @@
+.collect
+    margin: 0 5%
+    .collect-product
+        margin: 10px
+    .collect-treasure-content
+        display: inline-flex
+        .collect-card 
+            margin-right: 15px
+            position: relative
+            .go-shop-btn
+                margin-top: -25px
+                position: absolute
+                cursor: pointer
+                span
+                    display: none
+                    color: white
+            .delete-btn
+                cursor: pointer
+                i
+                    display: none
+            .delete-pop-show
+                width: 100%;
+                height: 100%
+                position: absolute
+                top: 0;
+                .delete-pop
+                    // position: absolute
+                    top: 0
+                    left: 0
+                    width: 100%
+                    height: 100%
+                    z-index: 10
+                .del-pop-bg
+                    background-color: #000
+                    filter: alpha(opacity=50)
+                    opacity: .5
+                    position: absolute
+                    top: 0
+                    left: 0
+                    width: 100%
+                    height: 100%
+                .del-pop-box 
+                    position: absolute
+                    top: 50%
+                    left: 0
+                    margin-top: -30px
+                    width: 100%
+                    .txt
+                        height: 25px;
+                        line-height: 25px;
+                        color: #fff;
+                        margin-bottom: 7px;
+                        text-align: center
+                    .btns
+                        text-align: center
+                    .btn-ok
+                        border-color: #ff4200;
+                        background-color: #ff4200;
+                        color: #fff
+                    .btn-close
+                        display: inline-block;
+                        background-color: #fff;
+                        cursor: pointer;
+                        margin-left: 3px;
+                        margin-right: 3px;
+            .ant-card-cover
+                width: 148px
+                height: 148px
+            .ant-card-body
+                height: 46px
+                padding: 4px 24px
+            img
+                height: 148px
+        .collect-card:hover
+            .go-shop-btn
+                margin-top: -25px
+                position: absolute
+                background-color: #000
+                opacity: .5
+                width: 100%
+                padding: 2px
+                text-align: center
+                span
+                    display: block
+                    color: white
+            .delete-btn
+                cursor: pointer
+                padding: 4px
+                background-color: #000
+                opacity: .5
+                top: 0
+                right: 0
+                position: absolute
+                i
+                    display: block
+                    color: white
+                    font-size: 20px
+        .card-text
+            .ant-card-meta-detail
+                padding: 4px 20px
+            .ant-card-meta-detail > div:not(:last-child)
+                margin: auto
+            .ant-card-meta-description
+                text-align: center
+                color: #f40
+        .ant-card-body
+            height: 80px
+    .collect-header
+        display: flex
+        .collect-header-product
+            min-width: 100px
+            text-align: center
+            background: #18202d
+            opacity: .5
+            cursor: pointer
+            color: white
+        .collect-header-product-no
+            min-width: 100px
+            text-align: center
+            cursor: pointer
+            color: white
+        .collect-header-shop
+            min-width: 100px
+            text-align: center
+            background: #18202d
+            opacity: .5
+            cursor: pointer
+            color: white
+        .collect-header-shop-no
+            min-width: 100px
+            text-align: center
+            cursor: pointer
+            color: white
+
+    .ant-layout-header
+        height: 100%
+    .global-search-wrapper 
+        text-align: right
+    
